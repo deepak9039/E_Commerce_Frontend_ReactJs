@@ -1,3 +1,4 @@
+import { common } from '@mui/material/colors';
 import axios from 'axios';
 import { useEffect } from 'react';
 
@@ -187,6 +188,28 @@ export const logoutUser = async () => {
   }
 }
 
+// Get User by ID
+export const getUserById = async (userId) => {
+  try {
+    const res = await axios.post('/api/getUser', { userId : userId });
+    return res.data;
+  } catch (err) {
+    console.error('API call error getUserById:', err)
+    throw err
+  }
+}
+
+//Get User Addresses
+export const userAddress = async (userId) => {
+  try {
+    const res = await axios.post('/api/userAddress', { userId : userId });
+    return res.data;
+  } catch (err) {
+    console.error('API call error userAddress:', err)
+    throw err
+  }
+}
+
 //Get all users
 export const getAllUsers = async () => {
   try {
@@ -261,7 +284,27 @@ export const findOrdersByUserId = async (userId) => {
   }
 }
 
+// Admin Order Endpoints
+export const getAllOrders = async () => {
+  try {
+    const res = await axios.post('/api/admin/getAllOrders');
+    return res.data;
+  } catch (err) {
+    console.error('API call error getAllOrders:', err)
+    throw err
+  }
+}
 
+
+export const updateOrderStatus = async (payload) => {
+  try {
+    const res = await axios.post('/api/admin/updateOrderStatus', payload);
+    return res.data;
+  } catch (err) {
+    console.error('API call error updateOrderStatus:', err)
+    throw err
+  }
+}
 
 const apiService = () => {
     useEffect(() => {

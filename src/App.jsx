@@ -18,9 +18,12 @@ import AdminRoute from "./components/Admin/AdminRoute";
 import CartPage from "./components/Cart/CartPage";
 import Order from "./components/OrderPage/Order";
 import UserOrders from "./components/OrderPage/UserOrders";
+import AdminOrders from "./components/Admin/AdminOrders";
 
 import { loginUser } from "./services/apiService";
 import { CartProvider } from "./components/Context/CartContext";
+import UserProfile from "./components/UserDetails/UserProfile";
+import UserAddress from "./components/UserDetails/UserAddress";
 
 const theme = createTheme({
   palette: {
@@ -74,11 +77,13 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails user={user} />} />
             <Route path="/edit-product/:id" element={<AddProduct />} />
             <Route path="/register" element={<UserPage />} />
+            <Route path="/profile" element={<UserProfile user={user} />} />
+            <Route path="/user/address" element={<UserAddress user={user} />} />
             <Route path="/users" element={<UsersTable />} />
             <Route path="/signin" element={<LoginPage handleLogin={handleLogin} />} />
             <Route path="/order" element={<Order user={user} />} />
             <Route path="/user-orders" element={<UserOrders user={user} />} />
-
+            <Route path="/admin-orders" element={<AdminOrders user={user} />} />
           </Routes>
         </Router>
       </CartProvider>

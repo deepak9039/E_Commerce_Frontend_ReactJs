@@ -25,7 +25,7 @@ const AdminDashboard = () => {
         { title: "Add Category", icon: <CategoryIcon sx={{ fontSize: 40 }} />, path: "/add-category" },
         { title: "Add Product", icon: <InventoryIcon sx={{ fontSize: 40 }} />, path: "/add-product" },
         { title: "View Products", icon: <ListAltIcon sx={{ fontSize: 40 }} />, path: "/view-products" },
-        { title: "Orders", icon: <ShoppingCartIcon sx={{ fontSize: 40 }} />, path: "/orders" },
+        { title: "Orders", icon: <ShoppingCartIcon sx={{ fontSize: 40 }} />, path: "/admin-orders" },
         { title: "Users", icon: <PeopleIcon sx={{ fontSize: 40 }} />, path: "/users" },
         { title: "Reports", icon: <BarChartIcon sx={{ fontSize: 40 }} />, path: "/reports" },
         { title: "Settings", icon: <SettingsIcon sx={{ fontSize: 40 }} />, path: "/settings" }
