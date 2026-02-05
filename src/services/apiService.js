@@ -199,6 +199,28 @@ export const getUserById = async (userId) => {
   }
 }
 
+// Update User Profile
+export const updateUserProfile = async (payload) => {
+  try {
+    const res = await axios.post('/api/updateUser', payload);
+    return res.data;
+  } catch (err) {
+    console.error('API call error updateUserProfile:', err)
+    throw err
+  }
+}
+
+// Update User Address
+export const updateUserAddress = async (payload) => {
+  try {
+    const res = await axios.post('/api/updateUserAddress', payload);
+    return res.data;
+  } catch (err) {
+    console.error('API call error updateUserAddress:', err)
+    throw err
+  } 
+}
+
 //Get User Addresses
 export const userAddress = async (userId) => {
   try {
@@ -274,9 +296,9 @@ export const saveOrder = async (payload) => {
   }
 }
 
-export const findOrdersByUserId = async (userId) => {
+export const findOrdersByUserId = async (userId, page = 0, pageSize = 10) => {
   try {
-    const res = await axios.post('/api/getOrdersByUserId', { userId : userId });
+    const res = await axios.post('/api/getOrdersByUserId', { userId : userId, page: page, pageSize: pageSize });
     return res.data;
   } catch (err) {
     console.error('API call error findOrdersByUserId:', err)
@@ -305,6 +327,47 @@ export const updateOrderStatus = async (payload) => {
     throw err
   }
 }
+
+export const ordersCount = async () => {
+  try {
+    const res = await axios.post('/api/ordersCount');
+    return res.data;
+  } catch (err) {
+    console.error('API call error ordersCount:', err)
+    throw err
+  }
+}
+
+export const productsCount = async () => {
+  try {
+    const res = await axios.post('/api/productsCount');
+    return res.data;
+  } catch (err) {
+    console.error('API call error productsCount:', err)
+    throw err
+  }
+}
+
+export const usersCount = async () => {
+  try {
+    const res = await axios.post('/api/usersCount');
+    return res.data;
+  } catch (err) {
+    console.error('API call error usersCount:', err)
+    throw err
+  }
+} 
+
+export const categorySales = async () => {
+  try {
+    const res = await axios.post('/api/categorySales');
+    console.log("categorySales response:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error('API call error categorySales:', err)
+    throw err
+  }
+}   
 
 const apiService = () => {
     useEffect(() => {

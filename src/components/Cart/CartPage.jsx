@@ -74,16 +74,22 @@ const CartPage = ({ user }) => {
 
     return (
         <Container maxWidth="lg" sx={{ mt: 2, pb: 4 }}>
-
-            <Typography variant="h5" sx={{ my: 4, fontWeight: 'bold' }}>
-                Shopping Cart
-            </Typography>
             <Grid container spacing={2}>
                 {/* LEFT COLUMN (8) */}
                 <Grid size={8}>
                     {cartItems.length === 0 ? (
-                        <Typography>Your cart is empty.</Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 4 }}>
+                            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Missing Cart items?</Typography>
+                            <Typography variant="body1" sx={{ mb: 3 }}>Login to see the items you added previously</Typography>
+                            <Button variant="contained" color="primary" onClick={() => navigate('/signin')}>
+                                Login
+                            </Button>
+                        </Box>
                     ) : (
+                        <>
+                        <Typography variant="h5" sx={{ my: 4, fontWeight: 'bold' }}>
+                            Shopping Cart
+                        </Typography>
                         <Grid container spacing={2}>
                             {cartItems?.map((item, index) => (
                                 <Grid size={12} key={index}>
@@ -158,31 +164,34 @@ const CartPage = ({ user }) => {
                                 </Grid>
                             ))}
                         </Grid>
+                        </>
                     )}
                 </Grid>
 
 
 
                 {/* RIGHT COLUMN (4) */}
-                <Grid size={4}>
-                    <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
-                        <Typography variant="h6">Cart Summary</Typography>
-                        <Divider sx={{ my: 1 }} />
-                        <Typography>Total Items: {cartItems.length}</Typography>
-                        <Typography sx={{ mt: 1, fontWeight: 'bold' }}>
-                            Total Order Price: ₹ {totalOrderPrice}
-                        </Typography>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            sx={{ mt: 2 }}
-                            disabled={cartItems.length === 0}
-                            onClick={() => navigate('/order', { state: { totalAmount: totalOrderPrice, cartItems: cartItems } })}
-                        >
-                            Checkout
-                        </Button>
-                    </Box>
-                </Grid>
+                {cartItems.length > 0 && (
+                    <Grid size={4}>
+                        <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
+                            <Typography variant="h6">Cart Summary</Typography>
+                            <Divider sx={{ my: 1 }} />
+                            <Typography>Total Items: {cartItems.length}</Typography>
+                            <Typography sx={{ mt: 1, fontWeight: 'bold' }}>
+                                Total Order Price: ₹ {totalOrderPrice}
+                            </Typography>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                sx={{ mt: 2 }}
+                                disabled={cartItems.length === 0}
+                                onClick={() => navigate('/order', { state: { totalAmount: totalOrderPrice, cartItems: cartItems } })}
+                            >
+                                Checkout
+                            </Button>
+                        </Box>
+                    </Grid>
+                )}
             </Grid>
         </Container>
     );

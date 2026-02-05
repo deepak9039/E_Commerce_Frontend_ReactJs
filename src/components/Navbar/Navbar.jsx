@@ -17,6 +17,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 
 import { logoutUser } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
+import SearchBar from "../Search/SearchBar";
 
 /* ================= STYLED CART BADGE ================= */
 const CartBadge = styled(Badge)(({ theme }) => ({
@@ -75,14 +76,31 @@ const Navbar = ({ user, setUser }) => {
 
         <Box sx={{ flexGrow: 1 }} />
 
+        {/* SEARCH BAR - CENTERED */}
+        <Box sx={{ display: "flex", justifyContent: "center", flex: 1 }}>
+          <SearchBar />
+        </Box>
+
+        <Box sx={{ flexGrow: 1 }} />
+
         {/* ================= AUTH ================= */}
         {!user ? (
           <>
-            <Button component={RouterLink} to="/register" color="inherit">
+            {/* <Button component={RouterLink} to="/register" color="inherit">
               Register
-            </Button>
+            </Button> */}
             <Button component={RouterLink} to="/signin" color="inherit">
               Login
+            </Button>
+            {/* CART */}
+            <Button component={RouterLink} to="/cart">
+              <IconButton>
+                <Button sx={{color: "white"}}>
+                  Cart
+                </Button>
+                <ShoppingCartIcon sx={{ color: "white" }} />
+                <CartBadge badgeContent={cartCount || 0} />
+              </IconButton>
             </Button>
           </>
         ) : (
@@ -98,17 +116,18 @@ const Navbar = ({ user, setUser }) => {
             {/* USER */}
             {user.role === "ROLE_USER" && (
               <>
-                {/* CART */}
-                <Button component={RouterLink} to="/cart" color="inherit">
-                  <IconButton>
-                    <ShoppingCartIcon sx={{ color: "white" }} />
-                    <CartBadge badgeContent={cartCount || 0} />
-                  </IconButton>
-                </Button>
-
                 {/* ORDERS */}
                 <Button component={RouterLink} to="/user-orders" color="inherit">
                   Orders
+                </Button>
+                <Button component={RouterLink} to="/cart" color="inherit">
+                  <IconButton>
+                    <Button sx={{color: "white"}}>
+                      Cart
+                    </Button>
+                    <ShoppingCartIcon sx={{ color: "white" }} />
+                    <CartBadge badgeContent={cartCount || 0} />
+                  </IconButton>
                 </Button>
               </>
             )}

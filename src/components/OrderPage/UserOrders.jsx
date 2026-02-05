@@ -8,11 +8,15 @@ import {
   Box,
   Divider,
   Chip,
+  Pagination,
 } from "@mui/material";
 import { findOrdersByUserId } from "../../services/apiService";
 
 const UserOrders = ({ user }) => {
   const [orders, setOrders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   console.log("UserOrders Component - User:", user);
 
@@ -22,15 +26,21 @@ const UserOrders = ({ user }) => {
 
     const fetchOrders = async () => {
       try {
-        const res = await findOrdersByUserId(user?.userId);
-        setOrders(res || []);
+        const res = await findOrdersByUserId(user?.userId, currentPage, 10);
+        setOrders(res?.orders || []);
+        setTotalPages(res?.totalPages || 0);
+        setTotalElements(res?.totalElements || 0);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     };
 
     fetchOrders();
-  }, [user?.userId]);
+  }, [user?.userId, currentPage]);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -165,6 +175,28 @@ const UserOrders = ({ user }) => {
           </Grid>
         ))}
       </Grid>
+
+      {/* ================= PAGINATION ================= */}
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4, mb: 2 }}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+          />
+        </Box>
+      )}
+
+      {/* ================= PAGINATION INFO ================= */}
+      {totalElements > 0 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <Typography variant="body2" color="text.secondary">
+            Showing page {currentPage} of {totalPages} | Total Orders: {totalElements}
+          </Typography>
+        </Box>
+      )}
     </Container>
   );
 };

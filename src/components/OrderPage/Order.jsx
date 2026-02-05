@@ -48,7 +48,13 @@ const Order = ({ user }) => {
   // Calculate order summary
   const subtotal = totalAmount;
   const tax = subtotal * 0.05; // 5% tax
-  const delivery = 50; // Fixed delivery charge
+  let delivery = 0;
+  if(totalAmount < 1000){
+    delivery = 50; // Fixed delivery charge
+  }
+  else{
+    delivery = 0; // Fixed delivery charge
+  }
   const total = subtotal + tax + delivery;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 

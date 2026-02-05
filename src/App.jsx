@@ -24,6 +24,8 @@ import { loginUser } from "./services/apiService";
 import { CartProvider } from "./components/Context/CartContext";
 import UserProfile from "./components/UserDetails/UserProfile";
 import UserAddress from "./components/UserDetails/UserAddress";
+import AdminLayout from "./components/Admin/AdminLayout";
+import { logoutUser } from "./services/apiService";
 
 const theme = createTheme({
   palette: {
@@ -35,6 +37,8 @@ const theme = createTheme({
 
 function App() {
   const [user, setUser] = useState(null);
+
+  console.log("Current User in App.jsx:", user); 
 
   const handleLogin = async (email, password) => {
     try {
@@ -50,12 +54,23 @@ function App() {
     }
   };
 
+  const signOut = async () => {
+      localStorage.removeItem("user");
+      setUser(null);
+      await logoutUser();
+      navigate("/signin");
+    };
+  
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <CartProvider>
         <Router>
           <Navbar user={user} setUser={setUser} />
+          {/* {!user || user.role !== "ROLE_ADMIN" && (
+            <Navbar user={user} setUser={setUser} />
+          )} */}
           <Toolbar />
 
           <Routes>
@@ -65,7 +80,8 @@ function App() {
               path="/admin"
               element={
                 <AdminRoute user={user}>
-                  <AdminDashboard />
+                  {/* <AdminDashboard /> */}
+                  <AdminLayout user={user} signOut={signOut} />
                 </AdminRoute>
               }
             />

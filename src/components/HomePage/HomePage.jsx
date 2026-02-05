@@ -83,7 +83,7 @@ const HomePage = () => {
             borderRadius: 2,
             backgroundColor: 'background.paper',
             boxShadow: 3,
-            m: 2,
+            m: 0,
             display: 'flex',
             alignItems: 'center',
             px: 2,

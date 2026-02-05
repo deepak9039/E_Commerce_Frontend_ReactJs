@@ -112,11 +112,21 @@ const UserPage = () => {
 
         {/* USER INFORMATION */}
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               label="Username"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
+              fullWidth
+              required
+            />
+          </Grid> */}
+          <Grid item xs={12}>
+            <TextField
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               fullWidth
               required
             />
@@ -133,38 +143,29 @@ const UserPage = () => {
             />
           </Grid>
 
-          <Grid item xs={12}>
-            <TextField
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              required
-            />
-          </Grid>
 
-          <Grid item xs={12} sm={6}>
+
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               label="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               fullWidth
             />
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={12} sm={6}>
+          {/* <Grid item xs={12} sm={6}>
             <TextField
               label="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               fullWidth
             />
-          </Grid>
+          </Grid> */}
         </Grid>
 
         {/* ADDRESS SECTION */}
-        <Box>
+        {/* <Box>
           <Typography variant="h6" sx={{ mt: 2 }}>
             Addresses
           </Typography>
@@ -241,7 +242,7 @@ const UserPage = () => {
           <Button variant="contained" sx={{ mt: 1 }} onClick={addAddress}>
             Add Address
           </Button>
-        </Box>
+        </Box> */}
 
         {/* SUBMIT */}
         <Button type="submit" variant="contained" color="success" sx={{ mt: 3 }}>

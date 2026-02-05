@@ -10,7 +10,7 @@ import {
   Box,
   Divider,
 } from "@mui/material";
-import { userAddress } from "../../services/apiService";
+import { userAddress, updateUserAddress } from "../../services/apiService";
 
 /*
 EXPECTED API RESPONSE:
@@ -54,7 +54,22 @@ const UserAddress = ({ user }) => {
 
   const handleUpdateAddress = async () => {
     try {
-      await updateUserAddress(selectedAddress.addressId, selectedAddress);
+
+        
+        const payload = {
+          addressId: selectedAddress.addressId,
+          addressLine: selectedAddress.addressLine,
+          address: selectedAddress.address,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          country: selectedAddress.country,
+          pinCode: selectedAddress.pinCode,
+          phoneNumber: selectedAddress.phoneNumber,
+          userId: user.userId
+        };
+        console.log("Payload for address update:", payload);
+
+      await updateUserAddress(payload);
       alert("Address updated successfully!");
 
       // Update local list

@@ -85,6 +85,8 @@ const LoginPage = ({ handleLogin }) => {
               onChange={(e) => setPassword(e.target.value)}
             />
 
+            <spam>Don't have an account? <a href="/register">Register</a></spam>
+
             <Button
               variant="contained"
               size="large"

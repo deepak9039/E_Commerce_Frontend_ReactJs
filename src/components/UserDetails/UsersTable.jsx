@@ -70,7 +70,7 @@ const UsersTable = () => {
     {
       field: "addresses",
       headerName: "Addresses",
-      width: 350,
+      width: 200,
       renderCell: (params) => (
         <Box>
           {params.value?.map((a, i) => (

@@ -11,7 +11,7 @@ import {
   Alert
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
-import { getUserById } from "../../services/apiService";
+import { getUserById, updateUserProfile } from "../../services/apiService";
 
 
 const UserProfile = ({ user }) => {
@@ -117,7 +117,6 @@ const UserProfile = ({ user }) => {
               label="Username"
               value={userName}
               fullWidth
-              disabled
             />
           </Grid>
 
@@ -136,6 +135,7 @@ const UserProfile = ({ user }) => {
               label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled
               fullWidth
               required
             />
