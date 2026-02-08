@@ -62,11 +62,17 @@ const Navbar = ({ user, setUser }) => {
 
   /* ================= UI ================= */
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed"
+    sx={{
+      backgroundColor: "#0f172a",
+      color: "#e5e7eb",
+      boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+    }}
+    >
       <Toolbar>
         {/* LOGO */}
-        <Typography variant="h6" sx={{ mr: 3 }}>
-          E-Commerce
+        <Typography variant="h6" sx={{ mr: 3 }} fontWeight="bold" gutterBottom>
+          YourStore
         </Typography>
 
         {/* HOME */}
@@ -117,9 +123,9 @@ const Navbar = ({ user, setUser }) => {
             {user.role === "ROLE_USER" && (
               <>
                 {/* ORDERS */}
-                <Button component={RouterLink} to="/user-orders" color="inherit">
+                {/* <Button component={RouterLink} to="/user-orders" color="inherit">
                   Orders
-                </Button>
+                </Button> */}
                 <Button component={RouterLink} to="/cart" color="inherit">
                   <IconButton>
                     <Button sx={{color: "white"}}>
@@ -190,6 +196,14 @@ const Navbar = ({ user, setUser }) => {
                 }}
               >
                 Address
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  navigate("/user-orders");
+                }}
+              >
+                Orders
               </MenuItem>
             </Menu>
           </Box>

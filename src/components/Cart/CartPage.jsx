@@ -87,20 +87,23 @@ const CartPage = ({ user }) => {
                         </Box>
                     ) : (
                         <>
-                        <Typography variant="h5" sx={{ my: 4, fontWeight: 'bold' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                             Shopping Cart
                         </Typography>
-                        <Grid container spacing={2}>
+                        <Grid container sx={{my:2}} spacing={2}>
                             {cartItems?.map((item, index) => (
                                 <Grid size={12} key={index}>
                                     <Card sx={{ display: 'flex', gap: 2 }}>
-                                        <CardMedia
-                                            component="img"
-                                            sx={{ width: 140 }}
-                                            image={`http://localhost:1234/image/product/${item?.product?.productImageUrl}`}
-                                            alt={item.productName}
-                                        />
-                                        <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                        <Grid size={3}>
+                                            <CardMedia
+                                                component="img"
+                                                sx={{ width: "100%", objectFit: 'contain', borderRadius: 1 }}
+                                                height={100}
+                                                image={`http://localhost:1234/image/product/${item?.product?.productImageUrl}`}
+                                                alt={item.productName}
+                                            />
+                                        </Grid>
+                                        <Grid size={9} sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
                                             <CardContent sx={{ flex: '1 0 auto' }}>
                                                 <Typography variant="h6">{item.productName}</Typography>
                                                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
@@ -159,7 +162,7 @@ const CartPage = ({ user }) => {
                                                     Remove
                                                 </Button>
                                             </CardActions>
-                                        </Box>
+                                        </Grid>
                                     </Card>
                                 </Grid>
                             ))}
@@ -172,7 +175,7 @@ const CartPage = ({ user }) => {
 
                 {/* RIGHT COLUMN (4) */}
                 {cartItems.length > 0 && (
-                    <Grid size={4}>
+                    <Grid size={4} sx={{mt:6}}>
                         <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
                             <Typography variant="h6">Cart Summary</Typography>
                             <Divider sx={{ my: 1 }} />

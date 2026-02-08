@@ -56,7 +56,7 @@ const UserOrders = ({ user }) => {
 
       <Grid container spacing={2}>
         {orders.map((order) => (
-          <Grid item xs={12} key={order.id}>
+          <Grid size={12} key={order.id}>
             <Card>
               <CardContent>
                 {/* ================= HEADER ================= */}
@@ -94,48 +94,48 @@ const UserOrders = ({ user }) => {
 
                 {/* ================= PRODUCT DETAILS ================= */}
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={3}>
+                  <Grid size={3}>
                     <Box
                       component="img"
                       src={`http://localhost:1234/image/product/${order.product.productImageUrl}`}
                       alt={order.product.productName}
                       sx={{
                         width: "100%",
-                        height: 150,
+                        height: 100,
                         objectFit: "contain",
                         borderRadius: 1,
                       }}
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid size={4}>
                     <Typography variant="h6">
                       {order.product.productName}
                     </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="text.secondary">
                       Category: {order.product.categoryName}
-                    </Typography>
+                    </Typography> */}
 
-                    <Typography variant="body2" sx={{ mt: 1 }}>
+                    {/* <Typography variant="body2" sx={{ mt: 1 }}>
                       {order.product.productDescription}
-                    </Typography>
+                    </Typography> */}
 
-                    <Typography sx={{ mt: 1 }}>
+                    {/* <Typography sx={{ mt: 1 }}>
                       Quantity: <b>{order.quantity}</b>
-                    </Typography>
+                    </Typography> */}
 
                     <Typography>
                       Price: ₹{order.price}
                     </Typography>
 
-                    <Typography fontWeight="bold">
+                    {/* <Typography fontWeight="bold">
                       Total: ₹{order.price * order.quantity}
-                    </Typography>
+                    </Typography> */}
                   </Grid>
 
                   {/* ================= ADDRESS ================= */}
-                  <Grid item xs={12} md={3}>
+                  {/* <Grid size={4}>
                     <Typography fontWeight="bold">
                       Delivery Address
                     </Typography>
@@ -156,7 +156,7 @@ const UserOrders = ({ user }) => {
                     <Typography variant="body2">
                       📞 {order.orderAddress.phoneNumber}
                     </Typography>
-                  </Grid>
+                  </Grid> */}
                 </Grid>
 
                 <Divider sx={{ my: 2 }} />

@@ -5,6 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { Toolbar } from "@mui/material";
 
 import Navbar from "./components/Navbar/Navbar";
+import Footer from "./components/Footer/Footer";
 import HomePage from "./components/HomePage/HomePage";
 import AddCategory from "./components/Category/AddCategory";
 import AddProduct from "./components/Product/AddProduct";
@@ -101,6 +102,7 @@ function App() {
             <Route path="/user-orders" element={<UserOrders user={user} />} />
             <Route path="/admin-orders" element={<AdminOrders user={user} />} />
           </Routes>
+          <Footer />
         </Router>
       </CartProvider>
     </ThemeProvider>

@@ -8,8 +8,9 @@ import {
   Button,
   Stack,
   Alert,
+  Avatar,
 } from "@mui/material";
-import { loginUser } from "../../services/apiService";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = ({ handleLogin }) => {
@@ -21,7 +22,6 @@ const LoginPage = ({ handleLogin }) => {
   const navigate = useNavigate();
 
   const handleLoginClick = async () => {
-    
     if (!email || !password) {
       setError("email and Password are required");
       return;
@@ -29,9 +29,7 @@ const LoginPage = ({ handleLogin }) => {
 
     const result = await handleLogin(email, password);
 
-
     if (result?.data?.status === "FAILED") {
-      console.log("Login failed result:", result);
       setError(result?.data?.message || "Login failed. Please try again.");
       return;
     }
@@ -39,38 +37,58 @@ const LoginPage = ({ handleLogin }) => {
     setError("");
     setSuccess("");
 
-
     const loggedUser = result;
-    console.log("Logged in user ======:", loggedUser, "+++++++",result.data);
-
 
     if (loggedUser?.role === "ROLE_ADMIN") {
       navigate("/admin");
     } else if (loggedUser?.role === "ROLE_USER") {
       navigate("/");
     }
-
   };
 
   return (
     <Box
+      minHeight="70vh"
       display="flex"
       justifyContent="center"
-      sx={{ mt: 5 }}
+      alignItems="center"
+      sx={{ backgroundColor: "#f4f6f8" }}
     >
-      <Card sx={{ width: 380, borderRadius: 4, boxShadow: 4 }}>
-        <CardContent>
-          <Typography variant="h5" textAlign="center" fontWeight="bold" mb={3}>
-            User Login
-          </Typography>
+      <Card sx={{ width: 420, borderRadius: 4, boxShadow: 4 }}>
+        <CardContent sx={{ p: 4 }}>
+          {/* ===== HEADER (STYLE ONLY) ===== */}
+          <Box textAlign="center" mb={3}>
+            <Avatar
+              sx={{
+                width: 64,
+                height: 64,
+                bgcolor: "primary.main",
+                mx: "auto",
+                mb: 1,
+              }}
+            >
+              <LockOutlinedIcon fontSize="large" />
+            </Avatar>
 
-          <Stack spacing={2}>
+            <Typography
+              variant="h5"
+              fontWeight="bold"
+              color="primary.main"
+            >
+              Welcome Back
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              Login to your account
+            </Typography>
+          </Box>
+
+          <Stack spacing={2.5}>
             {error && <Alert severity="error">{error}</Alert>}
             {success && <Alert severity="success">{success}</Alert>}
 
             <TextField
-              label="email"
-              variant="outlined"
+              label="Email"
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -78,26 +96,40 @@ const LoginPage = ({ handleLogin }) => {
 
             <TextField
               label="Password"
-              variant="outlined"
               type="password"
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <spam>Don't have an account? <a href="/register">Register</a></spam>
-
             <Button
               variant="contained"
               size="large"
               onClick={handleLoginClick}
               sx={{
-                backgroundColor: "#1976d2",
-                "&:hover": { backgroundColor: "#115293" },
+                py: 1.3,
+                fontWeight: "bold",
+                textTransform: "none",
+                borderRadius: 3,
               }}
             >
               Login
             </Button>
+
+            <Typography variant="body2" textAlign="center">
+              Don’t have an account?{" "}
+              <Typography
+                component="a"
+                href="/register"
+                sx={{
+                  color: "primary.main",
+                  fontWeight: "bold",
+                  textDecoration: "none",
+                }}
+              >
+                Register
+              </Typography>
+            </Typography>
           </Stack>
         </CardContent>
       </Card>

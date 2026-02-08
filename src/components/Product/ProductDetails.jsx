@@ -80,7 +80,9 @@ const ProductDetails = ({ user }) => {
         {/* 🔵 LEFT SIDE IMAGE */}
         <Grid size={6}>
           <CardMedia
-            sx={{ height: 600, borderRadius: "10px" }}
+            component="img"
+            sx={{ width: "100%", height: "100%", objectFit: 'contain', borderRadius: 1 }}
+            alt={product.productName}
             image={`http://localhost:1234/image/product/${product.productImageUrl}`}
             title={product.productName}
           />

@@ -145,9 +145,10 @@ export const getProduct = async (productId) => {
 }
 
 //Get all products
-export const findAllProduct = async () => {
+export const findAllProduct = async (payload) => {
   try {
-    const res = await axios.get('/api/findAllProducts')
+    const res = await axios.post('/api/findAllProducts', payload)
+    console.log("findAllProduct response:", res.data);
     return res.data
   } catch (err) {
     console.error('API call error getAllProducts:', err)
