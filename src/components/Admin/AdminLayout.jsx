@@ -55,6 +55,17 @@ TabPanel.propTypes = {
 /* ---------------- MAIN LAYOUT ---------------- */
 export default function AdminLayout({ user, signOut }) {
   const [value, setValue] = React.useState(0);
+  const [editProductId, setEditProductId] = React.useState(null);
+
+  const handleEditProduct = (productId) => {
+    setEditProductId(productId);
+    setValue(3); // Switch to "Add Product" tab (index 3)
+  };
+
+  const handleProductSaved = () => {
+    setEditProductId(null);
+    setValue(2); // Switch back to "Products" tab (index 2)
+  };
 
   return (
     <Box
@@ -109,8 +120,8 @@ export default function AdminLayout({ user, signOut }) {
       <Box
         sx={{
           width: drawerWidth,
-          position: "fixed",
-          top: topBarHeight,
+          // position: "fixed",
+          // top: topBarHeight,
           bottom: 0,
           bgcolor: "#fff",
           borderRight: "1px solid #e0e0e0",
@@ -119,7 +130,13 @@ export default function AdminLayout({ user, signOut }) {
         <Tabs
           orientation="vertical"
           value={value}
-          onChange={(e, v) => setValue(v)}
+          onChange={(e, v) => {
+            setValue(v);
+            // Clear edit mode when clicking "Add Product" tab
+            if (v === 3) {
+              setEditProductId(null);
+            }
+          }}
           sx={{
             height: "100%",
             "& .MuiTab-root": {
@@ -128,7 +145,7 @@ export default function AdminLayout({ user, signOut }) {
               gap: 1.5,
               textAlign: "left",
               minHeight: 56,
-              px: 3,
+              // px: 3,
               fontWeight: 600,
               textTransform: "none",
             },
@@ -154,7 +171,7 @@ export default function AdminLayout({ user, signOut }) {
       {/* ================= RIGHT CONTENT ================= */}
       <Box
         sx={{
-          marginLeft: `${drawerWidth}px`,
+          // marginLeft: `${drawerWidth}px`,
         //   marginTop: `${topBarHeight}px`,
           height: `calc(100vh - ${topBarHeight}px)`,
           overflowY: "auto",
@@ -169,10 +186,10 @@ export default function AdminLayout({ user, signOut }) {
           <AddCategory />
         </TabPanel>
         <TabPanel value={value} index={2}>
-          <ViewProduct />
+          <ViewProduct onEditProduct={handleEditProduct} />
         </TabPanel>
         <TabPanel value={value} index={3}>
-          <AddProduct />
+          <AddProduct editProductId={editProductId} onProductSaved={handleProductSaved} />
         </TabPanel>
         <TabPanel value={value} index={4}>
           <AdminOrders />

@@ -11,9 +11,17 @@ import {
   MenuItem,
   Avatar,
   Badge,
+  Container,
+  Divider,
+  ListItemIcon,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import LogoutIcon from "@mui/icons-material/Logout";
 
 import { logoutUser } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
@@ -25,8 +33,8 @@ const CartBadge = styled(Badge)(({ theme }) => ({
     backgroundColor: theme.palette.error.main,
     color: "#fff",
     fontSize: "0.7rem",
-    top: -18,
-    right: 0,
+    top: -8,
+    right: -6,
   },
 }));
 
@@ -62,153 +70,204 @@ const Navbar = ({ user, setUser }) => {
 
   /* ================= UI ================= */
   return (
-    <AppBar position="fixed"
-    sx={{
-      backgroundColor: "#0f172a",
-      color: "#e5e7eb",
-      boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-    }}
+    <AppBar
+      position="fixed"
+      sx={{
+        backgroundColor: "#0f172a",
+        color: "#e5e7eb",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+      }}
     >
-      <Toolbar>
-        {/* LOGO */}
-        <Typography variant="h6" sx={{ mr: 3 }} fontWeight="bold" gutterBottom>
-          YourStore
-        </Typography>
+      <Container maxWidth="lg">
+        <Toolbar sx={{ minHeight: 72 }}>
 
-        {/* HOME */}
-        <Button component={RouterLink} to="/" color="inherit">
-          Home
-        </Button>
+          <Typography
+            variant="h6"
+            component={RouterLink}
+            to="/"
+            sx={{
+              ml: 2,
+              color: "#e5e7eb",
+              textDecoration: "none",
+              textTransform: "none",
+              fontWeight: 500,
+              outline: "none",
+              border: "none",
 
-        <Box sx={{ flexGrow: 1 }} />
+              "&:focus": {
+                outline: "none",
+              },
+              "&:active": {
+                outline: "none",
+              },
+              "&:focus-visible": {
+                outline: "none",
+              },
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,0.08)",
+              },
+            }}
+          >
+            YourStore
+          </Typography>
 
-        {/* SEARCH BAR - CENTERED */}
-        <Box sx={{ display: "flex", justifyContent: "center", flex: 1 }}>
-          <SearchBar />
-        </Box>
 
-        <Box sx={{ flexGrow: 1 }} />
+          {/* HOME */}
+          {/* <Button
+            component={RouterLink}
+            to="/"
+            sx={{
+              ml: 2,
+              color: "#e5e7eb",
+              textTransform: "none",
+              fontWeight: 500,
+              "&:hover": {
+                backgroundColor: "rgba(255,255,255,0.08)",
+              },
+            }}
+          >
+            Home
+          </Button> */}
 
-        {/* ================= AUTH ================= */}
-        {!user ? (
-          <>
-            {/* <Button component={RouterLink} to="/register" color="inherit">
-              Register
-            </Button> */}
-            <Button component={RouterLink} to="/signin" color="inherit">
-              Login
-            </Button>
-            {/* CART */}
-            <Button component={RouterLink} to="/cart">
-              <IconButton>
-                <Button sx={{color: "white"}}>
-                  Cart
-                </Button>
-                <ShoppingCartIcon sx={{ color: "white" }} />
-                <CartBadge badgeContent={cartCount || 0} />
-              </IconButton>
-            </Button>
-          </>
-        ) : (
-          <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            
-            {/* ADMIN */}
-            {user.role === "ROLE_ADMIN" && (
-              <Button component={RouterLink} to="/admin" color="inherit">
-                Dashboard
-              </Button>
-            )}
+          <Box sx={{ flexGrow: 1 }} />
 
-            {/* USER */}
-            {user.role === "ROLE_USER" && (
-              <>
-                {/* ORDERS */}
-                {/* <Button component={RouterLink} to="/user-orders" color="inherit">
-                  Orders
-                </Button> */}
-                <Button component={RouterLink} to="/cart" color="inherit">
-                  <IconButton>
-                    <Button sx={{color: "white"}}>
-                      Cart
-                    </Button>
-                    <ShoppingCartIcon sx={{ color: "white" }} />
-                    <CartBadge badgeContent={cartCount || 0} />
-                  </IconButton>
-                </Button>
-              </>
-            )}
-
-            {/* USER AVATAR + NAME (HOVER MENU) */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                cursor: "pointer",
-                color: "white",
-              }}
-              onMouseEnter={handleMenuOpen}
-            >
-              <Typography sx={{ fontWeight: "bold" }}>
-                {user.email || "User"}
-              </Typography>
-
-              <Avatar sx={{ bgcolor: "white", color: "#1976d2" }}>
-                {user?.userName?.charAt(0)?.toUpperCase()}
-              </Avatar>
-            </Box>
-
-            {/* LOGOUT BUTTON (OUTSIDE MENU) */}
-            <Button color="inherit" onClick={signOut}>
-              Logout
-            </Button>
-
-            {/* DROPDOWN MENU */}
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={handleMenuClose}
-              MenuListProps={{
-                onMouseLeave: handleMenuClose,
-              }}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-            >
-              <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                  navigate("/profile");
-                }}
-              >
-                Profile
-              </MenuItem>
-
-              <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                  navigate("/user/address");
-                }}
-              >
-                Address
-              </MenuItem>
-              <MenuItem
-                onClick={() => {
-                  handleMenuClose();
-                  navigate("/user-orders");
-                }}
-              >
-                Orders
-              </MenuItem>
-            </Menu>
+          {/* SEARCH */}
+          <Box sx={{ flex: 1, maxWidth: 420 }}>
+            <SearchBar />
           </Box>
-        )}
-      </Toolbar>
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {/* ================= AUTH ================= */}
+          {!user ? (
+            <>
+              <Button
+                component={RouterLink}
+                to="/signin"
+                sx={{
+                  color: "#e5e7eb",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                  },
+                }}
+              >
+                Login
+              </Button>
+
+              {/* CART */}
+              <IconButton component={RouterLink} to="/cart" sx={{ ml: 1 }}>
+                <CartBadge badgeContent={cartCount || 0}>
+                  <ShoppingCartIcon sx={{ color: "white" }} />
+                </CartBadge>
+              </IconButton>
+            </>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+
+              {/* ADMIN */}
+              {user.role === "ROLE_ADMIN" && (
+                <Button
+                  component={RouterLink}
+                  to="/admin"
+                  sx={{ color: "#e5e7eb", textTransform: "none" }}
+                >
+                  Dashboard
+                </Button>
+              )}
+
+              {/* USER CART */}
+              {user.role === "ROLE_USER" && (
+                <IconButton component={RouterLink} to="/cart">
+                  <CartBadge badgeContent={cartCount || 0}>
+                    <ShoppingCartIcon sx={{ color: "white" }} />
+                  </CartBadge>
+                </IconButton>
+              )}
+
+              {/* USER INFO */}
+              <Box
+                onMouseEnter={handleMenuOpen}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  cursor: "pointer",
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 2,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                  },
+                }}
+              >
+                <Typography sx={{ fontWeight: 500 }}>
+                  {user.email || "User"}
+                </Typography>
+                <Avatar
+                  sx={{
+                    bgcolor: "#e5e7eb",
+                    color: "#1976d2",
+                    width: 34,
+                    height: 34,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {user?.userName?.charAt(0)?.toUpperCase()}
+                </Avatar>
+              </Box>
+
+              {/* DROPDOWN */}
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                MenuListProps={{ onMouseLeave: handleMenuClose }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+                PaperProps={{
+                  sx: {
+                    mt: 1,
+                    minWidth: 200,
+                    borderRadius: 2,
+                  },
+                }}
+              >
+                <MenuItem onClick={() => navigate("/profile")}>
+                  <ListItemIcon>
+                    <AccountCircleIcon fontSize="small" />
+                  </ListItemIcon>
+                  Profile
+                </MenuItem>
+
+                <MenuItem onClick={() => navigate("/user/address")}>
+                  <ListItemIcon>
+                    <LocationOnIcon fontSize="small" />
+                  </ListItemIcon>
+                  Address
+                </MenuItem>
+
+                <MenuItem onClick={() => navigate("/user-orders")}>
+                  <ListItemIcon>
+                    <ReceiptLongIcon fontSize="small" />
+                  </ListItemIcon>
+                  Orders
+                </MenuItem>
+
+                <Divider />
+
+                <MenuItem onClick={signOut}>
+                  <ListItemIcon>
+                    <LogoutIcon fontSize="small" color="error" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </Menu>
+            </Box>
+          )}
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 };

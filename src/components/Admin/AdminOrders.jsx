@@ -85,7 +85,8 @@ const AdminOrders = () => {
           <TableHead>
             <TableRow>
               <TableCell><b>ID</b></TableCell>
-              <TableCell><b>User & Address</b></TableCell>
+              <TableCell><b>User</b></TableCell>
+              <TableCell><b>Address</b></TableCell>
               <TableCell><b>Order Date</b></TableCell>
               <TableCell><b>Price Details</b></TableCell>
               <TableCell><b>Status</b></TableCell>
@@ -107,9 +108,16 @@ const AdminOrders = () => {
                     {order.orderAddress.lastName}
                   </Typography>
 
+                </TableCell>
+                <TableCell>
+                  
+
                   <Typography variant="body2">
                     {order.orderAddress.address},{" "}
                     {order.orderAddress.city},{" "}
+                  </Typography>
+                  <Typography>
+
                     {order.orderAddress.state} -{" "}
                     {order.orderAddress.pinCode}
                   </Typography>
@@ -129,7 +137,9 @@ const AdminOrders = () => {
                 </TableCell>
 
                 {/* PRICE */}
+
                 <TableCell>
+                  <Typography>{order.product.productName}</Typography>
                   <Typography>Qty: {order.quantity}</Typography>
                   <Typography>Price: ₹{order.price}</Typography>
                   <Typography fontWeight="bold">

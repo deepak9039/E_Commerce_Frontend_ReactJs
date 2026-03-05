@@ -9,16 +9,19 @@ import {
   Button,
   Box,
   Divider,
+  Paper,
 } from "@mui/material";
 import { userAddress, updateUserAddress } from "../../services/apiService";
 
-/*
-EXPECTED API RESPONSE:
-{
-  status: "Success",
-  addresses: [ {...} ]
-}
-*/
+const emptyAddress = {
+  addressLine: "",
+  address: "",
+  city: "",
+  state: "",
+  country: "",
+  pinCode: "",
+  phoneNumber: "",
+};
 
 const UserAddress = ({ user }) => {
   const [addresses, setAddresses] = useState([]);
@@ -42,7 +45,11 @@ const UserAddress = ({ user }) => {
 
   /* ================= HANDLERS ================= */
   const handleSelectAddress = (address) => {
-    setSelectedAddress({ ...address }); // clone object
+    setSelectedAddress({ ...address });
+  };
+
+  const handleAddNew = () => {
+    setSelectedAddress({ ...emptyAddress });
   };
 
   const handleChange = (e) => {
@@ -54,72 +61,96 @@ const UserAddress = ({ user }) => {
 
   const handleUpdateAddress = async () => {
     try {
-
-        
-        const payload = {
-          addressId: selectedAddress.addressId,
-          addressLine: selectedAddress.addressLine,
-          address: selectedAddress.address,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          country: selectedAddress.country,
-          pinCode: selectedAddress.pinCode,
-          phoneNumber: selectedAddress.phoneNumber,
-          userId: user.userId
-        };
-        console.log("Payload for address update:", payload);
+      const payload = {
+        addressId: selectedAddress.addressId,
+        addressLine: selectedAddress.addressLine,
+        address: selectedAddress.address,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        country: selectedAddress.country,
+        pinCode: selectedAddress.pinCode,
+        phoneNumber: selectedAddress.phoneNumber,
+        userId: user.userId,
+      };
 
       await updateUserAddress(payload);
-      alert("Address updated successfully!");
+      alert("Address saved successfully!");
 
-      // Update local list
       setAddresses((prev) =>
-        prev.map((addr) =>
-          addr.addressId === selectedAddress.addressId
-            ? selectedAddress
-            : addr
-        )
+        selectedAddress.addressId
+          ? prev.map((addr) =>
+              addr.addressId === selectedAddress.addressId
+                ? selectedAddress
+                : addr
+            )
+          : prev
       );
 
       setSelectedAddress(null);
     } catch (error) {
       console.error("Update failed:", error);
-      alert("Failed to update address");
+      alert("Failed to save address");
     }
   };
 
   /* ================= UI ================= */
   return (
-    <Container maxWidth="md" sx={{ mt: 10 }}>
-      <Typography variant="h5" gutterBottom>
-        My Addresses
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 5 }}>
+      {/* ===== HEADER ===== */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={4}
+      >
+        <Typography variant="h5" fontWeight="bold">
+          My Addresses
+        </Typography>
 
-      {/* ================= ADDRESS LIST ================= */}
-      <Grid container spacing={2}>
+        <Button
+          variant="contained"
+          onClick={handleAddNew}
+          sx={{
+            backgroundColor: "#0f172a",
+            "&:hover": { backgroundColor: "#1e293b" },
+          }}
+        >
+          + Add Address
+        </Button>
+      </Box>
+
+      {/* ===== ADDRESS LIST ===== */}
+      <Grid container spacing={3}>
         {addresses.map((addr) => (
-          <Grid item xs={12} key={addr.addressId}>
+          <Grid size={6} key={addr.addressId}>
             <Card
+              onClick={() => handleSelectAddress(addr)}
               sx={{
                 cursor: "pointer",
+                height: "100%",
+                borderRadius: 3,
                 border:
                   selectedAddress?.addressId === addr.addressId
                     ? "2px solid #1976d2"
-                    : "1px solid #ddd",
+                    : "1px solid #e5e7eb",
+                transition: "all 0.25s ease",
+                "&:hover": {
+                  transform: "translateY(-4px)",
+                  boxShadow: 4,
+                },
               }}
-              onClick={() => handleSelectAddress(addr)}
             >
               <CardContent>
-                <Typography fontWeight="bold">
-                  {addr.addressLine || "Address"}
+                <Typography fontWeight="bold" gutterBottom>
+                  {addr.addressLine || "Saved Address"}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" color="text.secondary">
                   {addr.address || "-"}, {addr.city}, {addr.state}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" color="text.secondary">
                   {addr.country} - {addr.pinCode || "-"}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ mt: 1 }}>
                   📞 {addr.phoneNumber}
                 </Typography>
               </CardContent>
@@ -128,13 +159,14 @@ const UserAddress = ({ user }) => {
         ))}
       </Grid>
 
-      {/* ================= EDIT FORM ================= */}
+      {/* ===== FORM ===== */}
       {selectedAddress && (
-        <Box sx={{ mt: 4 }}>
-          <Divider sx={{ mb: 2 }} />
-          <Typography variant="h6" gutterBottom>
-            Update Address
+        <Paper elevation={3} sx={{ mt: 6, p: 4, borderRadius: 3 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            {selectedAddress.addressId ? "Update Address" : "Add New Address"}
           </Typography>
+
+          <Divider sx={{ mb: 3 }} />
 
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -208,24 +240,26 @@ const UserAddress = ({ user }) => {
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 3, display: "flex", gap: 2 }}>
+          <Box mt={4} display="flex" gap={2}>
             <Button
               variant="contained"
-              color="primary"
               onClick={handleUpdateAddress}
+              sx={{
+                backgroundColor: "#0f172a",
+                "&:hover": { backgroundColor: "#1e293b" },
+              }}
             >
-              Update Address
+              Save Address
             </Button>
 
             <Button
               variant="outlined"
-              color="secondary"
               onClick={() => setSelectedAddress(null)}
             >
               Cancel
             </Button>
           </Box>
-        </Box>
+        </Paper>
       )}
     </Container>
   );

@@ -10,7 +10,7 @@ import {
     Grid,
     Avatar,
 } from "@mui/material";
-import { ordersCount, productsCount, usersCount, categorySales } from "../../services/apiService";
+import { ordersCount, productsCount, usersCount, categorySales, topSellingproducts, getAllOrders, ordersDesc } from "../../services/apiService";
 
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -156,8 +156,13 @@ export default function AdminDashboard() {
     ];
 
     const [categorySalesData, setCategorySalesData] = React.useState(null);
+    const [topSellingProducts, setTopSellingProductsTop] = React.useState(null);
+    const [orders, setOrders] = React.useState([]);
+    
 
     console.log("Category Sales Data:", categorySalesData);
+    console.log("top sell product :", topSellingProducts);
+    console.log("recent orders", orders);
 
     const fetchCategorySales = async () => {
         try {
@@ -165,6 +170,25 @@ export default function AdminDashboard() {
             setCategorySalesData(res.data || []);
         } catch (err) {
             console.error("Category Sales API error:", err);
+        }
+    };
+
+    const topSalesProduct = async () => {
+        try{
+            const res = await topSellingproducts();
+            setTopSellingProductsTop(res?.products || []);
+            console.log("sdsdsdsdsd",res);
+        }catch(err){
+            console.log("top sale products", err);
+        }
+    }
+
+    const fetchOrders = async () => {
+        try {
+            const res = await ordersDesc();
+            setOrders(res.orders || []);
+        } catch (error) {
+            console.error("Error fetching orders:", error);
         }
     };
 
@@ -179,6 +203,8 @@ export default function AdminDashboard() {
         };
         fetchCounts();
         fetchCategorySales();
+        topSalesProduct();
+        fetchOrders();
     }, []);
 
     return (
@@ -293,19 +319,14 @@ export default function AdminDashboard() {
                                 </Box>
 
 
-                                {[
-                                    { id: "#ORD-001", name: "John Doe", amount: "$234.50", status: "Completed" },
-                                    { id: "#ORD-002", name: "Jane Smith", amount: "$156.00", status: "Processing" },
-                                    { id: "#ORD-003", name: "Bob Johnson", amount: "$89.99", status: "Pending" },
-                                    { id: "#ORD-004", name: "Alice Brown", amount: "$445.00", status: "Completed" },
-                                ].map((order) => (
+                                {orders.slice(0, 5).map((order) => (
                                     <Box key={order.id} mb={2}>
                                         <Box display="flex" justifyContent="space-between">
                                             <Box>
-                                                <Typography fontWeight="500">{order.id}</Typography>
-                                                <Typography variant="body2" color="text.secondary">{order.name}</Typography>
+                                                <Typography fontWeight="500">{order.orderId.slice(0, 5)}</Typography>
+                                                <Typography variant="body2" color="text.secondary">{order.product.productName}</Typography>
                                             </Box>
-                                            <Typography fontWeight="500">{order.amount}</Typography>
+                                            <Typography fontWeight="500">₹ {order.price}</Typography>
                                         </Box>
                                         <Typography
                                             variant="caption"
@@ -314,15 +335,15 @@ export default function AdminDashboard() {
                                                 py: 0.3,
                                                 borderRadius: 2,
                                                 bgcolor:
-                                                    order.status === "Completed"
+                                                    order.status === "DELIVERED"
                                                         ? "#dcfce7"
-                                                        : order.status === "Processing"
+                                                        : order.status === "IN_PROGRESS"
                                                             ? "#dbeafe"
                                                             : "#fef3c7",
                                                 color:
-                                                    order.status === "Completed"
+                                                    order.status === "DELIVERED"
                                                         ? "#166534"
-                                                        : order.status === "Processing"
+                                                        : order.status === "IN_PROGRESS"
                                                             ? "#1d4ed8"
                                                             : "#92400e",
                                             }}
@@ -345,21 +366,16 @@ export default function AdminDashboard() {
                                 </Box>
 
 
-                                {[
-                                    { rank: "#1", name: "Wireless Headphones", sales: "245 sales", amount: "$12,250" },
-                                    { rank: "#2", name: "Smart Watch", sales: "189 sales", amount: "$18,900" },
-                                    { rank: "#3", name: "Laptop Stand", sales: "156 sales", amount: "$4,680" },
-                                    { rank: "#4", name: "USB-C Cable", sales: "234 sales", amount: "$2,340" },
-                                ].map((product) => (
+                                {topSellingProducts?.map((product) => (
                                     <Box key={product.rank} display="flex" justifyContent="space-between" mb={2}>
                                         <Box display="flex" gap={2}>
-                                            <Avatar sx={{ bgcolor: "#f1f5f9", color: "#334155" }}>{product.rank}</Avatar>
+                                            <Avatar sx={{ bgcolor: "#f1f5f9", color: "#334155" }}>{product.productId}</Avatar>
                                             <Box>
-                                                <Typography fontWeight="500">{product.name}</Typography>
-                                                <Typography variant="body2" color="text.secondary">{product.sales}</Typography>
+                                                <Typography fontWeight="500">{product.productName}</Typography>
+                                                <Typography variant="body2" color="text.secondary">{product.quantity} sales </Typography>
                                             </Box>
                                         </Box>
-                                        <Typography fontWeight="500">{product.amount}</Typography>
+                                        <Typography fontWeight="500">₹ {product.totalAmount}</Typography>
                                     </Box>
                                 ))}
                             </CardContent>

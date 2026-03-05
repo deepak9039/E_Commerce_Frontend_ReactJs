@@ -16,8 +16,9 @@ const Footer = () => {
       sx={{
         mt: "auto",
         backgroundColor: "#0f172a",
-        color: "#e5e7eb",
+        color: "",
         pt: 5,
+        mt: 5,
       }}
     >
       <Container maxWidth="lg">

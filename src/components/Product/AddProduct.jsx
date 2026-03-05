@@ -15,12 +15,14 @@ import {
 } from '@mui/material';
 import { findAllCategory, createProduct, getProduct, updateProduct } from '../../services/apiService';
 
-const AddProduct = () => {
+const AddProduct = ({ editProductId, onProductSaved }) => {
 
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [productPrice, setProductPrice] = useState('');
+    const [discount, setDiscount] = useState('');
+    const [discountPrice, setDiscountPrice] = useState('');
     const [stockQuantity, setStockQuantity] = useState('');
 
     // existing image from backend (filename)
@@ -34,23 +36,47 @@ const AddProduct = () => {
     const [apiResponse, setApiResponse] = useState(null);
 
     const { id } = useParams();
+    // Use editProductId prop as fallback if no URL param
+    const productId = id || editProductId;
 
     useEffect(() => {
         fetchCategories();
     }, []);
 
     useEffect(() => {
-        if (id) loadProductForEdit();
-    }, [id]);
+        if (productId) loadProductForEdit();
+    }, [productId]);
+
+    // Reset form when switching to add mode (editProductId becomes null)
+    useEffect(() => {
+        if (!editProductId && !id) {
+            resetForm();
+        }
+    }, [editProductId, id]);
+
+    const resetForm = () => {
+        setProductName('');
+        setProductDescription('');
+        setCategoryName('');
+        setProductPrice('');
+        setDiscount('');
+        setDiscountPrice('');
+        setStockQuantity('');
+        setExistingImage('');
+        setImageFile(null);
+        setApiResponse(null);
+    };
 
     const loadProductForEdit = async () => {
         try {
-            const res = await getProduct(id);
+            const res = await getProduct(productId);
 
             setProductName(res.productName);
             setProductDescription(res.productDescription);
             setCategoryName(res.categoryName);
             setProductPrice(res.productPrice);
+            setDiscount(res.discount);
+            setDiscountPrice(res.discountPrice);
             setStockQuantity(res.stockQuantity);
 
             // store existing image name
@@ -82,15 +108,16 @@ const AddProduct = () => {
                 productDescription,
                 categoryName,
                 productPrice: Number(productPrice),
+                discount: Number(discount),
+                discountPrice: Number(discountPrice),
                 stockQuantity: Number(stockQuantity),
-
                 // If user uploaded new file → send blank (backend will replace)
                 // else → send existing filename
                 productImage: imageFile ? "" : existingImage
             };
 
-            if (id) {
-                productPart.productId = Number(id);
+            if (productId) {
+                productPart.productId = Number(productId);
             }
 
             const blob = new Blob([JSON.stringify(productPart)], { type: "application/json" });
@@ -102,13 +129,18 @@ const AddProduct = () => {
             }
 
             let response;
-            if (id) {
+            if (productId) {
                 response = await updateProduct(formData); // only update API
             } else {
                 response = await createProduct(formData);
             }
 
             setApiResponse(response?.message || "Product saved successfully !!.");
+
+            // Call callback if provided (from admin layout)
+            if (onProductSaved) {
+                setTimeout(() => onProductSaved(), 1500);
+            }
 
         } catch (err) {
             console.error(err);
@@ -118,10 +150,24 @@ const AddProduct = () => {
         }
     };
 
+    useEffect(() => {
+    if (productPrice && discount) {
+        const price = Number(productPrice);
+        const disc = Number(discount);
+
+        if (!isNaN(price) && !isNaN(disc)) {
+            const calculated = price - (price * disc) / 100;
+            setDiscountPrice(calculated.toFixed(2));
+            }
+        } else {
+            setDiscountPrice('');
+        }
+    }, [productPrice, discount]);
+
     return (
         <Container maxWidth="sm" sx={{ py: 4 }}>
             <Typography variant="h5" sx={{ mb: 2 }}>
-                {id ? "Edit Product" : "Add Product"}
+                {productId ? "Edit Product" : "Add Product"}
             </Typography>
 
             {apiResponse && (
@@ -170,6 +216,25 @@ const AddProduct = () => {
                 />
 
                 <TextField
+                    label="Discount"
+                    type="number"
+                    value={discount}
+                    onChange={(e) => setDiscount(e.target.value)}
+                />
+
+                <TextField
+                    label="Discount Price"
+                    type="number"
+                    value={discountPrice}
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                    sx={{
+                        backgroundColor: "#f5f5f5"
+                    }}
+                />
+
+                <TextField
                     label="Stock Quantity"
                     type="number"
                     value={stockQuantity}
@@ -206,7 +271,7 @@ const AddProduct = () => {
                 </Box>
 
                 <Button type="submit" variant="contained" disabled={submitting}>
-                    {submitting ? "Saving..." : id ? "Update Product" : "Create Product"}
+                    {submitting ? "Saving..." : productId ? "Update Product" : "Create Product"}
                 </Button>
 
             </Box>

@@ -8,11 +8,13 @@ import {
   Grid,
   Avatar,
   Stack,
-  Alert
+  Alert,
+  Card,
+  CardContent,
+  Divider,
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
 import { getUserById, updateUserProfile } from "../../services/apiService";
-
 
 const UserProfile = ({ user }) => {
   // ---- USER STATES ----
@@ -57,7 +59,7 @@ const UserProfile = ({ user }) => {
       userId: user.userId,
       firstName,
       lastName,
-      email
+      email,
     };
 
     try {
@@ -72,104 +74,125 @@ const UserProfile = ({ user }) => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h5" gutterBottom>
+    <Container maxWidth="md" sx={{ py: 6 }}>
+      {/* ===== PAGE TITLE ===== */}
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        sx={{ mb: 3, color: "#0f172a" }}
+      >
         My Profile
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gap: 3 }}>
-        
-        {/* ======= ALERT ======= */}
-        {alertMessage && (
-          <Alert severity={alertType} variant="filled">
-            {alertMessage}
-          </Alert>
-        )}
-
-        {/* PROFILE ICON */}
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Avatar
-            sx={{
-              width: 80,
-              height: 80,
-              bgcolor: "#e0e0e0",
-              color: "#616161",
-            }}
+      <Card sx={{ borderRadius: 4, boxShadow: 4 }}>
+        <CardContent sx={{ p: 4 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{ display: "grid", gap: 4 }}
           >
-            <Person sx={{ fontSize: 45 }} />
-          </Avatar>
+            {/* ===== ALERT ===== */}
+            {alertMessage && (
+              <Alert severity={alertType} variant="filled">
+                {alertMessage}
+              </Alert>
+            )}
 
-          <Box>
-            <Typography fontWeight="bold">
-              {firstName} {lastName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {role}
-            </Typography>
+            {/* ===== PROFILE HEADER ===== */}
+            <Stack direction="row" spacing={3} alignItems="center">
+              <Avatar
+                sx={{
+                  width: 90,
+                  height: 90,
+                  bgcolor: "#e5e7eb",
+                  color: "#1e293b",
+                }}
+              >
+                <Person sx={{ fontSize: 50 }} />
+              </Avatar>
+
+              <Box>
+                <Typography variant="h6" fontWeight="bold">
+                  {firstName} {lastName}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {role}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {email}
+                </Typography>
+              </Box>
+            </Stack>
+
+            <Divider />
+
+            {/* ===== USER DETAILS ===== */}
+            <Grid container spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Username"
+                  value={userName}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Role"
+                  value={role}
+                  fullWidth
+                  disabled
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <TextField
+                  label="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  fullWidth
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  fullWidth
+                />
+              </Grid>
+            </Grid>
+
+            {/* ===== ACTION ===== */}
+            <Box display="flex" justifyContent="flex-end">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  px: 4,
+                  py: 1.2,
+                  backgroundColor: "#0f172a",
+                  "&:hover": { backgroundColor: "#1e293b" },
+                }}
+              >
+                Update Profile
+              </Button>
+            </Box>
           </Box>
-        </Stack>
-
-        {/* USER DETAILS */}
-        <Grid container spacing={2}>
-          {/* READ ONLY */}
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Username"
-              value={userName}
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Role"
-              value={role}
-              fullWidth
-              disabled
-            />
-          </Grid>
-
-          {/* EDITABLE */}
-          <Grid item xs={12}>
-            <TextField
-              label="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled
-              fullWidth
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              fullWidth
-            />
-          </Grid>
-        </Grid>
-
-        {/* SUBMIT */}
-        <Button
-          type="submit"
-          variant="contained"
-          color="success"
-          sx={{ mt: 3 }}
-        >
-          Update Profile
-        </Button>
-      </Box>
+        </CardContent>
+      </Card>
     </Container>
   );
 };

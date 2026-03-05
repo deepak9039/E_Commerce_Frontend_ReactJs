@@ -1,264 +1,396 @@
 import React from 'react';
 import {
-    Grid,
-    Typography,
-    Card,
-    CardMedia,
-    CardContent,
-    CardActions,
-    Button,
-    Box,
+  Grid,
+  Typography,
+  Box,
+  IconButton,
+  Container
 } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { findAllProduct, findAllCategory, getProductsByCategory } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 50;
 
 const HomePage = () => {
-    const [products, setProducts] = React.useState([]);
-    const [categories, setCategories] = React.useState([]);
-    const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
+  const [products, setProducts] = React.useState([]);
+  const [categories, setCategories] = React.useState([]);
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
+  const [page, setPage] = React.useState(0);
+  const [totalPages, setTotalPages] = React.useState(0);
+  const [sliderIndex, setSliderIndex] = React.useState(0);
 
-    const [page, setPage] = React.useState(0);
-    const [totalPages, setTotalPages] = React.useState(0);
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const fetchAllProducts = async (pageNo = 0) => {
+    try {
+      const payload = { page: pageNo, pageSize: PAGE_SIZE };
+      const res = await findAllProduct(payload);
 
-    // =========================
-    // FETCH ALL PRODUCTS
-    // =========================
-    const fetchAllProducts = async (pageNo = 0) => {
-        try {
-            const payload = {
-                page: pageNo,
-                pageSize: PAGE_SIZE,
-            };
+      setProducts(res.products || []);
+      setPage(res.page || 0);
+      setTotalPages(res.totalPages || 0);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-            const res = await findAllProduct(payload);
+  const fetchCategories = async () => {
+    try {
+      const res = await findAllCategory();
+      setCategories(res);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-            setProducts(res.products || []);
-            setPage(res.page || 0);
-            setTotalPages(res.totalPages || 0);
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    };
+  const handleCategoryClick = async (categoryName, pageNo = 0) => {
+    try {
+      setSelectedCategoryId(categoryName);
+      const payload = { page: pageNo, pageSize: PAGE_SIZE };
+      const res = await getProductsByCategory(categoryName, payload);
 
-    // =========================
-    // FETCH CATEGORIES
-    // =========================
-    const fetchCategories = async () => {
-        try {
-            const res = await findAllCategory();
-            setCategories(res);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
+      setProducts(res.products || []);
+      setPage(res.page || 0);
+      setTotalPages(res.totalPages || 0);
+    } catch (err) {
+      setProducts([]);
+    }
+  };
 
-    // =========================
-    // CATEGORY CLICK (WITH PAGINATION)
-    // =========================
-    const handleCategoryClick = async (categoryName, pageNo = 0) => {
-        try {
-            setSelectedCategoryId(categoryName);
+  const handlePageChange = (e, value) => {
+    const newPage = value - 1;
+    selectedCategoryId
+      ? handleCategoryClick(selectedCategoryId, newPage)
+      : fetchAllProducts(newPage);
+  };
 
-            const payload = {
-                page: pageNo,
-                pageSize: PAGE_SIZE,
-            };
+  const limitWords = (text, limit = 18) => {
+    if (!text) return '';
+    const words = text.split(' ');
+    return words.length <= limit ? text : words.slice(0, limit).join(' ') + '...';
+  };
 
-            const res = await getProductsByCategory(categoryName, payload);
+  React.useEffect(() => {
+    fetchCategories();
+    fetchAllProducts(0);
+  }, []);
 
-            setProducts(res.products || []);
-            setPage(res.page || 0);
-            setTotalPages(res.totalPages || 0);
-        } catch (error) {
-            console.error('Error fetching category products:', error);
-            setProducts([]);
-        }
-    };
+  const sliderProducts = products.slice(0, 3);
 
-    // =========================
-    // PAGINATION CHANGE
-    // =========================
-    const handlePageChange = (event, value) => {
-        const newPage = value - 1; // MUI is 1-based
+  return (
+    <>
+      {/* ================= CATEGORY BAR ================= */}
+      <Box
+        sx={{
+          position: "sticky",
+          top: 64,
+          zIndex: 1000,
+          backgroundColor: "#ffffff",
+          borderBottom: "1px solid #e5e7eb",
+          py: 1.5,
+        }}
+      >
+        <Box
+          sx={{
+            px: 3,
+            display: "flex",
+            alignItems: "center",
+            overflowX: "auto",
+            gap: 4,
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
+          <Box
+            onClick={() => fetchAllProducts(0)}
+            sx={{
+              cursor: "pointer",
+              fontWeight: 600,
+              color: !selectedCategoryId ? "primary.main" : "#475569",
+              borderBottom: !selectedCategoryId ? "2px solid #1976d2" : "none",
+              pb: 0.5,
+            }}
+          >
+            <Typography fontWeight={600}>All</Typography>
+          </Box>
 
-        if (selectedCategoryId) {
-            handleCategoryClick(selectedCategoryId, newPage);
-        } else {
-            fetchAllProducts(newPage);
-        }
-    };
-
-    // =========================
-    // LIMIT WORDS
-    // =========================
-    const limitWords = (text, limit = 18) => {
-        if (!text) return '';
-        const words = text.split(' ');
-        return words.length <= limit
-            ? text
-            : words.slice(0, limit).join(' ') + '...';
-    };
-
-    // =========================
-    // INITIAL LOAD
-    // =========================
-    React.useEffect(() => {
-        fetchCategories();
-        fetchAllProducts(0);
-    }, []);
-
-    return (
-        <>
-            {/* ================= CATEGORY BAR ================= */}
+          {categories.map((cat) => (
             <Box
-                sx={{
-                    height: 140,
-                    mb: 3,
-                    borderRadius: 2,
-                    backgroundColor: 'background.paper',
-                    boxShadow: 3,
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 2,
-                }}
+              key={cat.id}
+              onClick={() => handleCategoryClick(cat.categoryName, 0)}
+              sx={{
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+                color:
+                  selectedCategoryId === cat.categoryName
+                    ? "primary.main"
+                    : "#475569",
+                borderBottom:
+                  selectedCategoryId === cat.categoryName
+                    ? "2px solid #1976d2"
+                    : "none",
+                pb: 0.5,
+              }}
             >
-                <Grid container spacing={2}>
-                    <Grid
-                        item
-                        xs={1.5}
-                        sx={{ textAlign: 'center', cursor: 'pointer' }}
-                        onClick={() => {
-                            setSelectedCategoryId(null);
-                            fetchAllProducts(0);
-                        }}
-                    >
-                        <Typography variant="body2" fontWeight={600}>
-                            All
-                        </Typography>
-                    </Grid>
-
-                    {categories.map((cat) => (
-                        <Grid
-                            item
-                            xs={1.5}
-                            key={cat.id}
-                            sx={{ textAlign: 'center', cursor: 'pointer' }}
-                            onClick={() => handleCategoryClick(cat.categoryName, 0)}
-                        >
-                            <Box
-                                component="img"
-                                src={`http://localhost:1234/image/category/${cat.categoryImage}`}
-                                alt={cat.categoryName}
-                                sx={{
-                                    width: 60,
-                                    height: 60,
-                                    objectFit: 'contain',
-                                    mb: 1,
-                                    transition: 'transform 0.2s',
-                                    '&:hover': { transform: 'scale(1.1)' },
-                                }}
-                            />
-                            <Typography variant="body2" fontWeight={500}>
-                                {cat.categoryName}
-                            </Typography>
-                        </Grid>
-                    ))}
-                </Grid>
+              <Typography variant="body2" fontWeight={500}>
+                {cat.categoryName}
+              </Typography>
             </Box>
+          ))}
+        </Box>
+      </Box>
+      {/* HERO SLIDER */}
+      {sliderProducts.length > 0 && (
+        <Box
+          sx={{
+            width: '100%',
+            height: 300,
+            backgroundColor: '#fde2e4',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 4,
+            mb: 4,
+          }}
+        >
+          <IconButton
+            onClick={() =>
+              setSliderIndex(
+                sliderIndex === 0 ? sliderProducts.length - 1 : sliderIndex - 1
+              )
+            }
+          >
+            <ArrowBackIosNewIcon />
+          </IconButton>
 
-            {/* ================= PRODUCT LIST ================= */}
-            <Box sx={{ m: 2 }}>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                    Products
+          <Grid
+            container
+            alignItems="center"
+            spacing={4}
+            onClick={() =>
+              navigate(`/product/${sliderProducts[sliderIndex].productId}`)
+            }
+            sx={{ cursor: 'pointer' }}
+          >
+            <Grid item xs={6}>
+              <Typography variant="h4" fontWeight="bold">
+                {limitWords(sliderProducts[sliderIndex]?.productName, 10)}
+              </Typography>
+
+              {/* SLIDER PRICE UI */}
+              <Box sx={{ mt: 2 }}>
+                <Typography
+                  component="span"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: 22,
+                    mr: 2
+                  }}
+                >
+                  ₹{sliderProducts[sliderIndex].discount > 0
+                    ? sliderProducts[sliderIndex].discountPrice
+                    : sliderProducts[sliderIndex].productPrice}
                 </Typography>
 
-                {products.length === 0 ? (
-                    <Typography variant="body1">
-                        {selectedCategoryId
-                            ? 'No products available in this category.'
-                            : 'No products available.'}
-                    </Typography>
-                ) : (
-                    <Grid container spacing={2}>
-                        {products.map((product) => (
-                            <Grid size={3} key={product.productId}>
-                                <Card
-                                    sx={{
-                                        height: '100%',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={() =>
-                                        navigate(`/product/${product.productId}`)
-                                    }
-                                >
-                                    <CardMedia
-                                        component="img"
-                                        sx={{ width: "100%", height: "100%", objectFit: 'contain', borderRadius: 1 }}
-                                        alt={product.productName}
-                                        image={`http://localhost:1234/image/product/${product.productImageUrl}`}
-                                        title={product.productName}
-                                    />
-                                    <CardContent>
-                                        <Typography variant="h6">
-                                            {product.productName}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {limitWords(product.productDescription)}
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small">Add to Cart</Button>
-                                        <Button
-                                            size="small"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(`/product/${product.productId}`);
-                                            }}
-                                        >
-                                            View Details
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                )}
-
-                {/* ================= PAGINATION ================= */}
-                {totalPages > 1 && (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            mt: 4,
-                        }}
+                {sliderProducts[sliderIndex].discount > 0 && (
+                  <>
+                    <Typography
+                      component="span"
+                      sx={{
+                        textDecoration: "line-through",
+                        color: "#64748b",
+                        mr: 1
+                      }}
                     >
-                        <Pagination
-                            count={totalPages}
-                            page={page + 1}
-                            onChange={handlePageChange}
-                            color="primary"
-                        />
-                    </Box>
+                      ₹{sliderProducts[sliderIndex].productPrice}
+                    </Typography>
+
+                    <Typography
+                      component="span"
+                      sx={{
+                        color: "#16a34a",
+                        fontWeight: 600
+                      }}
+                    >
+                      {sliderProducts[sliderIndex].discount}% OFF
+                    </Typography>
+                  </>
+                )}
+              </Box>
+            </Grid>
+
+            <Grid item xs={6}>
+              <Box
+                sx={{
+                  position: "relative",
+                  width: "100%",
+                  height: 260,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {sliderProducts[sliderIndex].discount > 0 && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 10,
+                      left: 10,
+                      backgroundColor: "#dc2626",
+                      color: "#fff",
+                      px: 1,
+                      py: 0.3,
+                      fontSize: 12,
+                      fontWeight: 700,
+                      borderRadius: 1,
+                    }}
+                  >
+                    {sliderProducts[sliderIndex].discount}% OFF
+                  </Box>
                 )}
 
-                {totalPages > 0 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                            Page {page + 1} of {totalPages}
-                        </Typography>
+                <Box
+                  component="img"
+                  src={`http://localhost:1234/image/product/${sliderProducts[sliderIndex]?.productImageUrl}`}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
+          <IconButton
+            onClick={() =>
+              setSliderIndex((sliderIndex + 1) % sliderProducts.length)
+            }
+          >
+            <ArrowForwardIosIcon />
+          </IconButton>
+        </Box>
+      )}
+
+      {/* PRODUCT LIST */}
+      <Container maxWidth="lg" sx={{ py: 5 }}>
+        {/* <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+          Products
+        </Typography> */}
+
+        <Grid container spacing={3}>
+          {products.map((product) => (
+            <Grid item xs={3} key={product.productId}>
+              <Box
+                sx={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/product/${product.productId}`)}
+              >
+                {/* IMAGE WITH BADGE */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    borderRadius: 3,
+                    overflow: "hidden",
+                    backgroundColor: "#f8fafc"
+                  }}
+                >
+                  {product.discount > 0 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 10,
+                        left: 10,
+                        backgroundColor: "#dc2626",
+                        color: "#fff",
+                        px: 1,
+                        py: 0.3,
+                        fontSize: 12,
+                        fontWeight: 700,
+                        borderRadius: 1,
+                      }}
+                    >
+                      {product.discount}% OFF
                     </Box>
-                )}
-            </Box>
-        </>
-    );
+                  )}
+
+                  <Box
+                    component="img"
+                    src={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                    sx={{
+                      width: "100%",
+                      height: 260,
+                      objectFit: "cover",
+                    }}
+                  />
+                </Box>
+
+                {/* DETAILS */}
+                <Box sx={{ mt: 1 }}>
+                  <Typography fontWeight={700} fontSize={14}>
+                    {limitWords(product.productName, 4)}
+                  </Typography>
+
+                  <Box sx={{ mt: 0.5 }}>
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 16,
+                        mr: 1
+                      }}
+                    >
+                      ₹{product.discount > 0
+                        ? product.discountPrice
+                        : product.productPrice}
+                    </Typography>
+
+                    {product.discount > 0 && (
+                      <>
+                        <Typography
+                          component="span"
+                          sx={{
+                            textDecoration: "line-through",
+                            color: "#94a3b8",
+                            fontSize: 14,
+                            mr: 1
+                          }}
+                        >
+                          ₹{product.productPrice}
+                        </Typography>
+
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: "#16a34a",
+                            fontSize: 13,
+                            fontWeight: 600
+                          }}
+                        >
+                          {product.discount}% OFF
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
+
+        {totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination
+              count={totalPages}
+              page={page + 1}
+              onChange={handlePageChange}
+            />
+          </Box>
+        )}
+      </Container>
+    </>
+  );
 };
 
 export default HomePage;

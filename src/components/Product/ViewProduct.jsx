@@ -3,28 +3,52 @@ import { Grid, Typography, Box, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { findAllProduct } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
+import Pagination from '@mui/material/Pagination';
 
-const ViewProduct = () => {
-        const navigate = useNavigate();
+const ViewProduct = ({ onEditProduct }) => {
+    const navigate = useNavigate();
+
+    const PAGE_SIZE = 50;
+
+    // const [products, setProducts] = useState([]);
+    const [page, setPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
     const [products, setProducts] = useState([]);
 
     console.log("Products i am view product:", products);
 
-    const fetchProducts = async () => {
-        try {
-            const response = await findAllProduct();
-            setProducts(response);
+    // const fetchProducts = async () => {
+    //     try {
+    //         const response = await findAllProduct();
+    //         setProducts(response);
+    //     } catch (error) {
+    //         console.error('Error fetching products:', error);
+    //     }
+
+    // };
+    const fetchProducts = async (pageNo = 0) => {
+    try {
+        const payload = { page: pageNo, pageSize: PAGE_SIZE };
+        const response = await findAllProduct(payload);
+
+            setProducts(response.products || []);
+            setPage(response.page || 0);
+            setTotalPages(response.totalPages || 0);
+
         } catch (error) {
             console.error('Error fetching products:', error);
+            setProducts([]);
         }
-
     };
 
-    console.log
+    const handlePageChange = (e, value) => {
+        const newPage = value - 1;
+        fetchProducts(newPage);
+    };
 
     useEffect(() => {
-        fetchProducts();
+        fetchProducts(0);
     }, []);
 
     return (
@@ -98,7 +122,7 @@ const ViewProduct = () => {
                                     variant="outlined"
                                     size="small"
                                     color="primary"
-                                    onClick={() => navigate(`/edit-product/${product.productId}`)}
+                                    onClick={() => onEditProduct ? onEditProduct(product.productId) : navigate(`/edit-product/${product.productId}`)}
                                 >
                                     Edit
                                 </Button>
@@ -110,6 +134,15 @@ const ViewProduct = () => {
                         </Box>
                     ))}
                 </Box>
+                {totalPages > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <Pagination
+                            count={totalPages}
+                            page={page + 1}
+                            onChange={handlePageChange}
+                        />
+                    </Box>
+                )}
             </Grid>
 
         </Box>

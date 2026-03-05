@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -10,22 +10,22 @@ import {
   Stack,
   Grid,
   Button,
-  Divider
+  Divider,
+  Chip,
+  Paper
 } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { getProductById, addToCart, cartCountByUserId } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
-import RelatedProduct from "./RelatedProduct";
+import RelatedProducts from "./RelatedProducts";
+import ProductReviews from "../Review/ProductReviews";
 
 const ProductDetails = ({ user }) => {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const { refreshCartCount } = useCart();
-
-
-  console.log("Product ID from params: User ID ",product?.productId, user);
 
   const fetchProduct = async () => {
     try {
@@ -37,20 +37,15 @@ const ProductDetails = ({ user }) => {
     setLoading(false);
   };
 
-  const addToCartClick =  async() => {
-     try{
-      const cartRes = await addToCart({productId: product?.productId, userId: user?.userId});
-      const count = await cartCountByUserId(user?.userId);
-      console.log("Cart Count after adding product:", count);
-      console.log("Cart Response:", cartRes);
-      // 🔥 GLOBAL UPDATE
+  const addToCartClick = async () => {
+    try {
+      await addToCart({ productId: product?.productId, userId: user?.userId });
+      await cartCountByUserId(user?.userId);
       refreshCartCount(user?.userId);
-     }
-     catch(err){
+    } catch (err) {
       console.error("Add to cart error:", err);
     }
-  }
-    
+  };
 
   useEffect(() => {
     fetchProduct();
@@ -58,8 +53,8 @@ const ProductDetails = ({ user }) => {
 
   if (loading) {
     return (
-      <Stack alignItems="center" mt={4}>
-        <CircularProgress />
+      <Stack alignItems="center" mt={6}>
+        <CircularProgress size={50} />
       </Stack>
     );
   }
@@ -74,86 +69,196 @@ const ProductDetails = ({ user }) => {
 
   return (
     <>
-    <Box>
-      <Grid container spacing={2} sx={{ p: 4 }}>
-        
-        {/* 🔵 LEFT SIDE IMAGE */}
-        <Grid size={6}>
-          <CardMedia
-            component="img"
-            sx={{ width: "100%", height: "100%", objectFit: 'contain', borderRadius: 1 }}
-            alt={product.productName}
-            image={`http://localhost:1234/image/product/${product.productImageUrl}`}
-            title={product.productName}
-          />
-        </Grid>
+      <Container maxWidth="lg" sx={{ mt: 8 }}>
 
-        {/* 🔵 RIGHT SIDE DETAILS */}
-        <Grid size={6}>
-          < Card sx={{ boxShadow: 0 }}>
-            <CardContent>
+        <Grid container spacing={6}>
 
-              {/* PRODUCT NAME */}
-              <Typography variant="h4" sx={{ mb: 2 }}>
-                {product.productName}
-              </Typography>
+          {/* IMAGE */}
+          <Grid size={5}>
+            <Box
+              sx={{
+                border: "1px solid #ddd",
+                borderRadius: 1,
+                p: 2,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: 420,
+              }}
+            >
+              <CardMedia
+                component="img"
+                image={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                alt={product.productName}
+                sx={{
+                  maxHeight: 380,
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+          </Grid>
 
-              {/* PRICE */}
-              <Typography variant="h5" color="success.main" sx={{ mb: 2, fontWeight: "bold" }}>
-                ₹ {product.productPrice}
-              </Typography>
+          {/* DETAILS */}
+          <Grid size={7}>
 
-              {/* 🔵 SERVICE BADGES */}
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  🚚 <strong>Free Delivery</strong>
-                </Typography>
-                <Typography variant="body1" sx={{ mb: 1 }}>
-                  🔄 <strong>7-Day Return Available</strong>
-                </Typography>
-                <Typography variant="body1">
-                  💵 <strong>Cash on Delivery</strong>
-                </Typography>
-              </Box>
+            {/* PRODUCT NAME */}
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                color: "#0f172a",
+                mb: 1,
+              }}
+            >
+              {product.productName}
+            </Typography>
 
-              <Divider sx={{ my: 2 }} />
+            {/* CATEGORY */}
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 2 }}
+            >
+              Category: {product.categoryName}
+            </Typography>
 
-              {/* DESCRIPTION */}
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Description:</strong> {product.productDescription}
-              </Typography>
+            <Box sx={{ mb: 2 }}>
 
-              {/* CATEGORY */}
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Category:</strong> {product.categoryName}
-              </Typography>
-
-              {/* STOCK */}
-              <Typography variant="body1" sx={{ mt: 1 }}>
-                <strong>Stock:</strong> {product.stockQuantity}
-              </Typography>
-
-              {/* ADD TO CART BUTTON */}
-              <Button
-                variant="contained"
-                color="primary"
-                fullWidth
-                size="large"
-                sx={{ mt: 3, py: 1.5, fontSize: "18px" }}
-                onClick={addToCartClick}
+              {/* Discounted Price */}
+              <Typography
+                variant="h4"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#0f172a",
+                  display: "inline-block",
+                  mr: 2,
+                }}
               >
-                Add to Cart
-              </Button>
+                ₹ {product.discountPrice || product.productPrice}
+              </Typography>
 
-            </CardContent>
-          </Card>
+              {/* Original Price */}
+              {product.discount > 0 && (
+                <Typography
+                  component="span"
+                  sx={{
+                    textDecoration: "line-through",
+                    color: "#94a3b8",
+                    fontSize: 18,
+                    mr: 2,
+                  }}
+                >
+                  ₹ {product.productPrice}
+                </Typography>
+              )}
+
+              {/* Discount Percentage */}
+              {product.discount > 0 && (
+                <Chip
+                  label={`${product.discount}% OFF`}
+                  size="small"
+                  sx={{
+                    backgroundColor: "#dcfce7",
+                    color: "#15803d",
+                    fontWeight: "bold",
+                  }}
+                />
+              )}
+
+              {/* You Save */}
+              {product.discount > 0 && (
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mt: 1,
+                    color: "#15803d",
+                    fontWeight: 500,
+                  }}
+                >
+                  You save ₹ {product.productPrice - product.discountPrice}
+                </Typography>
+              )}
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* SERVICE INFO */}
+            <Stack spacing={1.2} sx={{ mb: 3 }}>
+              <Typography variant="body2">🚚 Free Delivery</Typography>
+              <Typography variant="body2">🔄 7-Day Return Available</Typography>
+              <Typography variant="body2">💵 Cash on Delivery</Typography>
+            </Stack>
+
+            <Divider sx={{ my: 2 }} />
+
+            {/* DESCRIPTION */}
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: "bold", mb: 0.5, color: "#0f172a" }}
+            >
+              Description
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 3 }}
+            >
+              {product.productDescription}
+            </Typography>
+
+            {/* STOCK */}
+            <Typography
+              variant="body2"
+              sx={{
+                mb: 3,
+                fontWeight: 500,
+                color:
+                  product.stockQuantity > 0
+                    ? "success.main"
+                    : "error.main",
+              }}
+            >
+              {product.stockQuantity > 0
+                ? `In stock (${product.stockQuantity} available)`
+                : "Out of stock"}
+            </Typography>
+
+            {/* CTA */}
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={addToCartClick}
+              sx={{
+                px: 4,
+                textTransform: "none",
+                fontWeight: "bold",
+                backgroundColor: "#0f172a",
+                "&:hover": { backgroundColor: "#1e293b" },
+              }}
+            >
+              Add to Cart
+            </Button>
+
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
-    <Box sx={{ p: 4 }}>
-      <RelatedProduct />
-    </Box>
+        {/* RELATED PRODUCTS */}
+        <Box sx={{ mt: 8 }}>
+          <Divider sx={{ mb: 3 }} />
+          {/* <Typography
+            variant="h6"
+            sx={{ fontWeight: "bold", color: "#0f172a", mb: 3 }}
+          >
+            Related Products
+          </Typography> */}
+          <RelatedProducts />
+          <ProductReviews />
+        </Box>
+      </Container>
+
     </>
+
+
   );
 };
 

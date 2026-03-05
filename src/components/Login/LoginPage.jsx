@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useNavigate } from "react-router-dom";
+import AlertMessage from "../Message/AlertMessage";
 
 const LoginPage = ({ handleLogin }) => {
   const [email, setEmail] = useState("");
@@ -29,8 +30,10 @@ const LoginPage = ({ handleLogin }) => {
 
     const result = await handleLogin(email, password);
 
-    if (result?.data?.status === "FAILED") {
-      setError(result?.data?.message || "Login failed. Please try again.");
+    console.log("handle login resp",result);
+
+    if (result?.status === "FAILED") {
+      setError(result?.message || "Login failed. Please try again.");
       return;
     }
 
@@ -47,6 +50,11 @@ const LoginPage = ({ handleLogin }) => {
   };
 
   return (
+    <Box>
+    <Box>
+
+      <AlertMessage />
+    </Box>
     <Box
       minHeight="70vh"
       display="flex"
@@ -62,7 +70,7 @@ const LoginPage = ({ handleLogin }) => {
               sx={{
                 width: 64,
                 height: 64,
-                bgcolor: "primary.main",
+                bgcolor: "#0f172a",
                 mx: "auto",
                 mb: 1,
               }}
@@ -73,7 +81,7 @@ const LoginPage = ({ handleLogin }) => {
             <Typography
               variant="h5"
               fontWeight="bold"
-              color="primary.main"
+              color="#0f172a"
             >
               Welcome Back
             </Typography>
@@ -90,6 +98,7 @@ const LoginPage = ({ handleLogin }) => {
             <TextField
               label="Email"
               fullWidth
+              size="small"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -97,6 +106,7 @@ const LoginPage = ({ handleLogin }) => {
             <TextField
               label="Password"
               type="password"
+              size="small"
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -104,13 +114,10 @@ const LoginPage = ({ handleLogin }) => {
 
             <Button
               variant="contained"
-              size="large"
               onClick={handleLoginClick}
               sx={{
-                py: 1.3,
-                fontWeight: "bold",
-                textTransform: "none",
-                borderRadius: 3,
+                backgroundColor: "#0f172a",
+                "&:hover": { backgroundColor: "#1e293b" },
               }}
             >
               Login
@@ -133,6 +140,7 @@ const LoginPage = ({ handleLogin }) => {
           </Stack>
         </CardContent>
       </Card>
+    </Box>
     </Box>
   );
 };

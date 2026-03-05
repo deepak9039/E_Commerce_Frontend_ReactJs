@@ -1,4 +1,4 @@
-import React, { use, useState,useEffect } from 'react';
+import React, { use, useState, useEffect } from 'react';
 import {
     Container,
     Typography,
@@ -11,6 +11,9 @@ import {
     Box,
     Divider,
 } from '@mui/material';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+
 import { useNavigate } from 'react-router-dom';
 import { getCartByUserId, quntityUpdatePlus, quntityUpdateMinus, removeCartItem } from '../../services/apiService';
 import { useCart } from '../Context/CartContext';
@@ -67,7 +70,11 @@ const CartPage = ({ user }) => {
     const viewProduct = (id) => navigate(`/product/${id}`);
 
     const totalOrderPrice = cartItems.reduce((acc, item) => 0 + item?.totalOrderPrice, 0);
+    const totalOrderDiscount = cartItems.reduce((acc,item) => 0 + item?.totalOrderDiscount,0);
+    console.log("totalOrderPrice", totalOrderPrice);
+    console.log("totalOrderDiscount", totalOrderDiscount);
 
+    
     useEffect(() => {
         fetchCartItems();
     }, []);
@@ -79,94 +86,194 @@ const CartPage = ({ user }) => {
                 <Grid size={8}>
                     {cartItems.length === 0 ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 4 }}>
-                            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>Missing Cart items?</Typography>
-                            <Typography variant="body1" sx={{ mb: 3 }}>Login to see the items you added previously</Typography>
-                            <Button variant="contained" color="primary" onClick={() => navigate('/signin')}>
-                                Login
-                            </Button>
+
+                            {user === null ? (
+
+                                // 🔐 NOT LOGGED IN
+                                <Box
+
+                                >
+                                    <ShoppingCartOutlinedIcon
+                                        sx={{ fontSize: 50, color: "#9ca3af", mb: 2 }}
+                                    />
+
+                                    <Typography
+                                        variant="h5"
+                                        sx={{ fontWeight: 600, mb: 1 }}
+                                    >
+                                        Missing Cart items?
+                                    </Typography>
+
+                                    <Typography
+                                        variant="body1"
+                                        sx={{ color: "#6b7280", mb: 3 }}
+                                    >
+                                        Login to see the items you added previously
+                                    </Typography>
+
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => navigate("/signin")}
+                                        size="small"
+                                        sx={{
+                                            backgroundColor: "#0f172a",
+                                            "&:hover": { backgroundColor: "#1e293b" },
+                                        }}
+                                    >
+                                        Login
+                                    </Button>
+                                </Box>
+
+                            ) : (
+
+                                // 🛒 CART EMPTY
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        textAlign: "center",
+                                        px: 3,
+                                    }}
+                                >
+                                    <ShoppingCartOutlinedIcon
+                                        sx={{ fontSize: 40, color: "#9ca3af", mb: 2 }}
+                                    />
+
+                                    <Typography
+                                        variant="h6"
+                                        sx={{ fontWeight: 600, mb: 2 }}
+                                    >
+                                        Your cart is empty
+                                    </Typography>
+                                </Box>
+                            )}
+
                         </Box>
                     ) : (
                         <>
-                        <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                            Shopping Cart
-                        </Typography>
-                        <Grid container sx={{my:2}} spacing={2}>
-                            {cartItems?.map((item, index) => (
-                                <Grid size={12} key={index}>
-                                    <Card sx={{ display: 'flex', gap: 2 }}>
-                                        <Grid size={3}>
-                                            <CardMedia
-                                                component="img"
-                                                sx={{ width: "100%", objectFit: 'contain', borderRadius: 1 }}
-                                                height={100}
-                                                image={`http://localhost:1234/image/product/${item?.product?.productImageUrl}`}
-                                                alt={item.productName}
-                                            />
-                                        </Grid>
-                                        <Grid size={9} sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                                            <CardContent sx={{ flex: '1 0 auto' }}>
-                                                <Typography variant="h6">{item.productName}</Typography>
-                                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                                    {item.product.productDescription.length > 60
-                                                        ? item?.product?.productDescription.slice(0, 60) + '...'
-                                                        : item.product.productDescription}
-                                                </Typography>
-                                                <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
-                                                    Price: ₹ {item?.product?.productPrice}
-                                                </Typography>
-                                                <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
-                                                    
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                                                        Quantity: 
-                                                    {/* MINUS BUTTON */}
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        disabled={item.quantity === 1}
-                                                        onClick={() => updateQuantityMinus(item?.id,item?.userDlts?.userId, item?.product?.productId)}
-                                                    >
-                                                        -
-                                                    </Button>
+                            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                                Shopping Cart
+                            </Typography>
+                            <Grid container sx={{ my: 2 }} spacing={2}>
+                                {cartItems?.map((item, index) => (
+                                    <Grid size={12} key={index}>
+                                        <Card sx={{ display: 'flex', gap: 2 }}>
+                                            <Grid size={3}>
+                                                <CardMedia
+                                                    component="img"
+                                                    sx={{ width: "100%", objectFit: 'contain', borderRadius: 1 }}
+                                                    height={100}
+                                                    image={`http://localhost:1234/image/product/${item?.product?.productImageUrl}`}
+                                                    alt={item.productName}
+                                                />
+                                            </Grid>
+                                            <Grid size={9} sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                                                <CardContent sx={{ flex: '1 0 auto' }}>
+                                                    <Typography variant="h6">{item.productName}</Typography>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                                        {item.product.productDescription.length > 60
+                                                            ? item?.product?.productDescription.slice(0, 60) + '...'
+                                                            : item.product.productDescription}
+                                                    </Typography>
+                                                    <Box sx={{ mt: 0.5 }}>
+                                                        <Typography
+                                                            component="span"
+                                                            sx={{
+                                                                fontWeight: 700,
+                                                                fontSize: 16,
+                                                                mr: 1
+                                                            }}
+                                                        >
+                                                            ₹{item.product.discount > 0
+                                                                ? item.product.discountPrice
+                                                                : item.product.productPrice}
+                                                        </Typography>
 
-                                                    {/* QUANTITY */}
-                                                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minWidth: 30, textAlign: 'center' }}>
-                                                        {item.quantity}
+                                                        {item.product.discount > 0 && (
+                                                            <>
+                                                                <Typography
+                                                                    component="span"
+                                                                    sx={{
+                                                                        textDecoration: "line-through",
+                                                                        color: "#94a3b8",
+                                                                        fontSize: 14,
+                                                                        mr: 1
+                                                                    }}
+                                                                >
+                                                                    ₹{item.product.productPrice}
+                                                                </Typography>
+
+                                                                <Typography
+                                                                    component="span"
+                                                                    sx={{
+                                                                        color: "#16a34a",
+                                                                        fontSize: 13,
+                                                                        fontWeight: 600
+                                                                    }}
+                                                                >
+                                                                    {item.product.discount}% OFF
+                                                                </Typography>
+                                                            </>
+                                                        )}
+                                                    </Box>
+                                                    {/* <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
+                                                        Price: ₹ {item?.product?.productPrice}
+                                                    </Typography> */}
+                                                    <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
+
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                                                            Quantity:
+                                                            {/* MINUS BUTTON */}
+                                                            <Button
+                                                                variant="outlined"
+                                                                size="small"
+                                                                disabled={item.quantity === 1}
+                                                                onClick={() => updateQuantityMinus(item?.id, item?.userDlts?.userId, item?.product?.productId)}
+                                                            >
+                                                                -
+                                                            </Button>
+
+                                                            {/* QUANTITY */}
+                                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', minWidth: 30, textAlign: 'center' }}>
+                                                                {item.quantity}
+                                                            </Typography>
+
+                                                            {/* PLUS BUTTON */}
+                                                            <Button
+                                                                variant="outlined"
+                                                                size="small"
+                                                                onClick={() => updateQuantityPlus(item?.id, item?.userDlts?.userId, item?.product?.productId)}
+                                                            >
+                                                                +
+                                                            </Button>
+
+                                                        </Box>
+
+                                                    </Typography>
+                                                    <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
+                                                        Total Price: ₹ {item?.totalPrice}
                                                     </Typography>
 
-                                                    {/* PLUS BUTTON */}
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        onClick={() => updateQuantityPlus(item?.id,item?.userDlts?.userId, item?.product?.productId)}
-                                                    >
-                                                        +
+                                                </CardContent>
+                                                <CardActions sx={{ mt: 'auto' }}>
+                                                    <Button size="small" onClick={() => viewProduct(item?.product?.productId)}>
+                                                        View Details
                                                     </Button>
-
-                                                    </Box>
-
-                                                </Typography>
-                                                <Typography variant="subtitle1" sx={{ mt: 1, fontWeight: 'bold' }}>
-                                                    Total Price: ₹ {item?.totalPrice}
-                                                </Typography>
-
-                                            </CardContent>
-                                            <CardActions sx={{ mt: 'auto' }}>
-                                                <Button size="small" onClick={() => viewProduct(item?.product?.productId)}>
-                                                    View Details
-                                                </Button>
-                                                <Button
-                                                    size="small"
-                                                    color="error"
-                                                    onClick={() => removeFromCart(item?.id,item?.userDlts?.userId, item?.product?.productId)}
-                                                >
-                                                    Remove
-                                                </Button>
-                                            </CardActions>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
+                                                    <Button
+                                                        size="small"
+                                                        color="error"
+                                                        onClick={() => removeFromCart(item?.id, item?.userDlts?.userId, item?.product?.productId)}
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                </CardActions>
+                                            </Grid>
+                                        </Card>
+                                    </Grid>
+                                ))}
+                            </Grid>
                         </>
                     )}
                 </Grid>
@@ -175,26 +282,107 @@ const CartPage = ({ user }) => {
 
                 {/* RIGHT COLUMN (4) */}
                 {cartItems.length > 0 && (
-                    <Grid size={4} sx={{mt:6}}>
-                        <Box sx={{ p: 2, border: '1px solid #ccc', borderRadius: 2 }}>
-                            <Typography variant="h6">Cart Summary</Typography>
-                            <Divider sx={{ my: 1 }} />
-                            <Typography>Total Items: {cartItems.length}</Typography>
-                            <Typography sx={{ mt: 1, fontWeight: 'bold' }}>
-                                Total Order Price: ₹ {totalOrderPrice}
+                    <Grid size={4} sx={{ mt: 6 }}>
+                        <Box
+                            sx={{
+                                p: 3,
+                                border: "1px solid #e5e7eb",
+                                borderRadius: 2,
+                                backgroundColor: "#ffffff",
+                            }}
+                        >
+                            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                                PRICE DETAILS
                             </Typography>
-                            <Button
-                                variant="contained"
-                                color="success"
-                                sx={{ mt: 2 }}
-                                disabled={cartItems.length === 0}
-                                onClick={() => navigate('/order', { state: { totalAmount: totalOrderPrice, cartItems: cartItems } })}
+
+                            <Divider sx={{ mb: 2 }} />
+
+                            {/* MRP */}
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+                                <Typography sx={{ color: "#475569" }}>MRP</Typography>
+                                <Typography>₹ {totalOrderPrice}</Typography>
+                            </Box>
+
+                            {/* DISCOUNT */}
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                    <Typography sx={{ color: "#475569" }}>
+                                        Discounts
+                                    </Typography>
+                                    <KeyboardArrowDownIcon sx={{ fontSize: 18 }} />
+                                </Box>
+                                <Typography sx={{ color: "green", fontWeight: 500 }}>
+                                    - ₹ {totalOrderDiscount}
+                                </Typography>
+                            </Box>
+
+                            <Divider sx={{ mb: 2 }} />
+
+                            {/* TOTAL */}
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                                <Typography sx={{ fontWeight: 600 }}>
+                                    Total Amount
+                                </Typography>
+                                <Typography sx={{ fontWeight: 600 }}>
+                                    ₹ {totalOrderPrice}
+                                </Typography>
+                            </Box>
+
+                            {/* SAVINGS BOX */}
+                            <Box
+                                sx={{
+                                    backgroundColor: "#e6f4ea",
+                                    color: "#1e7e34",
+                                    px: 2,
+                                    py: 1.5,
+                                    borderRadius: 2,
+                                    fontWeight: 500,
+                                    mb: 3,
+                                }}
                             >
-                                Checkout
+                                🎉 You'll save ₹200 on this order!
+                            </Box>
+
+                            {/* SECURE TEXT */}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    color: "#6b7280",
+                                    fontSize: 14,
+                                    mb: 3,
+                                }}
+                            >
+                                🛡 Safe and secure payments. Easy returns. 100% Authentic products.
+                            </Box>
+
+                            {/* PLACE ORDER BUTTON */}
+                            <Button
+                                fullWidth
+                                sx={{
+                                    backgroundColor: "#facc15",
+                                    color: "#000",
+                                    fontWeight: 600,
+                                    py: 1.5,
+                                    fontSize: 16,
+                                    "&:hover": {
+                                        backgroundColor: "#eab308",
+                                    },
+                                }}
+                                disabled={cartItems.length === 0}
+                                onClick={() =>
+                                    navigate("/order", {
+                                        state: { totalAmount: totalOrderPrice, cartItems: cartItems, totalOrderDiscount: totalOrderDiscount },
+                                    })
+                                }
+                            >
+                                Place Order
                             </Button>
                         </Box>
                     </Grid>
                 )}
+
             </Grid>
         </Container>
     );

@@ -20,6 +20,8 @@ import CartPage from "./components/Cart/CartPage";
 import Order from "./components/OrderPage/Order";
 import UserOrders from "./components/OrderPage/UserOrders";
 import AdminOrders from "./components/Admin/AdminOrders";
+import SearchResults from "./components/Search/SearchResults";
+import ProductReviewPage from "./components/Review/ProductReviewPage";
 
 import { loginUser } from "./services/apiService";
 import { CartProvider } from "./components/Context/CartContext";
@@ -27,6 +29,7 @@ import UserProfile from "./components/UserDetails/UserProfile";
 import UserAddress from "./components/UserDetails/UserAddress";
 import AdminLayout from "./components/Admin/AdminLayout";
 import { logoutUser } from "./services/apiService";
+import OrderSuccess from "./components/OrderPage/OrderSuccess";
 
 const theme = createTheme({
   palette: {
@@ -42,18 +45,24 @@ function App() {
   console.log("Current User in App.jsx:", user); 
 
   const handleLogin = async (email, password) => {
-    try {
-      const response = await loginUser({ email, password });
-      if (response.status === "FAILED") return response;
-      setUser(response);
-      return response;
-    } catch (err) {
-      return {
-        success: false,
-        message: "Login failed",
-      };
-    }
-  };
+  try {
+    const response = await loginUser({ email, password });
+    console.log("====", response);
+
+    if (response.status === "FAILED") return response;
+
+    setUser(response);
+    return response;
+
+  } catch (err) {
+    console.log("Login Error:", err);
+
+    return err?.response?.data || {
+      status: "FAILED",
+      message: "Login failed. Please try again.",
+    };
+  }
+};
 
   const signOut = async () => {
       localStorage.removeItem("user");
@@ -101,6 +110,9 @@ function App() {
             <Route path="/order" element={<Order user={user} />} />
             <Route path="/user-orders" element={<UserOrders user={user} />} />
             <Route path="/admin-orders" element={<AdminOrders user={user} />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/order-success" element={<OrderSuccess />} />
+            <Route path="/productReview" element={<ProductReviewPage />} />
           </Routes>
           <Footer />
         </Router>

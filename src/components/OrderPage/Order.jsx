@@ -21,19 +21,21 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getUserAddresses, saveOrder, addUserAddress } from "../../services/apiService";
 
 const Order = ({ user }) => {
   const location = useLocation();
-  const { totalAmount, cartItems } = location.state || { totalAmount: 0, cartItems: [] };
+  const navigate = useNavigate();
+  const { totalAmount, cartItems , totalOrderDiscount} = location.state || { totalAmount: 0, cartItems: [], totalOrderDiscount: 0 };
 
-  console.log("User in Order Page:", user);
+  console.log("Order Page - Received from Cart:", { totalAmount, cartItems, totalOrderDiscount });
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [openAddressForm, setOpenAddressForm] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [paymentError, setPaymentError] = useState(false);
   const [newAddress, setNewAddress] = useState({
     firstName: "",
     lastName: "",
@@ -45,68 +47,29 @@ const Order = ({ user }) => {
     pinCode: "",
   });
 
-  // Calculate order summary
   const subtotal = totalAmount;
-  const tax = subtotal * 0.05; // 5% tax
-  let delivery = 0;
-  if(totalAmount < 1000){
-    delivery = 50; // Fixed delivery charge
-  }
-  else{
-    delivery = 0; // Fixed delivery charge
-  }
+  const discount = totalOrderDiscount;
+  const tax = subtotal * 0.05;
+  const delivery = subtotal < 1000 ? 50 : 0;
   const total = subtotal + tax + delivery;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  /* ================= FETCH ADDRESSES ================= */
   const fetchAddresses = async () => {
-      try {
-        const res = await getUserAddresses(user.userId);
-        const list = res?.addresses || [];
+    const res = await getUserAddresses(user.userId);
+    const list = res?.addresses || [];
+    setAddresses(list);
+    if (list.length > 0) setSelectedAddressId(String(list[0].addressId));
+  };
 
-        setAddresses(list);
-
-        // ✅ Select ONLY the first address by default
-        if (list.length > 0) {
-          setSelectedAddressId(String(list[0].addressId));
-        } else {
-          setSelectedAddressId("");
-        }
-      } catch (error) {
-        console.error("Error fetching addresses:", error);
-        setAddresses([]);
-        setSelectedAddressId("");
-      }
-    };
   useEffect(() => {
-    if (!user?.userId) return;
-    fetchAddresses();
+    if (user?.userId) fetchAddresses();
   }, [user?.userId]);
 
-  /* ================= HANDLERS ================= */
   const handleChange = (e) => {
     setNewAddress({ ...newAddress, [e.target.name]: e.target.value });
   };
 
   const handleSaveAddress = async () => {
-    const id = Date.now().toString(); // 🔑 keep ID as STRING
-
-    const updatedAddresses = [...addresses, { ...newAddress, id }];
-    setAddresses(updatedAddresses);
-    setSelectedAddressId(id);
-
-    setNewAddress({
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      address: "",
-      city: "",
-      state: "",
-      pinCode: "",
-    });
-
-    setOpenAddressForm(false);
     try {
       const payload = {
         addressLine: newAddress.address,
@@ -116,71 +79,80 @@ const Order = ({ user }) => {
         pinCode: newAddress.pinCode,
         country: "India",
         phoneNumber: newAddress.phoneNumber,
-        userId: user?.userId
+        userId: user?.userId,
       };
-      const res = await addUserAddress(payload);
-      console.log("Address added successfully:", res);
-      // Refresh address list
+      await addUserAddress(payload);
       fetchAddresses();
+      setOpenAddressForm(false);
     } catch (error) {
-      console.error("Error adding address:", error);
+      console.error(error);
     }
   };
 
   const handleSaveorder = async () => {
-    try {
-      // 🔑 Find selected address object
-      const selectedAddress = addresses.find(
-        (addr) => String(addr.addressId) === String(selectedAddressId)
-      );
 
-      console.log("Selected Address ID:", selectedAddressId);
-      console.log("Selected Address Object:", selectedAddress);
-
-      if (!selectedAddress) {
-        alert("Please select an address");
-        return;
-      }
-      const orderPayload = {
-        userId: user?.userId,
-        paymentMethod: paymentMethod,
-        firstName: selectedAddress.firstName || user?.userName,
-        lastName: selectedAddress.lastName,
-        email: selectedAddress.email || user?.email,
-        phoneNumber: selectedAddress.phoneNumber,
-        address: selectedAddress.address,
-        city: selectedAddress.city,
-        state: selectedAddress.state,
-        pinCode: selectedAddress.pinCode,
-      };
-
-      const res = await saveOrder(orderPayload);
-      alert(res?.message || "Order placed successfully!");
-    } catch (error) {
-      console.error("Error placing order:", error);
-      alert("Failed to place order. Please try again.");
-    }
+    if (!paymentMethod) {
+    setPaymentError(true);
+    return;
   }
+    const selectedAddress = addresses.find(
+      (addr) => String(addr.addressId) === String(selectedAddressId)
+    );
+    if (!selectedAddress) return alert("Please select address");
 
-  /* ================= UI ================= */
+    const orderPayload = {
+      userId: user?.userId,
+      paymentMethod,
+      firstName: selectedAddress.firstName || user?.userName,
+      lastName: selectedAddress.lastName,
+      email: selectedAddress.email || user?.email,
+      phoneNumber: selectedAddress.phoneNumber,
+      address: selectedAddress.address,
+      city: selectedAddress.city,
+      state: selectedAddress.state,
+      pinCode: selectedAddress.pinCode,
+    };
+
+    const res = await saveOrder(orderPayload);
+    // alert(res?.message || "Order placed!");
+
+    console.log("ssss",res)
+    if(res.status === "Success") {
+      navigate("/order-success", { state: res });
+      console.log("i amsuccess")
+   }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 10 }}>
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
 
-        {/* 🔵 LEFT (9) */}
+        {/* LEFT – ADDRESS */}
         <Grid size={4}>
-          <Card>
+          <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
             <CardContent>
-              <Typography variant="h6">Select Delivery Address</Typography>
-              <Divider sx={{ my: 1 }} />
-
-              {addresses.length === 0 && (
-                <Typography color="text.secondary">
-                  No address found. Please add a new address.
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="h6" fontWeight="bold">
+                  Delivery Address
                 </Typography>
-              )}
 
-              {/* ✅ RADIO GROUP */}
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => setOpenAddressForm(true)}
+                  sx={{ 
+                        borderRadius: 2, 
+                        backgroundColor: "#0f172a",
+                        "&:hover": { backgroundColor: "#1e293b" },
+                  }}
+                  
+                >
+                  + Add
+                </Button>
+              </Box>
+
+              <Divider sx={{ my: 2 }} />
+
               <RadioGroup
                 value={selectedAddressId}
                 onChange={(e) => setSelectedAddressId(e.target.value)}
@@ -189,10 +161,13 @@ const Order = ({ user }) => {
                   <Box
                     key={addr.addressId}
                     sx={{
-                      border: "1px solid #ddd",
-                      borderRadius: 1,
+                      border: selectedAddressId === String(addr.addressId)
+                        ? "2px solid #1976d2"
+                        : "1px solid #ddd",
+                      borderRadius: 2,
                       p: 2,
                       mb: 2,
+                      transition: "0.3s",
                     }}
                   >
                     <FormControlLabel
@@ -206,114 +181,227 @@ const Order = ({ user }) => {
                           <Typography variant="body2">
                             {addr.address}, {addr.city}, {addr.state} - {addr.pinCode}
                           </Typography>
-                          <Typography variant="body2">
-                            📞 {addr.phoneNumber}
-                          </Typography>
-                          <Typography variant="body2">
-                            ✉ {addr.email}
-                          </Typography>
+                          <Typography variant="body2">📞 {addr.phoneNumber}</Typography>
                         </Box>
                       }
                     />
                   </Box>
                 ))}
               </RadioGroup>
-
-              <Button
-                variant="outlined"
-                onClick={() => setOpenAddressForm(true)}
-              >
-                + Add New Address
-              </Button>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid size={5}>
-          <Card>
+        {/* CENTER – PAYMENT */}
+        <Grid size={4}>
+          <Card sx={{ borderRadius: 3, boxShadow: 3 }}>
             <CardContent>
-              <Typography variant="h6">Select Payment Method</Typography>
-              <Divider sx={{ my: 1 }} />
+              <Typography variant="h6" fontWeight="bold">
+                Payment Method
+              </Typography>
 
-              <FormControl fullWidth sx={{ mt: 2 }}>
-                <InputLabel id="payment-method-label">
-                  Payment Method
-                </InputLabel>
+              <Divider sx={{ my: 3 }} />
 
+              <FormControl fullWidth error={paymentError}>
+                <InputLabel>Payment Method</InputLabel>
                 <Select
-                  labelId="payment-method-label"
                   value={paymentMethod}
                   label="Payment Method"
-                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  onChange={(e) => {
+                    setPaymentMethod(e.target.value);
+                    setPaymentError(false); // remove error once selected
+                  }}
+                  size="small"
                 >
-                  <MenuItem value="CASH_ON_DELIVERY">
-                    Cash on Delivery
-                  </MenuItem>
-                  <MenuItem value="UPI">
-                    UPI
-                  </MenuItem>
-                  <MenuItem value="CREDIT_CARD">
-                    Credit / Debit / ATM Card
-                  </MenuItem>
-                  <MenuItem value="EMI">
-                    EMI
-                  </MenuItem>
+                  <MenuItem value="CASH_ON_DELIVERY">Cash on Delivery</MenuItem>
+                  <MenuItem value="UPI">UPI</MenuItem>
+                  <MenuItem value="CREDIT_CARD">Card</MenuItem>
                 </Select>
+
+                {paymentError && (
+                  <Typography color="error" variant="caption" sx={{ mt: 1 }}>
+                    Please select a payment method
+                  </Typography>
+                )}
               </FormControl>
 
+              {/* 🔽 CARD / UPI DETAILS */}
+              {paymentMethod && paymentMethod !== "CASH_ON_DELIVERY" && (
+                <Box mt={3} display="grid" gap={2}>
+                  <Typography fontWeight="bold">Payment Details</Typography>
+
+                  {paymentMethod === "CREDIT_CARD" && (
+                    <>
+                      <TextField size="small" label="Card Number" fullWidth />
+                      <Box display="flex" gap={2}>
+                        <TextField size="small" label="Expiry" fullWidth />
+                        <TextField size="small" label="CVV" fullWidth />
+                      </Box>
+                      <TextField size="small" label="Card Holder Name" fullWidth />
+                    </>
+                  )}
+
+                  {paymentMethod === "UPI" && (
+                    <TextField label="UPI ID" fullWidth />
+                  )}
+                </Box>
+              )}
             </CardContent>
           </Card>
         </Grid>
 
-        {/* 🟢 RIGHT (3) */}
-        <Grid size={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Order Summary</Typography>
-              <Divider sx={{ my: 1 }} />
+        {/* RIGHT – SUMMARY */}
+        {/* RIGHT – SUMMARY */}
+<Grid size={4}>
+  <Box
+    sx={{
+      p: 3,
+      border: "1px solid #e5e7eb",
+      borderRadius: 3,
+      backgroundColor: "#ffffff",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+      position: "sticky",
+      top: 20
+    }}
+  >
+    {/* HEADER */}
+    <Typography
+      variant="subtitle1"
+      sx={{
+        fontWeight: 700,
+        letterSpacing: 0.5,
+        color: "#64748b",
+        mb: 2
+      }}
+    >
+      PRICE DETAILS
+    </Typography>
 
-              <Typography>Items: {totalItems}</Typography>
-              <Typography>Subtotal: ₹{subtotal.toFixed(2)}</Typography>
-              <Typography>Tax Charges: ₹{tax.toFixed(2)}</Typography>
-              <Typography>Delivery Charges: ₹{delivery.toFixed(2)}</Typography>
+    <Divider sx={{ mb: 2 }} />
 
-              <Divider sx={{ my: 1 }} />
+    {/* ITEMS */}
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+      <Typography sx={{ color: "#475569" }}>
+        Price ({totalItems} items)
+      </Typography>
 
-              <Typography fontWeight="bold">Total: ₹{total.toFixed(2)}</Typography>
+      <Typography fontWeight={500}>
+        ₹ {subtotal}
+      </Typography>
+    </Box>
 
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-                disabled={!selectedAddressId}
-                onClick={handleSaveorder}
-              >
-                Place Order
-              </Button>
-            </CardContent>
-          </Card>
-        </Grid>
+    {/* DISCOUNT */}
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+      <Typography sx={{ color: "#475569" }}>
+        Discount
+      </Typography>
+
+      <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
+        − ₹ {discount}
+      </Typography>
+    </Box>
+
+    {/* TAX */}
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+      <Typography sx={{ color: "#475569" }}>
+        Tax (5%)
+      </Typography>
+
+      <Typography>
+        ₹ {tax.toFixed(2)}
+      </Typography>
+    </Box>
+
+    {/* DELIVERY */}
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+      <Typography sx={{ color: "#475569" }}>
+        Delivery Charges
+      </Typography>
+
+      {delivery === 0 ? (
+        <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
+          FREE
+        </Typography>
+      ) : (
+        <Typography>
+          ₹ {delivery}
+        </Typography>
+      )}
+    </Box>
+
+    <Divider sx={{ mb: 2 }} />
+
+    {/* TOTAL */}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        mb: 2
+      }}
+    >
+      <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
+        Total Amount
+      </Typography>
+
+      <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
+        ₹ {total.toFixed(2)}
+      </Typography>
+    </Box>
+
+    <Divider sx={{ mb: 2 }} />
+
+    {/* SAVINGS */}
+    <Box
+      sx={{
+        backgroundColor: "#ecfdf5",
+        color: "#15803d",
+        px: 2,
+        py: 1.5,
+        borderRadius: 2,
+        fontWeight: 600,
+        mb: 3,
+        fontSize: 14
+      }}
+    >
+      🎉 You saved ₹ {discount} on this order
+    </Box>
+
+    {/* PLACE ORDER */}
+    <Button
+      fullWidth
+      sx={{
+        backgroundColor: "#facc15",
+        color: "#000",
+        fontWeight: 700,
+        py: 1.5,
+        fontSize: 16,
+        borderRadius: 2,
+        "&:hover": {
+          backgroundColor: "#eab308"
+        }
+      }}
+      disabled={!selectedAddressId}
+      onClick={handleSaveorder}
+    >
+      PLACE ORDER
+    </Button>
+  </Box>
+</Grid>
       </Grid>
 
-      {/* 🔴 ADD ADDRESS MODAL */}
-      <Dialog
-        open={openAddressForm}
-        onClose={() => setOpenAddressForm(false)}
-        fullWidth
-      >
+      {/* ADD ADDRESS DIALOG */}
+      <Dialog open={openAddressForm} onClose={() => setOpenAddressForm(false)} fullWidth>
         <DialogTitle>Add New Address</DialogTitle>
-
-        <DialogContent sx={{ display: "grid", gap: 2, mt: 1 }}>
-          <TextField label="First Name" name="firstName" onChange={handleChange} />
-          <TextField label="Last Name" name="lastName" onChange={handleChange} />
-          <TextField label="Email" name="email" onChange={handleChange} />
-          <TextField label="Phone Number" name="phoneNumber" onChange={handleChange} />
-          <TextField label="Address" name="address" onChange={handleChange} />
-          <TextField label="City" name="city" onChange={handleChange} />
-          <TextField label="State" name="state" onChange={handleChange} />
-          <TextField label="Pin Code" name="pinCode" onChange={handleChange} />
+        <DialogContent sx={{ display: "grid", gap: 2 }}>
+          <TextField size="small" label="First Name" name="firstName" onChange={handleChange} />
+          <TextField size="small" label="Last Name" name="lastName" onChange={handleChange} />
+          <TextField size="small" label="Email" name="email" onChange={handleChange} />
+          <TextField size="small" label="Phone Number" name="phoneNumber" onChange={handleChange} />
+          <TextField size="small" label="Address" name="address" onChange={handleChange} />
+          <TextField size="small" label="City" name="city" onChange={handleChange} />
+          <TextField size="small" label="State" name="state" onChange={handleChange} />
+          <TextField size="small" label="Pin Code" name="pinCode" onChange={handleChange} />
         </DialogContent>
-
         <DialogActions>
           <Button onClick={() => setOpenAddressForm(false)}>Cancel</Button>
           <Button variant="contained" onClick={handleSaveAddress}>

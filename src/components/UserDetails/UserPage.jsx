@@ -69,7 +69,7 @@ const UserPage = () => {
               sx={{
                 width: 64,
                 height: 64,
-                bgcolor: "primary.main",
+                bgcolor: "#0f172a",
                 mx: "auto",
                 mb: 1,
               }}
@@ -80,7 +80,6 @@ const UserPage = () => {
             <Typography
               variant="h5"
               fontWeight="bold"
-              color="primary.main"
             >
               Create Account
             </Typography>
@@ -101,6 +100,7 @@ const UserPage = () => {
               <TextField
                 label="Email"
                 type="email"
+                size="small"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 fullWidth
@@ -111,6 +111,7 @@ const UserPage = () => {
                 label="Password"
                 type="password"
                 value={password}
+                size="small"
                 onChange={(e) => setPassword(e.target.value)}
                 fullWidth
                 required
@@ -122,11 +123,8 @@ const UserPage = () => {
                 size="large"
                 color="primary"
                 sx={{
-                  mt: 1,
-                  py: 1.3,
-                  fontWeight: "bold",
-                  textTransform: "none",
-                  borderRadius: 3,
+                  backgroundColor: "#0f172a",
+                  "&:hover": { backgroundColor: "#1e293b" },
                 }}
               >
                 Create Account

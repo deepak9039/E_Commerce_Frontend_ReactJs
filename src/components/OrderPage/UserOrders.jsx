@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Container,
   Grid,
@@ -70,23 +71,18 @@ const UserOrders = ({ user }) => {
                       {new Date(order.orderDate).toLocaleDateString()}
                     </Typography>
                   </Grid>
-
+                      
                   <Grid
                     item
                     xs={12}
                     md={4}
                     textAlign={{ xs: "left", md: "right" }}
                   >
-                    <Chip
-                      label={order.status}
-                      color={
-                        order.status === "DELIVERED"
-                          ? "success"
-                          : order.status === "CANCELLED"
-                          ? "error"
-                          : "warning"
-                      }
-                    />
+                    <Typography variant="subtitle2" color="text.secondary">
+                      
+                        Payment Method:{" "}
+                        {order.paymentMethod}
+                    </Typography>
                   </Grid>
                 </Grid>
 
@@ -109,7 +105,7 @@ const UserOrders = ({ user }) => {
                   </Grid>
 
                   <Grid size={4}>
-                    <Typography variant="h6">
+                    <Typography fontSize={14}>
                       {order.product.productName}
                     </Typography>
 
@@ -125,15 +121,44 @@ const UserOrders = ({ user }) => {
                       Quantity: <b>{order.quantity}</b>
                     </Typography> */}
 
-                    <Typography>
+                    <Typography sx={{py:1}}>
                       Price: ₹{order.price}
                     </Typography>
-
+                      <Chip
+                      label={order.status}
+                      color={
+                        order.status === "DELIVERED"
+                          ? "success"
+                          : order.status === "CANCELLED"
+                          ? "error"
+                          : "warning"
+                      }
+                    />
                     {/* <Typography fontWeight="bold">
                       Total: ₹{order.price * order.quantity}
                     </Typography> */}
                   </Grid>
-
+                  {order.status === "DELIVERED" && (
+                  <Grid size={4}>
+                    <Typography
+                      component={Link}
+                      to="/productReview"
+                      variant="body2"
+                      sx={{
+                        textDecoration: "none",
+                        color: "primary.main",
+                        fontWeight: 500,
+                        "&:hover": {
+                          textDecoration: "underline",
+                        },
+                        cursor: "pointer",
+                      }}
+                    >
+                      Rate & Review Product
+                    </Typography>
+                  </Grid>
+                  )
+                  }
                   {/* ================= ADDRESS ================= */}
                   {/* <Grid size={4}>
                     <Typography fontWeight="bold">
@@ -159,17 +184,17 @@ const UserOrders = ({ user }) => {
                   </Grid> */}
                 </Grid>
 
-                <Divider sx={{ my: 2 }} />
+                {/* <Divider sx={{ my: 2 }} /> */}
 
                 {/* ================= FOOTER ================= */}
-                <Grid container>
+                {/* <Grid container>
                   <Grid item xs={12} md={6}>
                     <Typography>
                       Payment Method:{" "}
                       <b>{order.paymentMethod}</b>
                     </Typography>
                   </Grid>
-                </Grid>
+                </Grid> */}
               </CardContent>
             </Card>
           </Grid>

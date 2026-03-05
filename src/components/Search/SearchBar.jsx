@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Box,
@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
-import { findAllProduct } from "../../services/apiService";
+import { searchProducts } from "../../services/apiService";
 
 const SearchBar = () => {
   const navigate = useNavigate();
@@ -19,35 +19,41 @@ const SearchBar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
-  const handleSearch = async (value) => {
+  // Only update input value (NO API CALL)
+  const handleSearch = (value) => {
     setSearchQuery(value);
 
     if (value.trim() === "") {
       setSearchResults([]);
       setShowResults(false);
-      return;
-    }
-
-    try {
-      const products = await findAllProduct();
-      const filtered = products.filter(
-        (product) =>
-          product.productName.toLowerCase().includes(value.toLowerCase()) ||
-          product.productDescription.toLowerCase().includes(value.toLowerCase())
-      );
-      setSearchResults(filtered);
-      setShowResults(true);
-    } catch (error) {
-      console.error("Error searching products:", error);
-      setSearchResults([]);
     }
   };
+
+  // API call happens ONLY here
+  const performSearch = () => {
+  if (searchQuery.trim() === "") return;
+
+  navigate(`/search?q=${searchQuery.trim()}`);
+
+  setShowResults(false);
+  // setSearchQuery("");
+};
 
   const handleSelectProduct = (productId) => {
     navigate(`/product/${productId}`);
     setSearchQuery("");
     setShowResults(false);
   };
+
+  // ✅ Sync input with URL
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const queryFromUrl = params.get("q");
+
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl);
+    }
+  }, [location.search]);
 
   return (
     <Box sx={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -57,16 +63,17 @@ const SearchBar = () => {
         placeholder="Search products..."
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            performSearch();
+          }
+        }}
         onFocus={() => searchQuery && setShowResults(true)}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={() => {
-                  if (searchResults.length > 0) {
-                    handleSelectProduct(searchResults[0].productId);
-                  }
-                }}
+                onClick={performSearch}
                 edge="end"
                 sx={{ cursor: "pointer" }}
               >
@@ -109,7 +116,6 @@ const SearchBar = () => {
             {searchResults.map((product) => (
               <ListItem
                 key={product.productId}
-                button
                 onClick={() => handleSelectProduct(product.productId)}
                 sx={{
                   "&:hover": {
@@ -128,6 +134,7 @@ const SearchBar = () => {
         </Paper>
       )}
 
+      {/* NO RESULTS */}
       {showResults && searchResults.length === 0 && searchQuery && (
         <Paper
           sx={{

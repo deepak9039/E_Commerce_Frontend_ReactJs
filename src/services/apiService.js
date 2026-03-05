@@ -370,6 +370,35 @@ export const categorySales = async () => {
   }
 }   
 
+//product search
+export const searchProducts = async (query) =>{
+  try{
+    const res = await axios.post("/api/searchProducts", query);
+    return res.data;
+  }catch (err){
+    console.log("API call error product search", err)
+  }
+}
+
+//top selling product
+export const topSellingproducts = async () => {
+  try{
+    const res = await axios.post("/api/topSellingProducts");
+    return res.data;
+  }catch(err) {
+    console.log("error while feachin top selling products", err)
+  }
+}
+
+export const ordersDesc = async () =>{
+  try{
+    const res = await axios.post("/api/orderDesc");
+    return res.data;
+  }catch(err) {
+    console.log("error while feachin orderDesc", err)
+  }
+}
+
 const apiService = () => {
     useEffect(() => {
     findAllCategory();
