@@ -15,7 +15,7 @@ import {
   Paper
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { getProductById, addToCart, cartCountByUserId } from "../../services/apiService";
+import { getProductById, addToCart, cartCountByUserId, getProductsByCategory, getProductReviews } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
 import RelatedProducts from "./RelatedProducts";
 import ProductReviews from "../Review/ProductReviews";
@@ -24,12 +24,20 @@ const ProductDetails = ({ user }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  console.log("erer",relatedProducts);
+  console.log("Product reviews:", reviews);
 
   const { refreshCartCount } = useCart();
 
   const fetchProduct = async () => {
     try {
       const res = await getProductById(id);
+      const relatedProducts = await getProductsByCategory(res.categoryName);
+      const reviews = await getProductReviews(id);
+      setReviews(reviews);
+      setRelatedProducts(relatedProducts);
       setProduct(res);
     } catch (error) {
       console.log("Error fetching product:", error);
@@ -251,8 +259,8 @@ const ProductDetails = ({ user }) => {
           >
             Related Products
           </Typography> */}
-          <RelatedProducts />
-          <ProductReviews />
+          <RelatedProducts relatedProducts={relatedProducts} />
+          <ProductReviews reviews={reviews} />
         </Box>
       </Container>
 

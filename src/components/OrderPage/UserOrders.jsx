@@ -143,6 +143,11 @@ const UserOrders = ({ user }) => {
                     <Typography
                       component={Link}
                       to="/productReview"
+                      state={{
+                        user: user,
+                        product: order.product,
+                        orderId: order.id
+                      }}
                       variant="body2"
                       sx={{
                         textDecoration: "none",

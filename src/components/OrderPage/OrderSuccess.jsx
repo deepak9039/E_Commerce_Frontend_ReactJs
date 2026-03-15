@@ -5,8 +5,12 @@ import {
   Button,
   Paper,
   Divider,
+  Grid,
+  Chip
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const OrderSuccess = () => {
@@ -15,7 +19,6 @@ const OrderSuccess = () => {
 
   const orderData = location.state;
 
-  // If page refreshed and state lost
   if (!orderData || !orderData.orders) {
     return (
       <Box textAlign="center" mt={10}>
@@ -33,13 +36,11 @@ const OrderSuccess = () => {
     );
   }
 
-  // Calculate total amount
   const totalAmount = orderData.orders.reduce(
     (sum, order) => sum + order.price * order.quantity,
     0
   );
 
-  // Take first order to show common details
   const firstOrder = orderData.orders[0];
 
   return (
@@ -49,123 +50,176 @@ const OrderSuccess = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f5f5f5",
+        background: "#f8fafc",
         p: 3,
       }}
     >
       <Paper
-        elevation={4}
+        elevation={3}
         sx={{
-          maxWidth: 700,
+          maxWidth: 750,
           width: "100%",
-          p: 4,
           borderRadius: 3,
+          overflow: "hidden"
         }}
       >
-        <Box textAlign="center">
+        {/* SUCCESS HEADER */}
+        <Box
+          sx={{
+            textAlign: "center",
+            p: 4,
+            background: "#ecfdf5"
+          }}
+        >
           <CheckCircleOutlineIcon
-            sx={{ fontSize: 80, color: "green", mb: 2 }}
+            sx={{ fontSize: 70, color: "#16a34a", mb: 1 }}
           />
 
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Order Placed Successfully!
+          <Typography variant="h4" fontWeight="bold">
+            Order Placed Successfully
           </Typography>
 
-          <Typography variant="body1" color="text.secondary">
-            Thank you for your purchase. Your order has been confirmed.
+          <Typography color="text.secondary">
+            Thank you for shopping with us
           </Typography>
         </Box>
 
-        <Divider sx={{ my: 3 }} />
+        <Box sx={{ p: 4 }}>
 
-        {/* Order ID */}
-        <Typography>
-          <b>Order ID:</b> {firstOrder.orderId}
-        </Typography>
+          {/* ORDER INFO */}
+          <Grid container spacing={2} mb={3}>
+            <Grid item xs={12} md={6}>
+              <Typography>
+                <b>Order ID:</b> {firstOrder.orderId}
+              </Typography>
 
-        <Typography>
-          <b>Order Date:</b>{" "}
-          {new Date(firstOrder.orderDate).toLocaleString()}
-        </Typography>
+              <Typography>
+                <b>Order Date:</b>{" "}
+                {new Date(firstOrder.orderDate).toLocaleString()}
+              </Typography>
+            </Grid>
 
-        <Typography>
-          <b>Status:</b> {firstOrder.status}
-        </Typography>
+            <Grid item xs={12} md={6}>
+              <Typography>
+                <b>Payment Method:</b>{" "}
+                {firstOrder.paymentMethod || "Cash on Delivery"}
+              </Typography>
 
-        <Typography>
-          <b>Payment Method:</b>{" "}
-          {firstOrder.paymentMethod || "Cash on Delivery"}
-        </Typography>
+              <Box mt={1}>
+                <Chip
+                  label={firstOrder.status}
+                  color="success"
+                  size="small"
+                />
+              </Box>
+            </Grid>
+          </Grid>
 
-        <Divider sx={{ my: 3 }} />
+          <Divider sx={{ mb: 3 }} />
 
-        {/* Products List */}
-        <Typography variant="h6" gutterBottom>
-          Ordered Products:
-        </Typography>
+          {/* PRODUCTS */}
+          <Typography
+            variant="h6"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <ReceiptLongOutlinedIcon />
+            Ordered Products
+          </Typography>
 
-        {orderData.orders.map((order, index) => (
-          <Box key={index} sx={{ mb: 2 }}>
-            <Typography>
-              <b>Product:</b> {order.product.productName}
-            </Typography>
+          <Box mt={2}>
+            {orderData.orders.map((order, index) => (
+              <Box
+                key={index}
+                sx={{
+                  p: 2,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 2,
+                  mb: 2,
+                  background: "#fafafa"
+                }}
+              >
+                <Typography fontWeight={600}>
+                  {order.product.productName}
+                </Typography>
 
-            <Typography>
-              <b>Quantity:</b> {order.quantity}
-            </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Quantity: {order.quantity}
+                </Typography>
 
-            <Typography>
-              <b>Price:</b> ₹{order.price}
-            </Typography>
+                <Typography variant="body2">
+                  Price: ₹{order.price}
+                </Typography>
 
-            <Typography>
-              <b>Total:</b> ₹{order.price * order.quantity}
-            </Typography>
-
-            <Divider sx={{ mt: 2 }} />
+                <Typography fontWeight={600}>
+                  Total: ₹{order.price * order.quantity}
+                </Typography>
+              </Box>
+            ))}
           </Box>
-        ))}
 
-        {/* Grand Total */}
-        <Typography variant="h6" sx={{ mt: 2 }}>
-          Grand Total: ₹{totalAmount}
-        </Typography>
+          <Divider sx={{ my: 3 }} />
 
-        <Divider sx={{ my: 3 }} />
-
-        {/* Delivery Address */}
-        <Typography variant="h6" gutterBottom>
-          Delivery Address:
-        </Typography>
-
-        <Typography>
-          {firstOrder.orderAddress.address},{" "}
-          {firstOrder.orderAddress.city},{" "}
-          {firstOrder.orderAddress.state} -{" "}
-          {firstOrder.orderAddress.pinCode}
-        </Typography>
-
-        <Box
-          sx={{
-            mt: 4,
-            display: "flex",
-            gap: 2,
-            justifyContent: "center",
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={() => navigate("/orders")}
+          {/* TOTAL */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mb: 2
+            }}
           >
-            View Orders
-          </Button>
+            <Typography variant="h6">Grand Total</Typography>
+            <Typography variant="h6" fontWeight="bold">
+              ₹{totalAmount}
+            </Typography>
+          </Box>
 
-          <Button
-            variant="outlined"
-            onClick={() => navigate("/")}
+          <Divider sx={{ my: 3 }} />
+
+          {/* ADDRESS */}
+          <Typography
+            variant="h6"
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            Continue Shopping
-          </Button>
+            <LocalShippingOutlinedIcon />
+            Delivery Address
+          </Typography>
+
+          <Typography mt={1} color="text.secondary">
+            {firstOrder.orderAddress.address},{" "}
+            {firstOrder.orderAddress.city},{" "}
+            {firstOrder.orderAddress.state} -{" "}
+            {firstOrder.orderAddress.pinCode}
+          </Typography>
+
+          {/* ACTION BUTTONS */}
+          <Box
+            sx={{
+              mt: 4,
+              display: "flex",
+              gap: 2,
+              justifyContent: "center"
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#0f172a",
+                "&:hover": { backgroundColor: "#1e293b" },
+                px: 4
+              }}
+              onClick={() => navigate("/orders")}
+            >
+              View Orders
+            </Button>
+
+            <Button
+              variant="outlined"
+              sx={{ px: 4 }}
+              onClick={() => navigate("/")}
+            >
+              Continue Shopping
+            </Button>
+          </Box>
         </Box>
       </Paper>
     </Box>

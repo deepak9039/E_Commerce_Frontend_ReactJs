@@ -14,24 +14,40 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import Pagination from "@mui/material/Pagination";
 import { getAllOrders, updateOrderStatus } from "../../services/apiService";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState({});
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const PAGE_SIZE = 50;
 
-  /* ================= FETCH ALL ORDERS ================= */
+  const handlePageChange = (event, value) => {
+    const newPage = value - 1;
+    fetchOrders(newPage);
+  };
+
+  const fetchOrders = async (pageNo = 0) => {
+    try {
+      const payload = {
+        page: pageNo,
+        pageSize: PAGE_SIZE,
+      };
+
+      const res = await getAllOrders(payload);
+
+      setOrders(res.orders || []);
+      setPage(res.currentPage || 0);
+      setTotalPages(res.totalPages || 0);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await getAllOrders();
-        setOrders(res.orders || []);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
-
-    fetchOrders();
+    fetchOrders(0);
   }, []);
 
   const handleStatusChange = (orderId, newStatus) => {
@@ -189,6 +205,16 @@ const AdminOrders = () => {
           </TableBody>
         </Table>
       </TableContainer>
+      {totalPages > 1 && (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
+          <Pagination
+            count={totalPages}
+            page={page + 1}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
+      )}
     </Container>
   );
 };

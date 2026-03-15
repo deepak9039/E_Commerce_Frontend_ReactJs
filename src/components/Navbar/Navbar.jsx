@@ -33,8 +33,8 @@ const CartBadge = styled(Badge)(({ theme }) => ({
     backgroundColor: theme.palette.error.main,
     color: "#fff",
     fontSize: "0.7rem",
-    top: -8,
-    right: -6,
+    top: -3,
+    right: -2,
   },
 }));
 

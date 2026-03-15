@@ -10,7 +10,7 @@ import {
     Grid,
     Avatar,
 } from "@mui/material";
-import { ordersCount, productsCount, usersCount, categorySales, topSellingproducts, getAllOrders, ordersDesc } from "../../services/apiService";
+import { ordersCount, productsCount, usersCount, categorySales, topSellingproducts, getAllOrders, ordersDesc, totalRevenue, salesOverview } from "../../services/apiService";
 
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -29,48 +29,8 @@ import {
     Cell,
 } from "recharts";
 
-const salesData = [
-    { day: "Mon", orders: 120, sales: 4000 },
-    { day: "Tue", orders: 90, sales: 3000 },
-    { day: "Wed", orders: 70, sales: 2000 },
-    { day: "Thu", orders: 200, sales: 2800 },
-    { day: "Fri", orders: 240, sales: 2600 },
-    { day: "Sat", orders: 380, sales: 2390 },
-    { day: "Sun", orders: 420, sales: 3500 },
-];
-
-const pieData = [
-    { name: "Electronics", value: 35 },
-    { name: "Clothing", value: 26 },
-    { name: "Home & Garden", value: 17 },
-    { name: "Sports", value: 13 },
-    { name: "Books", value: 9 },
-];
 
 const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6", "#ef4444"];
-
-// const stats = [
-//     {
-//         label: "Total Revenue",
-//         value: "$45,231",
-//         icon: <MonetizationOnIcon />,
-//     },
-//     {
-//         label: "Orders",
-//         value: "2,345",
-//         icon: <ShoppingCartIcon />,
-//     },
-//     {
-//         label: "Customers",
-//         value: "1,234",
-//         icon: <PeopleIcon />,
-//     },
-//     {
-//         label: "Products",
-//         value: "456",
-//         icon: <InventoryIcon />,
-//     },
-// ];
 
 const renderPieLabel = ({ name, value }) => {
     return `${name} (${value}%)`;
@@ -108,8 +68,19 @@ export default function AdminDashboard() {
         orders: 0,
         products: 0,
         users: 0,
-        revenue: 45231,
+        revenue: 0,
     });
+
+    const [salesData, setSalesData] = React.useState([]);
+
+    const fetchSalesOverview = async () => {
+        try {
+            const res = await salesOverview();
+            setSalesData(res.data || []);
+        } catch (err) {
+            console.error("Sales Overview API error:", err);
+        }
+    };
 
     React.useEffect(() => {
         const fetchCounts = async () => {
@@ -117,12 +88,12 @@ export default function AdminDashboard() {
                 const orders = await ordersCount();
                 const products = await productsCount();
                 const users = await usersCount();
-
+                const revenue = await totalRevenue();
                 setCounts({
                     orders: orders.ordersCount,
                     products: products.productsCount,
                     users: users.usersCount,
-                    revenue: 45231, // replace if revenue API exists
+                    revenue: revenue.totalRevenue, // replace if revenue API exists
                 });
             } catch (err) {
                 console.error("Dashboard API error:", err);
@@ -130,12 +101,13 @@ export default function AdminDashboard() {
         };
 
         fetchCounts();
+        fetchSalesOverview();
     }, []);
 
     const stats = [
         {
             label: "Total Revenue",
-            value: `$${counts.revenue.toLocaleString()}`,
+            value: `₹${counts.revenue.toLocaleString()}`,
             icon: <MonetizationOnIcon />,
         },
         {
@@ -158,7 +130,8 @@ export default function AdminDashboard() {
     const [categorySalesData, setCategorySalesData] = React.useState(null);
     const [topSellingProducts, setTopSellingProductsTop] = React.useState(null);
     const [orders, setOrders] = React.useState([]);
-    
+    const [totalRev, setTotalRev] = React.useState(0);
+
 
     console.log("Category Sales Data:", categorySalesData);
     console.log("top sell product :", topSellingProducts);
@@ -224,7 +197,7 @@ export default function AdminDashboard() {
 
             <Box sx={{ p: 3 }}>
                 <Typography color="text.secondary" mb={3}>
-                    Welcome back! Here's what's happening today.
+                    Welcome back! Here's what's happening today. dd
                 </Typography>
 
                 {/* Stat Cards (4 grid with icons) */}
@@ -264,13 +237,13 @@ export default function AdminDashboard() {
                                         <Tooltip />
                                         <Line
                                             type="monotone"
-                                            dataKey="sales"
+                                            dataKey="totalSales"
                                             stroke="#2563eb"
                                             strokeWidth={2}
                                         />
                                         <Line
                                             type="monotone"
-                                            dataKey="orders"
+                                            dataKey="totalOrders"
                                             stroke="#10b981"
                                             strokeWidth={2}
                                         />
@@ -293,10 +266,10 @@ export default function AdminDashboard() {
                                             nameKey="categoryName"
                                             outerRadius={95}
                                             label={renderPieLabel}   // 👈 always visible
-                                            labelLine={false}
+                                            labelLine={true}
                                         >
-                                            {pieData.map((_, index) => (
-                                                <Cell key={index} fill={COLORS[index]} />
+                                            {categorySalesData?.map((entry, index) => (
+                                                <Cell key={index} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
                                     </PieChart>
@@ -309,79 +282,112 @@ export default function AdminDashboard() {
 
                 {/* Recent Orders & Top Products (6 / 6) */}
                 <Grid container spacing={2} mt={1}>
-                    {/* Recent Orders */}
+                {/* Recent Orders */}
                     <Grid size={6}>
-                        <Card sx={{ borderRadius: 3 }}>
-                            <CardContent>
-                                <Box display="flex" justifyContent="space-between" mb={2}>
-                                    <Typography fontWeight="bold">Recent Orders</Typography>
-                                    <Typography color="primary" sx={{ cursor: "pointer" }}>View all</Typography>
+                        <Card sx={{ borderRadius: 3, height: 500 }}>
+                        <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                            
+                            <Box display="flex" justifyContent="space-between" mb={2}>
+                            <Typography fontWeight="bold">Recent Orders</Typography>
+                            <Typography color="primary" sx={{ cursor: "pointer" }}>
+                                View all
+                            </Typography>
+                            </Box>
+
+                            {/* Scroll Area */}
+                            <Box sx={{ overflowY: "auto", pr: 1 }}>
+                            {orders.map((order) => (
+                                <Box key={order.id} mb={2}>
+                                <Box display="flex" justifyContent="space-between">
+                                    <Box>
+                                    <Typography fontWeight="500">
+                                        {order.orderId.slice(0, 5)}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {order.product.productName}
+                                    </Typography>
+                                    </Box>
+                                    <Typography fontWeight="500">
+                                    ₹ {order.price}
+                                    </Typography>
                                 </Box>
 
+                                <Typography
+                                    variant="caption"
+                                    sx={{
+                                    px: 1.5,
+                                    py: 0.3,
+                                    borderRadius: 2,
+                                    bgcolor:
+                                        order.status === "DELIVERED"
+                                        ? "#dcfce7"
+                                        : order.status === "IN_PROGRESS"
+                                        ? "#dbeafe"
+                                        : "#fef3c7",
+                                    color:
+                                        order.status === "DELIVERED"
+                                        ? "#166534"
+                                        : order.status === "IN_PROGRESS"
+                                        ? "#1d4ed8"
+                                        : "#92400e",
+                                    }}
+                                >
+                                    {order.status}
+                                </Typography>
+                                </Box>
+                            ))}
+                            </Box>
 
-                                {orders.slice(0, 5).map((order) => (
-                                    <Box key={order.id} mb={2}>
-                                        <Box display="flex" justifyContent="space-between">
-                                            <Box>
-                                                <Typography fontWeight="500">{order.orderId.slice(0, 5)}</Typography>
-                                                <Typography variant="body2" color="text.secondary">{order.product.productName}</Typography>
-                                            </Box>
-                                            <Typography fontWeight="500">₹ {order.price}</Typography>
-                                        </Box>
-                                        <Typography
-                                            variant="caption"
-                                            sx={{
-                                                px: 1.5,
-                                                py: 0.3,
-                                                borderRadius: 2,
-                                                bgcolor:
-                                                    order.status === "DELIVERED"
-                                                        ? "#dcfce7"
-                                                        : order.status === "IN_PROGRESS"
-                                                            ? "#dbeafe"
-                                                            : "#fef3c7",
-                                                color:
-                                                    order.status === "DELIVERED"
-                                                        ? "#166534"
-                                                        : order.status === "IN_PROGRESS"
-                                                            ? "#1d4ed8"
-                                                            : "#92400e",
-                                            }}
-                                        >
-                                            {order.status}
-                                        </Typography>
-                                    </Box>
-                                ))}
-                            </CardContent>
+                        </CardContent>
                         </Card>
                     </Grid>
 
                     {/* Top Products */}
                     <Grid size={6}>
-                        <Card sx={{ borderRadius: 3 }}>
-                            <CardContent>
-                                <Box display="flex" justifyContent="space-between" mb={2}>
-                                    <Typography fontWeight="bold">Top Products</Typography>
-                                    <Typography color="primary" sx={{ cursor: "pointer" }}>View all</Typography>
+                        <Card sx={{ borderRadius: 3, height: 500 }}>
+                        <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+
+                            <Box display="flex" justifyContent="space-between" mb={2}>
+                            <Typography fontWeight="bold">Top Products</Typography>
+                            <Typography color="primary" sx={{ cursor: "pointer" }}>
+                                View all
+                            </Typography>
+                            </Box>
+
+                            {/* Scroll Area */}
+                            <Box sx={{ overflowY: "auto", pr: 1 }}>
+                            {topSellingProducts?.map((product) => (
+                                <Box
+                                key={product.productId}
+                                display="flex"
+                                justifyContent="space-between"
+                                mb={2}
+                                >
+                                <Box display="flex" gap={2}>
+                                    <Avatar sx={{ bgcolor: "#f1f5f9", color: "#334155" }}>
+                                    {product.productId}
+                                    </Avatar>
+
+                                    <Box>
+                                    <Typography fontWeight="500">
+                                        {product.productName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        {product.quantity} sales
+                                    </Typography>
+                                    </Box>
                                 </Box>
 
+                                <Typography fontWeight="500">
+                                    ₹ {product.totalAmount}
+                                </Typography>
+                                </Box>
+                            ))}
+                            </Box>
 
-                                {topSellingProducts?.map((product) => (
-                                    <Box key={product.rank} display="flex" justifyContent="space-between" mb={2}>
-                                        <Box display="flex" gap={2}>
-                                            <Avatar sx={{ bgcolor: "#f1f5f9", color: "#334155" }}>{product.productId}</Avatar>
-                                            <Box>
-                                                <Typography fontWeight="500">{product.productName}</Typography>
-                                                <Typography variant="body2" color="text.secondary">{product.quantity} sales </Typography>
-                                            </Box>
-                                        </Box>
-                                        <Typography fontWeight="500">₹ {product.totalAmount}</Typography>
-                                    </Box>
-                                ))}
-                            </CardContent>
+                        </CardContent>
                         </Card>
                     </Grid>
-
                 </Grid>
 
                 {/* Quick Actions (3 / 3 / 3 / 3) */}

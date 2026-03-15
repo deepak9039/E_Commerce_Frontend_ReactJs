@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Typography, Box, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { findAllProduct } from '../../services/apiService';
+import { findAllProductAdmin } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 
@@ -30,7 +30,7 @@ const ViewProduct = ({ onEditProduct }) => {
     const fetchProducts = async (pageNo = 0) => {
     try {
         const payload = { page: pageNo, pageSize: PAGE_SIZE };
-        const response = await findAllProduct(payload);
+        const response = await findAllProductAdmin(payload);
 
             setProducts(response.products || []);
             setPage(response.page || 0);

@@ -103,7 +103,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails user={user} />} />
             <Route path="/edit-product/:id" element={<AddProduct />} />
             <Route path="/register" element={<UserPage />} />
-            <Route path="/profile" element={<UserProfile user={user} />} />
+            <Route path="/profile" element={<UserProfile user={user} setUser={setUser} />} />
             <Route path="/user/address" element={<UserAddress user={user} />} />
             <Route path="/users" element={<UsersTable />} />
             <Route path="/signin" element={<LoginPage handleLogin={handleLogin} />} />

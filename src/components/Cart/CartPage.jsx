@@ -340,7 +340,7 @@ const CartPage = ({ user }) => {
                                     mb: 3,
                                 }}
                             >
-                                🎉 You'll save ₹200 on this order!
+                                🎉 You'll save ₹{totalOrderDiscount} on this order!
                             </Box>
 
                             {/* SECURE TEXT */}

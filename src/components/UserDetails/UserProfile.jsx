@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -12,12 +13,17 @@ import {
   Card,
   CardContent,
   Divider,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
-import { getUserById, updateUserProfile } from "../../services/apiService";
+import { getUserById, updateUserProfile, logoutUser } from "../../services/apiService";
 
-const UserProfile = ({ user }) => {
-  // ---- USER STATES ----
+const UserProfile = ({ user, setUser }) => {
+
+  const navigate = useNavigate();
+
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [profilePicture, setProfilePicture] = useState("default.png");
@@ -25,33 +31,9 @@ const UserProfile = ({ user }) => {
   const [lastName, setLastName] = useState("");
   const [role, setRole] = useState("");
 
-  // ---- ALERT STATES ----
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
 
-  /* ================= FETCH USER DATA ================= */
-  useEffect(() => {
-    if (!user?.userId) return;
-
-    const fetchProfile = async () => {
-      try {
-        const res = await getUserById(user?.userId);
-
-        setUserName(res.userName);
-        setEmail(res.email);
-        setFirstName(res.firstName);
-        setLastName(res.lastName);
-        setRole(res.role);
-        setProfilePicture(res.profilePicture || "default.png");
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchProfile();
-  }, [user?.userId]);
-
-  /* ================= UPDATE PROFILE ================= */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -73,126 +55,196 @@ const UserProfile = ({ user }) => {
     }
   };
 
+  const signOut = async () => {
+    localStorage.removeItem("user");
+    setUser(null);
+    await logoutUser();
+    navigate("/signin");
+  };
+
+  useEffect(() => {
+    if (!user?.userId) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await getUserById(user?.userId);
+
+        setUserName(res.userName);
+        setEmail(res.email);
+        setFirstName(res.firstName);
+        setLastName(res.lastName);
+        setRole(res.role);
+        setProfilePicture(res.profilePicture || "default.png");
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProfile();
+  }, [user?.userId]);
+
   return (
-    <Container maxWidth="md" sx={{ py: 6 }}>
-      {/* ===== PAGE TITLE ===== */}
-      <Typography
-        variant="h5"
-        fontWeight="bold"
-        sx={{ mb: 3, color: "#0f172a" }}
-      >
-        My Profile
-      </Typography>
+    <Container maxWidth="lg" sx={{ py: 5 }}>
+      <Grid container spacing={3}>
 
-      <Card sx={{ borderRadius: 4, boxShadow: 4 }}>
-        <CardContent sx={{ p: 4 }}>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "grid", gap: 4 }}
-          >
-            {/* ===== ALERT ===== */}
-            {alertMessage && (
-              <Alert severity={alertType} variant="filled">
-                {alertMessage}
-              </Alert>
-            )}
+        {/* ===== LEFT SIDEBAR ===== */}
+        <Grid size={3}>
+          <Card sx={{ borderRadius: 3 }}>
+            <CardContent>
 
-            {/* ===== PROFILE HEADER ===== */}
-            <Stack direction="row" spacing={3} alignItems="center">
-              <Avatar
-                sx={{
-                  width: 90,
-                  height: 90,
-                  bgcolor: "#e5e7eb",
-                  color: "#1e293b",
-                }}
-              >
-                <Person sx={{ fontSize: 50 }} />
-              </Avatar>
+              {/* USER HEADER */}
+              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+                <Avatar sx={{ bgcolor: "#facc15" }}>
+                  <Person />
+                </Avatar>
 
-              <Box>
-                <Typography variant="h6" fontWeight="bold">
-                  {firstName} {lastName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {role}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {email}
-                </Typography>
+                <Box>
+                  <Typography variant="body2">Hello,</Typography>
+                  <Typography fontWeight="bold">
+                    {firstName} {lastName}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* MENU */}
+              <List>
+                <ListItem button onClick={() => navigate("/user-orders")}>
+                  <ListItemText primary="MY ORDERS" />
+                </ListItem>
+
+                <Divider />
+
+                <ListItem>
+                  <ListItemText
+                    primary="ACCOUNT SETTINGS"
+                    primaryTypographyProps={{ fontWeight: "bold" }}
+                  />
+                </ListItem>
+
+                <ListItem button selected>
+                  <ListItemText primary="Profile Information" />
+                </ListItem>
+
+                <ListItem button onClick={() => navigate("/user/address")}>
+                  <ListItemText primary="Manage Addresses" />
+                </ListItem>
+
+                <Divider sx={{ my: 1 }} />
+
+                <ListItem>
+                  <ListItemText
+                    primary="PAYMENTS"
+                    primaryTypographyProps={{ fontWeight: "bold" }}
+                  />
+                </ListItem>
+
+                <ListItem button>
+                  <ListItemText primary="Saved UPI" />
+                </ListItem>
+
+                <ListItem button>
+                  <ListItemText primary="Saved Cards" />
+                </ListItem>
+
+                <Divider />
+                <ListItem button onClick={signOut}>
+                  <ListItemText primary="Logout" />
+                </ListItem>
+
+
+              </List>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* ===== RIGHT PROFILE SECTION ===== */}
+        <Grid size={9}>
+          <Card sx={{ borderRadius: 3 }}>
+            <CardContent>
+
+              <Typography variant="h6" fontWeight="bold" mb={3}>
+                Personal Information
+              </Typography>
+
+              <Box component="form" onSubmit={handleSubmit}>
+
+                {alertMessage && (
+                  <Alert severity={alertType} sx={{ mb: 2 }}>
+                    {alertMessage}
+                  </Alert>
+                )}
+
+                <Grid container spacing={3}>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      label="First Name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      fullWidth
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      label="Last Name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      fullWidth
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      label="Username"
+                      value={userName}
+                      fullWidth
+                      InputProps={{ readOnly: true }}
+                    />
+                  </Grid>
+
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      label="Role"
+                      value={role}
+                      disabled
+                      fullWidth
+                    />
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Email Address"
+                      value={email}
+                      disabled
+                      fullWidth
+                    />
+                  </Grid>
+
+                </Grid>
+
+                <Box mt={4}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    sx={{
+                      px: 5,
+                      backgroundColor: "#0f172a",
+                      "&:hover": { backgroundColor: "#1e293b" },
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Box>
+
               </Box>
-            </Stack>
+            </CardContent>
+          </Card>
+        </Grid>
 
-            <Divider />
-
-            {/* ===== USER DETAILS ===== */}
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Username"
-                  value={userName}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Role"
-                  value={role}
-                  fullWidth
-                  disabled
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  label="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="First Name"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Last Name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  fullWidth
-                />
-              </Grid>
-            </Grid>
-
-            {/* ===== ACTION ===== */}
-            <Box display="flex" justifyContent="flex-end">
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{
-                  px: 4,
-                  py: 1.2,
-                  backgroundColor: "#0f172a",
-                  "&:hover": { backgroundColor: "#1e293b" },
-                }}
-              >
-                Update Profile
-              </Button>
-            </Box>
-          </Box>
-        </CardContent>
-      </Card>
+      </Grid>
     </Container>
   );
 };

@@ -156,6 +156,29 @@ export const findAllProduct = async (payload) => {
   }
 }
 
+//Get all products
+export const findAllProductAdmin = async (payload) => {
+  try {
+    const res = await axios.post('/api/admin/findAllProducts', payload)
+    console.log("findAllProduct response:", res.data);
+    return res.data
+  } catch (err) {
+    console.error('API call error getAllProducts:', err)
+    throw err
+  }
+}
+
+// Get products with out pagination
+export const findAllSponsoredProducts = async () => {
+  try {
+    const res = await axios.post('/api/findAllSponsoredProducts');
+    return res.data;
+  } catch (err) {
+    console.error('API call error findAllSponsoredProducts:', err);
+    throw err;
+  }
+}
+
 //User Endpoints
 export const registerUser = async (payload) => {
   try {
@@ -277,6 +300,7 @@ export const getProductById = async (productId) => {
 }
 
 export const getProductsByCategory = async (categoryName) => {
+  console.log("API call getProductsByCategory with categoryName:", categoryName);
   try {
     const res = await axios.post('/api/findProductsByCategoryName', { categoryName : categoryName });
     return res.data;
@@ -308,9 +332,9 @@ export const findOrdersByUserId = async (userId, page = 0, pageSize = 10) => {
 }
 
 // Admin Order Endpoints
-export const getAllOrders = async () => {
+export const getAllOrders = async (payload) => {
   try {
-    const res = await axios.post('/api/admin/getAllOrders');
+    const res = await axios.post('/api/admin/getAllOrders', payload);
     return res.data;
   } catch (err) {
     console.error('API call error getAllOrders:', err)
@@ -390,6 +414,7 @@ export const topSellingproducts = async () => {
   }
 }
 
+//dashboard order desceding
 export const ordersDesc = async () =>{
   try{
     const res = await axios.post("/api/orderDesc");
@@ -399,10 +424,54 @@ export const ordersDesc = async () =>{
   }
 }
 
+// total revenue
+export const totalRevenue = async () => {
+  try{
+    const res = await axios.post("/api/totalRevenue");
+    return res.data;
+  }catch(err) {
+    console.log("error while feachin total revenue", err)
+  }
+}
+
+//write review
+export const writeReview = async (payload) => {
+  try {
+    const res = await axios.post('/api/reviews', payload);
+    return res.data;
+  } catch (err) {
+    console.error('API call error writeReview:', err)
+    throw err
+  }
+}
+
+//get reviews by product id
+export const getProductReviews = async (productId) => {
+  try {
+    const res = await axios.get(`/api/reviews/product/${productId}`);
+    return res.data;
+  } catch (err) {
+    console.error('API call error getProductReviews:', err)
+    throw err
+  }
+}
+
+//sales-overview
+export const salesOverview = async () => {
+  try {
+    const res = await axios.get('/api/sales-overview');
+    return res.data;
+  } catch (err) {
+    console.error('API call error salesOverview:', err)
+    throw err
+  }
+}
+
 const apiService = () => {
     useEffect(() => {
     findAllCategory();
     findAllProduct();
+    findAllSponsoredProducts();
     }, []);
 }
 

@@ -27,7 +27,7 @@ import { getUserAddresses, saveOrder, addUserAddress } from "../../services/apiS
 const Order = ({ user }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { totalAmount, cartItems , totalOrderDiscount} = location.state || { totalAmount: 0, cartItems: [], totalOrderDiscount: 0 };
+  const { totalAmount, cartItems, totalOrderDiscount } = location.state || { totalAmount: 0, cartItems: [], totalOrderDiscount: 0 };
 
   console.log("Order Page - Received from Cart:", { totalAmount, cartItems, totalOrderDiscount });
 
@@ -51,7 +51,8 @@ const Order = ({ user }) => {
   const discount = totalOrderDiscount;
   const tax = subtotal * 0.05;
   const delivery = subtotal < 1000 ? 50 : 0;
-  const total = subtotal + tax + delivery;
+  // const total = subtotal + tax + delivery;
+  const total = subtotal + delivery;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const fetchAddresses = async () => {
@@ -92,9 +93,9 @@ const Order = ({ user }) => {
   const handleSaveorder = async () => {
 
     if (!paymentMethod) {
-    setPaymentError(true);
-    return;
-  }
+      setPaymentError(true);
+      return;
+    }
     const selectedAddress = addresses.find(
       (addr) => String(addr.addressId) === String(selectedAddressId)
     );
@@ -116,11 +117,11 @@ const Order = ({ user }) => {
     const res = await saveOrder(orderPayload);
     // alert(res?.message || "Order placed!");
 
-    console.log("ssss",res)
-    if(res.status === "Success") {
+    console.log("ssss", res)
+    if (res.status === "Success") {
       navigate("/order-success", { state: res });
       console.log("i amsuccess")
-   }
+    }
   };
 
   return (
@@ -140,12 +141,12 @@ const Order = ({ user }) => {
                   variant="contained"
                   size="small"
                   onClick={() => setOpenAddressForm(true)}
-                  sx={{ 
-                        borderRadius: 2, 
-                        backgroundColor: "#0f172a",
-                        "&:hover": { backgroundColor: "#1e293b" },
+                  sx={{
+                    borderRadius: 2,
+                    backgroundColor: "#0f172a",
+                    "&:hover": { backgroundColor: "#1e293b" },
                   }}
-                  
+
                 >
                   + Add
                 </Button>
@@ -251,142 +252,141 @@ const Order = ({ user }) => {
         </Grid>
 
         {/* RIGHT – SUMMARY */}
-        {/* RIGHT – SUMMARY */}
-<Grid size={4}>
-  <Box
-    sx={{
-      p: 3,
-      border: "1px solid #e5e7eb",
-      borderRadius: 3,
-      backgroundColor: "#ffffff",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-      position: "sticky",
-      top: 20
-    }}
-  >
-    {/* HEADER */}
-    <Typography
-      variant="subtitle1"
-      sx={{
-        fontWeight: 700,
-        letterSpacing: 0.5,
-        color: "#64748b",
-        mb: 2
-      }}
-    >
-      PRICE DETAILS
-    </Typography>
+        <Grid size={4}>
+          <Box
+            sx={{
+              p: 3,
+              border: "1px solid #e5e7eb",
+              borderRadius: 3,
+              backgroundColor: "#ffffff",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              position: "sticky",
+              top: 20
+            }}
+          >
+            {/* HEADER */}
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: 0.5,
+                color: "#64748b",
+                mb: 2
+              }}
+            >
+              PRICE DETAILS
+            </Typography>
 
-    <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2 }} />
 
-    {/* ITEMS */}
-    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
-      <Typography sx={{ color: "#475569" }}>
-        Price ({totalItems} items)
-      </Typography>
+            {/* ITEMS */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+              <Typography sx={{ color: "#475569" }}>
+                Price ({totalItems} items)
+              </Typography>
 
-      <Typography fontWeight={500}>
-        ₹ {subtotal}
-      </Typography>
-    </Box>
+              <Typography fontWeight={500}>
+                ₹ {subtotal}
+              </Typography>
+            </Box>
 
-    {/* DISCOUNT */}
-    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
-      <Typography sx={{ color: "#475569" }}>
-        Discount
-      </Typography>
+            {/* DISCOUNT */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+              <Typography sx={{ color: "#475569" }}>
+                Discount
+              </Typography>
 
-      <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
-        − ₹ {discount}
-      </Typography>
-    </Box>
+              <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
+                − ₹ {discount}
+              </Typography>
+            </Box>
 
-    {/* TAX */}
-    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
-      <Typography sx={{ color: "#475569" }}>
-        Tax (5%)
-      </Typography>
+            {/* TAX */}
+            {/* <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1.5 }}>
+              <Typography sx={{ color: "#475569" }}>
+                Tax (5%)
+              </Typography>
 
-      <Typography>
-        ₹ {tax.toFixed(2)}
-      </Typography>
-    </Box>
+              <Typography>
+                ₹ {tax.toFixed(2)}
+              </Typography>
+            </Box> */}
 
-    {/* DELIVERY */}
-    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-      <Typography sx={{ color: "#475569" }}>
-        Delivery Charges
-      </Typography>
+            {/* DELIVERY */}
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+              <Typography sx={{ color: "#475569" }}>
+                Delivery Charges
+              </Typography>
 
-      {delivery === 0 ? (
-        <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
-          FREE
-        </Typography>
-      ) : (
-        <Typography>
-          ₹ {delivery}
-        </Typography>
-      )}
-    </Box>
+              {delivery === 0 ? (
+                <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
+                  FREE
+                </Typography>
+              ) : (
+                <Typography>
+                  ₹ {delivery}
+                </Typography>
+              )}
+            </Box>
 
-    <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2 }} />
 
-    {/* TOTAL */}
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "space-between",
-        mb: 2
-      }}
-    >
-      <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
-        Total Amount
-      </Typography>
+            {/* TOTAL */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                mb: 2
+              }}
+            >
+              <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
+                Total Amount
+              </Typography>
 
-      <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
-        ₹ {total.toFixed(2)}
-      </Typography>
-    </Box>
+              <Typography sx={{ fontWeight: 700, fontSize: 18 }}>
+                ₹ {total.toFixed(2)}
+              </Typography>
+            </Box>
 
-    <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ mb: 2 }} />
 
-    {/* SAVINGS */}
-    <Box
-      sx={{
-        backgroundColor: "#ecfdf5",
-        color: "#15803d",
-        px: 2,
-        py: 1.5,
-        borderRadius: 2,
-        fontWeight: 600,
-        mb: 3,
-        fontSize: 14
-      }}
-    >
-      🎉 You saved ₹ {discount} on this order
-    </Box>
+            {/* SAVINGS */}
+            <Box
+              sx={{
+                backgroundColor: "#ecfdf5",
+                color: "#15803d",
+                px: 2,
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                mb: 3,
+                fontSize: 14
+              }}
+            >
+              🎉 You saved ₹ {discount} on this order
+            </Box>
 
-    {/* PLACE ORDER */}
-    <Button
-      fullWidth
-      sx={{
-        backgroundColor: "#facc15",
-        color: "#000",
-        fontWeight: 700,
-        py: 1.5,
-        fontSize: 16,
-        borderRadius: 2,
-        "&:hover": {
-          backgroundColor: "#eab308"
-        }
-      }}
-      disabled={!selectedAddressId}
-      onClick={handleSaveorder}
-    >
-      PLACE ORDER
-    </Button>
-  </Box>
-</Grid>
+            {/* PLACE ORDER */}
+            <Button
+              fullWidth
+              sx={{
+                backgroundColor: "#facc15",
+                color: "#000",
+                fontWeight: 700,
+                py: 1.5,
+                fontSize: 16,
+                borderRadius: 2,
+                "&:hover": {
+                  backgroundColor: "#eab308"
+                }
+              }}
+              disabled={!selectedAddressId}
+              onClick={handleSaveorder}
+            >
+              PLACE ORDER
+            </Button>
+          </Box>
+        </Grid>
       </Grid>
 
       {/* ADD ADDRESS DIALOG */}

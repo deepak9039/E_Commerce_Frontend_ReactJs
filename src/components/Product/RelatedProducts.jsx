@@ -2,54 +2,55 @@ import React from "react";
 import {
   Box,
   Typography,
-  Grid,
   Card,
   CardMedia,
   CardContent,
   Rating
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const relatedProducts = [
-  {
-    id: 1,
-    name: "Puma Running Shoes",
-    price: 2499,
-    rating: 4.5,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff"
-  },
-  {
-    id: 2,
-    name: "Nike Air Max Sneakers",
-    price: 3999,
-    rating: 4.2,
-    image: "https://images.unsplash.com/photo-1519741497674-611481863552"
-  },
-  {
-    id: 3,
-    name: "Adidas Casual Shoes",
-    price: 2999,
-    rating: 4.3,
-    image: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519"
-  },
-  {
-    id: 4,
-    name: "Reebok Training Shoes",
-    price: 2799,
-    rating: 4.1,
-    image: "https://images.unsplash.com/photo-1528701800489-20be2f37f1a2"
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/navigation";
+
+const RelatedProducts = ({ relatedProducts }) => {
+
+  const navigate = useNavigate();
+
+  const products = relatedProducts?.products || [];
+
+  const slidesToShow = products.length >= 4 ? 4 : products.length;
+
+  if (!products.length) {
+    return (
+      <Typography sx={{ mt: 4 }}>
+        No related products available
+      </Typography>
+    );
   }
-];
 
-const RelatedProducts = () => {
+  const limitWords = (text, limit = 3) => {
+  if (!text) return "";
+  const words = text.split(" ");
+  return words.length <= limit ? text : words.slice(0, limit).join(" ") + "...";
+};
+
   return (
     <Box sx={{ mt: 6 }}>
       <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
         Related Products
       </Typography>
 
-      <Grid container spacing={3}>
-        {relatedProducts.map((product) => (
-          <Grid item xs={12} sm={6} md={3} key={product.id}>
+      <Swiper
+        modules={[Navigation]}
+        spaceBetween={20}
+        slidesPerView={slidesToShow}
+        navigation={products.length > 4}
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product.productId}>
             <Card
               sx={{
                 borderRadius: 3,
@@ -58,30 +59,37 @@ const RelatedProducts = () => {
                 "&:hover": {
                   transform: "translateY(-5px)",
                   boxShadow: 4
-                }
+                },
+                mb: 1
               }}
+              onClick={() => navigate(`/product/${product.productId}`)}
             >
               <CardMedia
                 component="img"
                 height="180"
-                image={product.image}
+                image={`http://localhost:1234/image/product/${product.productImageUrl}`}
               />
 
               <CardContent>
                 <Typography fontWeight={600}>
-                  {product.name}
+                  {limitWords(product.productName)}
                 </Typography>
 
                 <Typography sx={{ color: "green", fontWeight: 600 }}>
-                  ₹{product.price}
+                  ₹{product.discountPrice || product.productPrice}
                 </Typography>
 
-                <Rating value={product.rating} precision={0.5} readOnly size="small" />
+                <Rating
+                  value={product.rating || 0}
+                  precision={0.5}
+                  readOnly
+                  size="small"
+                />
               </CardContent>
             </Card>
-          </Grid>
+          </SwiperSlide>
         ))}
-      </Grid>
+      </Swiper>
     </Box>
   );
 };

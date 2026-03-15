@@ -9,13 +9,14 @@ import {
 import Pagination from '@mui/material/Pagination';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { findAllProduct, findAllCategory, getProductsByCategory } from '../../services/apiService';
+import { findAllProduct, findAllCategory, getProductsByCategory, findAllSponsoredProducts } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 50;
 
 const HomePage = () => {
   const [products, setProducts] = React.useState([]);
+  const [sponsoredProducts, setSponsoredProducts] = React.useState([]);
   const [categories, setCategories] = React.useState([]);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState(null);
   const [page, setPage] = React.useState(0);
@@ -28,7 +29,8 @@ const HomePage = () => {
     try {
       const payload = { page: pageNo, pageSize: PAGE_SIZE };
       const res = await findAllProduct(payload);
-
+      const sponsoredProducts = await findAllSponsoredProducts();
+      setSponsoredProducts(sponsoredProducts?.products || []);
       setProducts(res.products || []);
       setPage(res.page || 0);
       setTotalPages(res.totalPages || 0);
@@ -78,21 +80,29 @@ const HomePage = () => {
     fetchAllProducts(0);
   }, []);
 
-  const sliderProducts = products.slice(0, 3);
+  const sliderProducts = products.filter(p => p.isSponsored === true);
+
+  console.log("Slider products:", sponsoredProducts);
 
   return (
     <>
       {/* ================= CATEGORY BAR ================= */}
       <Box
-        sx={{
+      sx={{
           position: "sticky",
           top: 64,
           zIndex: 1000,
           backgroundColor: "#ffffff",
           borderBottom: "1px solid #e5e7eb",
-          py: 1.5,
-        }}
-      >
+        }}>
+      <Container maxWidth="lg" sx={{
+          position: "sticky",
+          top: 64,
+          zIndex: 1000,
+          backgroundColor: "#ffffff",
+          py: 1,
+        }}>
+      
         <Box
           sx={{
             px: 3,
@@ -140,9 +150,10 @@ const HomePage = () => {
             </Box>
           ))}
         </Box>
+      </Container> 
       </Box>
       {/* HERO SLIDER */}
-      {sliderProducts.length > 0 && (
+      {sponsoredProducts.length > 0 && (
         <Box
           sx={{
             width: '100%',
@@ -158,7 +169,7 @@ const HomePage = () => {
           <IconButton
             onClick={() =>
               setSliderIndex(
-                sliderIndex === 0 ? sliderProducts.length - 1 : sliderIndex - 1
+                sliderIndex === 0 ? sponsoredProducts.length - 1 : sliderIndex - 1
               )
             }
           >
@@ -170,13 +181,13 @@ const HomePage = () => {
             alignItems="center"
             spacing={4}
             onClick={() =>
-              navigate(`/product/${sliderProducts[sliderIndex].productId}`)
+              navigate(`/product/${sponsoredProducts[sliderIndex].productId}`)
             }
             sx={{ cursor: 'pointer' }}
           >
             <Grid item xs={6}>
               <Typography variant="h4" fontWeight="bold">
-                {limitWords(sliderProducts[sliderIndex]?.productName, 10)}
+                {limitWords(sponsoredProducts[sliderIndex]?.productName, 10)}
               </Typography>
 
               {/* SLIDER PRICE UI */}
@@ -189,12 +200,12 @@ const HomePage = () => {
                     mr: 2
                   }}
                 >
-                  ₹{sliderProducts[sliderIndex].discount > 0
-                    ? sliderProducts[sliderIndex].discountPrice
-                    : sliderProducts[sliderIndex].productPrice}
+                  ₹{sponsoredProducts[sliderIndex].discount > 0
+                    ? sponsoredProducts[sliderIndex].discountPrice
+                    : sponsoredProducts[sliderIndex].productPrice}
                 </Typography>
 
-                {sliderProducts[sliderIndex].discount > 0 && (
+                {sponsoredProducts[sliderIndex].discount > 0 && (
                   <>
                     <Typography
                       component="span"
@@ -204,7 +215,7 @@ const HomePage = () => {
                         mr: 1
                       }}
                     >
-                      ₹{sliderProducts[sliderIndex].productPrice}
+                      ₹{sponsoredProducts[sliderIndex].productPrice}
                     </Typography>
 
                     <Typography
@@ -214,7 +225,7 @@ const HomePage = () => {
                         fontWeight: 600
                       }}
                     >
-                      {sliderProducts[sliderIndex].discount}% OFF
+                      {sponsoredProducts[sliderIndex].discount}% OFF
                     </Typography>
                   </>
                 )}
@@ -232,7 +243,7 @@ const HomePage = () => {
                   justifyContent: "center",
                 }}
               >
-                {sliderProducts[sliderIndex].discount > 0 && (
+                {sponsoredProducts[sliderIndex].discount > 0 && (
                   <Box
                     sx={{
                       position: "absolute",
@@ -247,13 +258,14 @@ const HomePage = () => {
                       borderRadius: 1,
                     }}
                   >
-                    {sliderProducts[sliderIndex].discount}% OFF
+                    {/* {sponsoredProducts[sliderIndex].discount}% OFF */}
+                    sponsored
                   </Box>
                 )}
 
                 <Box
                   component="img"
-                  src={`http://localhost:1234/image/product/${sliderProducts[sliderIndex]?.productImageUrl}`}
+                  src={`http://localhost:1234/image/product/${sponsoredProducts[sliderIndex]?.productImageUrl}`}
                   sx={{
                     width: "100%",
                     height: "100%",
@@ -266,7 +278,7 @@ const HomePage = () => {
 
           <IconButton
             onClick={() =>
-              setSliderIndex((sliderIndex + 1) % sliderProducts.length)
+              setSliderIndex((sliderIndex + 1) % sponsoredProducts.length)
             }
           >
             <ArrowForwardIosIcon />
