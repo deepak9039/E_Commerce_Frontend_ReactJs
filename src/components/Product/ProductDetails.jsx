@@ -12,21 +12,30 @@ import {
   Button,
   Divider,
   Chip,
-  Paper
+  Paper,
+  Pagination
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { getProductById, addToCart, cartCountByUserId, getProductsByCategory, getProductReviews } from "../../services/apiService";
+import { getProductById, addToCart, cartCountByUserId, getProductsByCategory, getProductReviews, fetchSimilarProducts } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
 import RelatedProducts from "./RelatedProducts";
 import ProductReviews from "../Review/ProductReviews";
+import SimilarProduct from "./SimilarProduct";
 
 const ProductDetails = ({ user }) => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [relatedPage, setRelatedPage] = useState(0);
+  const [relatedTotalPages, setRelatedTotalPages] = useState(0);
   const [reviews, setReviews] = useState([]);
-  console.log("erer",relatedProducts);
+  const RELATED_PAGE_SIZE = 10;
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [similarProductsData, setSimilarProductsData] = useState([]);
+  console.log("simlarProductsData", similarProductsData);
+  console.log("erer", relatedProducts);
   console.log("Product reviews:", reviews);
 
   const { refreshCartCount } = useCart();
@@ -34,10 +43,14 @@ const ProductDetails = ({ user }) => {
   const fetchProduct = async () => {
     try {
       const res = await getProductById(id);
-      const relatedProducts = await getProductsByCategory(res.categoryName);
+      const relatedProducts = await getProductsByCategory(res.categoryName, 0, RELATED_PAGE_SIZE);
       const reviews = await getProductReviews(id);
+      const similarProduct = await fetchSimilarProducts(res?.productId);
+      setSimilarProductsData(similarProduct);
       setReviews(reviews);
       setRelatedProducts(relatedProducts);
+      setRelatedPage(relatedProducts.page || 0);
+      setRelatedTotalPages(relatedProducts.totalPages || 0);
       setProduct(res);
     } catch (error) {
       console.log("Error fetching product:", error);
@@ -45,13 +58,40 @@ const ProductDetails = ({ user }) => {
     setLoading(false);
   };
 
+  const fetchRelatedByPage = async (pageNo = 0) => {
+    try {
+      const res = await getProductsByCategory(product.categoryName, pageNo, RELATED_PAGE_SIZE);
+      setRelatedProducts(res);
+      setRelatedPage(res.page || 0);
+      setRelatedTotalPages(res.totalPages || 0);
+    } catch (err) {
+      console.error('Error fetching related products:', err);
+    }
+  };
+
   const addToCartClick = async () => {
     try {
       await addToCart({ productId: product?.productId, userId: user?.userId });
       await cartCountByUserId(user?.userId);
       refreshCartCount(user?.userId);
+      setSuccessMessage("Item added to cart successfully!");
+
     } catch (err) {
-      console.error("Add to cart error:", err);
+      console.error("Add to cart error:", err.response?.data?.message || err.message);
+      const errorMessage = err.response?.data?.message || "Failed to add to cart";
+      if (errorMessage === "User not found") {
+        setError("Please log in to add items to your cart.");
+      } else {
+        setError(errorMessage);
+      }
+    }
+  };
+
+  const similarProducts = async () => {
+    try {
+
+    } catch (err) {
+      console.error("Error fetching similar products:", err);
     }
   };
 
@@ -227,25 +267,70 @@ const ProductDetails = ({ user }) => {
               }}
             >
               {product.stockQuantity > 0
-                ? `In stock (${product.stockQuantity} available)`
-                : "Out of stock"}
+                && `In stock (${product.stockQuantity} available)`
+              }
             </Typography>
+
+            {successMessage && (
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "#e6f4ea",
+                  border: "1px solid #b7e1cd",
+                }}
+              >
+                <Typography sx={{ color: "#1e7e34", fontWeight: 500 }}>
+                  ✔ {successMessage}
+                </Typography>
+              </Box>
+            )}
+
+            {error && (
+              <Box
+                sx={{
+                  mb: 2,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: "#fdecea",
+                  border: "1px solid #f5c6cb",
+                }}
+              >
+                <Typography sx={{ color: "#c62828", fontWeight: 500 }}>
+                  ✖ {error}
+                </Typography>
+              </Box>
+            )}
 
             {/* CTA */}
             <Button
               variant="contained"
-              color="primary"
               size="small"
               onClick={addToCartClick}
+              disabled={product.stockQuantity === 0}
               sx={{
                 px: 4,
                 textTransform: "none",
                 fontWeight: "bold",
-                backgroundColor: "#0f172a",
-                "&:hover": { backgroundColor: "#1e293b" },
+                backgroundColor:
+                  product.stockQuantity > 0 ? "#0f172a" : "#9ca3af",
+
+                cursor:
+                  product.stockQuantity > 0 ? "pointer" : "not-allowed",
+
+                "&:hover": {
+                  backgroundColor:
+                    product.stockQuantity > 0 ? "#1e293b" : "#9ca3af",
+                },
+
+                "&.Mui-disabled": {
+                  backgroundColor: "#9ca3af",
+                  color: "#fff",
+                },
               }}
             >
-              Add to Cart
+              {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
             </Button>
 
           </Grid>
@@ -260,7 +345,18 @@ const ProductDetails = ({ user }) => {
             Related Products
           </Typography> */}
           <RelatedProducts relatedProducts={relatedProducts} />
+          {relatedTotalPages > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+              <Pagination
+                count={relatedTotalPages}
+                page={relatedPage + 1}
+                onChange={(e, value) => fetchRelatedByPage(value - 1)}
+              />
+            </Box>
+          )}
+          <SimilarProduct similarProductsData={similarProductsData} />
           <ProductReviews reviews={reviews} />
+          
         </Box>
       </Container>
 

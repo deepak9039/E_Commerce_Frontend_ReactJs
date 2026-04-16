@@ -8,6 +8,7 @@ import {
   Divider,
   Stack,
 } from "@mui/material";
+import logo from "../../../public/logoNew1.png";
 
 const Footer = () => {
   return (
@@ -25,10 +26,25 @@ const Footer = () => {
           {/* ===== BRAND ===== */}
           <Grid item xs={12} md={4}>
             <Typography variant="h6" fontWeight="bold" gutterBottom color="#e2e8f0">
-              YourStore
+                <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
+          >
+            <img
+              src={logo}
+              alt="YourStore Logo"
+              style={{
+                height: "60px",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
             </Typography>
 
-            <Typography variant="body2" color="#e2e8f0">
+            <Typography variant="body2" color="#e2e8f0" sx={{ mt: 2 }}>
               Your one-stop destination for quality products, fast delivery,
               and a seamless shopping experience.
             </Typography>
@@ -40,9 +56,6 @@ const Footer = () => {
 
           {/* ===== QUICK LINKS ===== */}
           <Grid item xs={6} md={2}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom color="#e2e8f0">
-              Quick Links
-            </Typography>
 
             <Stack spacing={1}>
               <Link href="/" color="#e2e8f0" underline="hover">

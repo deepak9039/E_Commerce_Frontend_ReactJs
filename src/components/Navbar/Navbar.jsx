@@ -16,13 +16,13 @@ import {
   ListItemIcon,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-
+import logo from "../../../public/logoNew1.png";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { logoutUser } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
 import SearchBar from "../Search/SearchBar";
@@ -81,35 +81,19 @@ const Navbar = ({ user, setUser }) => {
       <Container maxWidth="lg">
         <Toolbar sx={{ minHeight: 72 }}>
 
-          <Typography
-            variant="h6"
-            component={RouterLink}
-            to="/"
-            sx={{
-              ml: 2,
-              color: "#e5e7eb",
-              textDecoration: "none",
-              textTransform: "none",
-              fontWeight: 500,
-              outline: "none",
-              border: "none",
-
-              "&:focus": {
-                outline: "none",
-              },
-              "&:active": {
-                outline: "none",
-              },
-              "&:focus-visible": {
-                outline: "none",
-              },
-              "&:hover": {
-                backgroundColor: "rgba(255,255,255,0.08)",
-              },
-            }}
-          >
-            YourStore
-          </Typography>
+        <Box
+          component={RouterLink}
+          to="/"
+          sx={{
+            ml: 2,
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            textDecoration: "none",
+          }}
+        >
+          <img src={logo} alt="logo" style={{ height: "50px" }} />
+        </Box>
 
 
           {/* HOME */}
@@ -205,7 +189,7 @@ const Navbar = ({ user, setUser }) => {
                 <Typography sx={{ fontWeight: 500 }}>
                   {user.email || "User"}
                 </Typography>
-                <Avatar
+                {/* <Avatar
                   sx={{
                     bgcolor: "#e5e7eb",
                     color: "#1976d2",
@@ -213,9 +197,11 @@ const Navbar = ({ user, setUser }) => {
                     height: 34,
                     fontWeight: "bold",
                   }}
-                >
-                  {user?.userName?.charAt(0)?.toUpperCase()}
-                </Avatar>
+                > */}
+                  {/* {user?.userName?.charAt(0)?.toUpperCase()} */}
+                {/* </Avatar> */}
+                  {/* {user?.userName?.charAt(0)?.toUpperCase()} */}
+                <KeyboardArrowDownIcon sx={{ color: '#e5e7eb', ml: 0.5 }} />
               </Box>
 
               {/* DROPDOWN */}

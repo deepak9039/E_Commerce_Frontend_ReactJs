@@ -299,10 +299,10 @@ export const getProductById = async (productId) => {
   }
 }
 
-export const getProductsByCategory = async (categoryName) => {
-  console.log("API call getProductsByCategory with categoryName:", categoryName);
+export const getProductsByCategory = async (categoryName, page, pageSize) => {
+  console.log("API call getProductsByCategory with categoryName:", categoryName, page, pageSize);
   try {
-    const res = await axios.post('/api/findProductsByCategoryName', { categoryName : categoryName });
+    const res = await axios.post('/api/findProductsByCategoryName', { categoryName : categoryName, page: page, pageSize: pageSize });
     return res.data;
   } catch (err) {
     console.error('API call error getProductsByCategory:', err);
@@ -467,6 +467,69 @@ export const salesOverview = async () => {
   }
 }
 
+// Api service to download Product Invoice
+export const downloadInvoice = async (userId, orderId) => {
+  try {
+    const res = await axios.post('/api/downloadInvoice', { userId, orderId }, { responseType: 'blob' });
+    // Create a URL for the blob and trigger a download
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `invoice_${orderId}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+  } catch (err) {
+    console.error('API call error downloadInvoice:', err)
+    throw err
+  }
+}
+
+// API service to fetch recordRecentView
+export const recentViewPost = async (userId, productId) => {
+  try {
+    const res = await axios.post('/api/api/recommendations/recent-view', null, { params: { userId, productId } });
+    return res.data;
+  } catch (err) {
+    console.error('API call error recordRecentView:', err)
+    throw err
+  }
+}
+
+//API service to fetch recentViews
+export const recentViewGet = async (userId, limit = 10) => {
+  try {
+    const res = await axios.get('/api/api/recommendations/recent-view', { params: { userId, limit } });
+    return res.data;
+  } catch (err) {
+    console.error('API call error fetchRecentViews:', err)
+    throw err
+  }
+}
+
+// API service to fetch recommended products
+export const fetchRecommendedProducts = async (userId, limit = 10) => {
+  try {
+    const res = await axios.get('/api/api/recommendations/similar', { params: { userId, limit } });
+    return res.data;
+  } catch (err) {
+    console.error('API call error fetchRecommendedProducts:', err)
+    throw err
+  }
+}
+
+//API service to fetch similar products
+export const fetchSimilarProducts = async (productId, limit = 10) => {
+  console.log("API call fetchSimilarProducts with productId:", productId, "limit:", limit);
+  try {
+    const res = await axios.get('/api/api/recommendations/similar', { params: { productId, limit } });
+    return res.data;
+  } catch (err) {
+    console.error('API call error fetchSimilarProducts:', err)
+    throw err
+  }
+}
+
+// API service to fetch initial data on app load
 const apiService = () => {
     useEffect(() => {
     findAllCategory();

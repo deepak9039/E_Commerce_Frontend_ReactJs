@@ -10,8 +10,9 @@ import {
   Divider,
   Chip,
   Pagination,
+  Button,
 } from "@mui/material";
-import { findOrdersByUserId } from "../../services/apiService";
+import { findOrdersByUserId, downloadInvoice } from "../../services/apiService";
 
 const UserOrders = ({ user }) => {
   const [orders, setOrders] = useState([]);
@@ -41,6 +42,14 @@ const UserOrders = ({ user }) => {
 
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
+  };
+
+  const handleDownloadInvoice = async (userId, orderId) => {
+    try {
+      await downloadInvoice(userId, orderId);
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+    }
   };
 
   return (
@@ -80,9 +89,28 @@ const UserOrders = ({ user }) => {
                   >
                     <Typography variant="subtitle2" color="text.secondary">
                       
-                        Payment Method:{" "}
+                        Payment Mode:{" "}
                         {order.paymentMethod}
                     </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    md={4}
+                    textAlign={{ xs: "left", md: "right" }}
+                  >
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleDownloadInvoice(user?.userId, order.orderId)}
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 2,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Download Invoice
+                    </Button>
                   </Grid>
                 </Grid>
 
