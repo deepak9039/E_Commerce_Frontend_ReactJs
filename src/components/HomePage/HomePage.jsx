@@ -9,13 +9,16 @@ import {
   IconButton,
   Container
 } from '@mui/material';
+import Toast from '../Common/Toast';
 import Pagination from '@mui/material/Pagination';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCartOutlined";
-import { findAllProduct, findAllCategory, getProductsByCategory, findAllSponsoredProducts, recentViewPost, recentViewGet, fetchRecommendedProducts } from '../../services/apiService';
+import { findAllProduct, findAllCategory, getProductsByCategory, findAllSponsoredProducts, recentViewPost, recentViewGet, fetchRecommendedProducts, addToCart } from '../../services/apiService';
+import { useCart } from '../Context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import CarouselHome from './CarouselHome';
+import DiscountProductsSlider from '../Product/DiscountProductsSlider';
 
 const PAGE_SIZE = 50;
 
@@ -34,6 +37,10 @@ const HomePage = ({ user }) => {
   const recommendedRef = React.useRef(null);
 
   const navigate = useNavigate();
+  const { refreshCartCount } = useCart();
+  const [toastOpen, setToastOpen] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState("");
+  const [toastSeverity, setToastSeverity] = React.useState("success");
 
   console.log("HomePage Component - User:", user?.userId);
 
@@ -81,7 +88,7 @@ const HomePage = ({ user }) => {
       : fetchAllProducts(newPage);
   };
 
-  const limitWords = (text, limit = 18) => {
+  const limitWords = (text, limit = 10) => {
     if (!text) return '';
     const words = text.split(' ');
     return words.length <= limit ? text : words.slice(0, limit).join(' ') + '...';
@@ -118,6 +125,27 @@ const HomePage = ({ user }) => {
 
   console.log("Recent views:", recentViewsProducts);
 
+  const handleAddToCart = async (e, product) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    try {
+      await addToCart({ productId: product?.productId, userId: user?.userId });
+      refreshCartCount(user?.userId);
+      setToastMessage('Item added to cart. GO TO CART');
+      setToastSeverity('success');
+      setToastOpen(true);
+    } catch (err) {
+      const errMessage = err?.response?.data?.message || 'Failed to add to cart';
+      setToastMessage(errMessage === 'User not found' ? 'Please log in to add items to your cart.' : errMessage);
+      setToastSeverity('error');
+      setToastOpen(true);
+    }
+  };
+
+  const handleToastClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setToastOpen(false);
+  };
+
   React.useEffect(() => {
     if (user?.userId) {
       fetchRecentViews(user.userId);
@@ -148,7 +176,7 @@ const HomePage = ({ user }) => {
     el.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' });
   };
 
-const settings = {
+  const settings = {
     dots: true,
     infinite: true,
     speed: 500,
@@ -371,169 +399,173 @@ const settings = {
 
       {user?.userId && (
         <>
-      {/* Recent View Products */}
-      {recentViewsProducts && (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ position: 'relative' }}>
-            <Box
-              sx={{
-                borderRadius: 3,
-                background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
-                p: 3,
-                overflow: 'hidden'
-              }}
-            >
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-                You may also like
-              </Typography>
-
-              <Box
-                ref={recentRef}
-                sx={{
-                  display: 'flex',
-                  gap: 3,
-                  overflowX: 'auto',
-                  px: 1,
-                  py: 1,
-                  '&::-webkit-scrollbar': { display: 'none' }
-                }}
-              >
-                {recentViewsProducts.length === 0 && (
-                  <Typography sx={{ mt: 2 }}>
-                    No recently viewed products found.
+          {/* Recent View Products */}
+          {recentViewsProducts && (
+            <Container maxWidth="lg" >
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  sx={{
+                    borderRadius: 3,
+                    background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
+                    p: 3,
+                    overflow: 'hidden'
+                  }}
+                >
+                  <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
+                    You may also like
                   </Typography>
-                )}
-                {recentViewsProducts.map((sp) => (
+
                   <Box
-                    key={sp.productId}
+                    ref={recentRef}
                     sx={{
-                      minWidth: 240,
-                      flex: '0 0 auto',
-                      borderRadius: 3,
-                      backgroundColor: '#fff',
-                      p: 1,
-                      boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
-                      transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
-                      '&:hover': {
-                        transform: 'translateY(-6px)',
-                        boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
-                        backgroundColor: '#fbfdff'
-                      }
+                      display: 'flex',
+                      gap: 3,
+                      overflowX: 'auto',
+                      px: 1,
+                      py: 1,
+                      '&::-webkit-scrollbar': { display: 'none' }
                     }}
-                    onClick={() => navigate(`/product/${sp.productId}`)}
                   >
-                    <Box
-                      component="img"
-                      src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
-                      sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
-                    />
-                    <Typography sx={{ mt: 1 }}>
-                      {limitWords(sp.productName, 3)}
-                    </Typography>
+                    {recentViewsProducts.length === 0 && (
+                      <Typography sx={{ mt: 2 }}>
+                        No recently viewed products found.
+                      </Typography>
+                    )}
+                    {recentViewsProducts.map((sp) => (
+                      <Box
+                        key={sp.productId}
+                        sx={{
+                          minWidth: 240,
+                          flex: '0 0 auto',
+                          borderRadius: 3,
+                          backgroundColor: '#fff',
+                          p: 1,
+                          boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+                          transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
+                          '&:hover': {
+                            transform: 'translateY(-6px)',
+                            boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
+                            backgroundColor: '#fbfdff'
+                          }
+                        }}
+                        onClick={() => navigate(`/product/${sp.productId}`)}
+                      >
+                        <Box
+                          component="img"
+                          src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
+                          sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
+                        />
+                        <Typography sx={{ mt: 1 }}>
+                          {limitWords(sp.productName, 3)}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
-                ))}
+                </Box>
+
+                <IconButton
+                  onClick={() => scrollSponsoredRecentViews('left')}
+                  sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                >
+                  <ArrowBackIosNewIcon />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => scrollSponsoredRecentViews('right')}
+                  sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                >
+                  <ArrowForwardIosIcon />
+                </IconButton>
               </Box>
-            </Box>
+            </Container>
+          )}
 
-            <IconButton
-              onClick={() => scrollSponsoredRecentViews('left')}
-              sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
-            >
-              <ArrowBackIosNewIcon />
-            </IconButton>
-
-            <IconButton
-              onClick={() => scrollSponsoredRecentViews('right')}
-              sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          </Box>
-        </Container>
-      )}
-
-      {/* Recommended Products */}
-      {recommendedProducts && (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Box sx={{ position: 'relative' }}>
-            <Box
-              sx={{
-                borderRadius: 3,
-                background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
-                p: 3,
-                overflow: 'hidden'
-              }}
-            >
-              <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-                Recommended for you
-              </Typography>
-
-              <Box
-                ref={recommendedRef}
-                sx={{
-                  display: 'flex',
-                  gap: 3,
-                  overflowX: 'auto',
-                  px: 1,
-                  py: 1,
-                  '&::-webkit-scrollbar': { display: 'none' }
-                }}
-              >
-                {recommendedProducts.length === 0 && (
-                  <Typography sx={{ mt: 2 }}>
-                    No recommended products found.
+          {/* Recommended Products */}
+          {recommendedProducts && (
+            <Container maxWidth="lg" sx={{ py: 4 }}>
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  sx={{
+                    borderRadius: 3,
+                    background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
+                    p: 3,
+                    overflow: 'hidden'
+                  }}
+                >
+                  <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
+                    Recommended for you
                   </Typography>
-                )}
-                {recommendedProducts.map((sp) => (
+
                   <Box
-                    key={sp.productId}
+                    ref={recommendedRef}
                     sx={{
-                      minWidth: 240,
-                      flex: '0 0 auto',
-                      borderRadius: 3,
-                      backgroundColor: '#fff',
-                      p: 1,
-                      boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
-                      transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
-                      '&:hover': {
-                        transform: 'translateY(-6px)',
-                        boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
-                        backgroundColor: '#fbfdff'
-                      }
+                      display: 'flex',
+                      gap: 3,
+                      overflowX: 'auto',
+                      px: 1,
+                      py: 1,
+                      '&::-webkit-scrollbar': { display: 'none' }
                     }}
-                    onClick={() => navigate(`/product/${sp.productId}`)}
                   >
-                    <Box
-                      component="img"
-                      src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
-                      sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
-                    />
-                    <Typography sx={{ mt: 1 }}>
-                      {limitWords(sp.productName, 3)}
-                    </Typography>
+                    {recommendedProducts.length === 0 && (
+                      <Typography sx={{ mt: 2 }}>
+                        No recommended products found.
+                      </Typography>
+                    )}
+                    {recommendedProducts.map((sp) => (
+                      <Box
+                        key={sp.productId}
+                        sx={{
+                          minWidth: 240,
+                          flex: '0 0 auto',
+                          borderRadius: 3,
+                          backgroundColor: '#fff',
+                          p: 1,
+                          boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+                          transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
+                          '&:hover': {
+                            transform: 'translateY(-6px)',
+                            boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
+                            backgroundColor: '#fbfdff'
+                          }
+                        }}
+                        onClick={() => navigate(`/product/${sp.productId}`)}
+                      >
+                        <Box
+                          component="img"
+                          src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
+                          sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
+                        />
+                        <Typography sx={{ mt: 1 }}>
+                          {limitWords(sp.productName, 3)}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
-                ))}
+                </Box>
+
+                <IconButton
+                  onClick={() => scrollSponsoredRecommended('left')}
+                  sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                >
+                  <ArrowBackIosNewIcon />
+                </IconButton>
+
+                <IconButton
+                  onClick={() => scrollSponsoredRecommended('right')}
+                  sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                >
+                  <ArrowForwardIosIcon />
+                </IconButton>
               </Box>
-            </Box>
-
-            <IconButton
-              onClick={() => scrollSponsoredRecommended('left')}
-              sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
-            >
-              <ArrowBackIosNewIcon />
-            </IconButton>
-
-            <IconButton
-              onClick={() => scrollSponsoredRecommended('right')}
-              sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
-            >
-              <ArrowForwardIosIcon />
-            </IconButton>
-          </Box>
-        </Container>
-      )}
+            </Container>
+          )}
         </>
       )}
+
+      <Box sx={{ backgroundColor: '#e5e7eb', mx: 4 }} >
+        <DiscountProductsSlider />
+      </Box>
 
       {/* PRODUCT LIST */}
       <Container maxWidth="lg" sx={{ pb: 5 }}>
@@ -544,153 +576,152 @@ const settings = {
         <Grid container spacing={3}>
           {products.map((product) => (
             <Grid size={3} xs={12} sm={6} md={4} lg={3} key={product.productId}>
-  <Box
-    onClick={() => handleProductClick(product)}
-    sx={{
-      cursor: "pointer",
-      borderRadius: 3,
-      overflow: "hidden",
-      backgroundColor: "#ffffff",
-      border: "1px solid #e5e7eb",
-      transition: "all 0.3s ease",
-      position: "relative",
+              <Box
+                onClick={() => handleProductClick(product)}
+                sx={{
+                  cursor: "pointer",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #e5e7eb",
+                  transition: "all 0.3s ease",
+                  position: "relative",
 
-      "&:hover": {
-        transform: "translateY(-6px)",
-        boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
-      },
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
+                  },
 
-      "&:hover .addToCartBtn": {
-        opacity: 1,
-        transform: "translateY(0)",
-      },
-    }}
-  >
-    {/* IMAGE SECTION */}
-    <Box
-      sx={{
-        position: "relative",
-        height: 220,
-        backgroundColor: "#f8fafc",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      {/* DISCOUNT */}
-      {product.discount > 0 && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            backgroundColor: "#dc2626",
-            color: "#fff",
-            px: 1,
-            py: 0.3,
-            fontSize: 11,
-            fontWeight: 700,
-            borderRadius: 1,
-          }}
-        >
-          {product.discount}% OFF
-        </Box>
-      )}
+                  "&:hover .addToCartBtn": {
+                    opacity: 1,
+                    transform: "translateY(0)",
+                  },
+                }}
+              >
+                {/* IMAGE SECTION */}
+                <Box
+                  sx={{
+                    position: "relative",
+                    height: 220,
+                    backgroundColor: "#f8fafc",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {/* DISCOUNT */}
+                  {product.discount > 0 && (
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        top: 10,
+                        left: 10,
+                        backgroundColor: "#dc2626",
+                        color: "#fff",
+                        px: 1,
+                        py: 0.3,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        borderRadius: 1,
+                      }}
+                    >
+                      {product.discount}% OFF
+                    </Box>
+                  )}
 
-      {/* IMAGE */}
-      <Box
-        component="img"
-        src={`http://localhost:1234/image/product/${product.productImageUrl}`}
-        sx={{
-          maxHeight: "90%",
-          maxWidth: "90%",
-          objectFit: "contain",
-        }}
-      />
+                  {/* IMAGE */}
+                  <Box
+                    component="img"
+                    src={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                    sx={{
+                      maxHeight: "90%",
+                      maxWidth: "90%",
+                      objectFit: "contain",
+                    }}
+                  />
 
-      {/* ADD TO CART BUTTON (HOVER) */}
-      <Box
-        className="addToCartBtn"
-        onClick={(e) => {
-          e.stopPropagation(); // prevent opening product page
-          handleAddToCart(product);
-        }}
-        sx={{
-          position: "absolute",
-          bottom: 10,
-          right: 10,
-          backgroundColor: "#0f172a",
-          color: "#fff",
-          borderRadius: "50%",
-          width: 42,
-          height: 42,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
-          opacity: 0,
-          transform: "translateY(10px)",
-          transition: "all 0.3s ease",
+                  {/* error messages are shown via Snackbar/Alert */}
 
-          "&:hover": {
-            backgroundColor: "#1e293b",
-          },
-        }}
-      >
-        <ShoppingCartIcon fontSize="small" />
-      </Box>
-    </Box>
+                  {/* ADD TO CART BUTTON (HOVER) */}
+                  <Box
+                    className="addToCartBtn"
+                    onClick={(e) => handleAddToCart(e, product)}
+                    sx={{
+                      position: "absolute",
+                      bottom: 10,
+                      right: 10,
+                      backgroundColor: "#0f172a",
+                      color: "#fff",
+                      borderRadius: "50%",
+                      width: 42,
+                      height: 42,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                      opacity: 0,
+                      transform: "translateY(10px)",
+                      transition: "all 0.3s ease",
 
-    {/* DETAILS */}
-    <Box sx={{ p: 1.5 }}>
-      <Typography
-        sx={{
-          fontWeight: 600,
-          fontSize: 14,
-          height: 36,
-          overflow: "hidden",
-        }}
-      >
-        {limitWords(product.productName, 5)}
-      </Typography>
+                      "&:hover": {
+                        backgroundColor: "#1e293b",
+                      },
+                    }}
+                  >
+                    <ShoppingCartIcon fontSize="small" />
+                  </Box>
+                </Box>
 
-      <Box sx={{ mt: 1 }}>
-        <Typography sx={{ fontWeight: 700, fontSize: 16, mr: 1 }}>
-          ₹{product.discount > 0
-            ? product.discountPrice
-            : product.productPrice}
-        </Typography>
+                {/* DETAILS */}
+                <Box sx={{ p: 1.5 }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 600,
+                      fontSize: 14,
+                      height: 36,
+                      overflow: "hidden",
+                    }}
+                  >
+                    {limitWords(product.productName, 5)}
+                  </Typography>
 
-        {product.discount > 0 && (
-          <>
-            <Typography
-              component="span"
-              sx={{
-                textDecoration: "line-through",
-                color: "#94a3b8",
-                fontSize: 13,
-                mr: 1,
-              }}
-            >
-              ₹{product.productPrice}
-            </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: 16, mr: 1 }}>
+                      ₹{product.discount > 0
+                        ? product.discountPrice
+                        : product.productPrice}
+                    </Typography>
 
-            <Typography
-              component="span"
-              sx={{
-                color: "#16a34a",
-                fontSize: 12,
-                fontWeight: 600,
-              }}
-            >
-              {product.discount}% OFF
-            </Typography>
-          </>
-        )}
-      </Box>
-    </Box>
-  </Box>
-</Grid>
+                    {product.discount > 0 && (
+                      <>
+                        <Typography
+                          component="span"
+                          sx={{
+                            textDecoration: "line-through",
+                            color: "#94a3b8",
+                            fontSize: 13,
+                            mr: 1,
+                          }}
+                        >
+                          ₹{product.productPrice}
+                        </Typography>
+
+                        <Typography
+                          component="span"
+                          sx={{
+                            color: "#16a34a",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {product.discount}% OFF
+                        </Typography>
+                      </>
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+            </Grid>
           ))}
         </Grid>
 
@@ -704,6 +735,7 @@ const settings = {
           </Box>
         )}
       </Container>
+      <Toast open={toastOpen} message={toastMessage} severity={toastSeverity} onClose={handleToastClose} />
     </>
   );
 };

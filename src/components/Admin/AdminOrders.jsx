@@ -16,13 +16,16 @@ import {
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import { getAllOrders, updateOrderStatus } from "../../services/apiService";
+import { fetchAdminOrders } from "../../services/adminService";
 
-const AdminOrders = () => {
+const AdminOrders = ( { user }) => {
   const [orders, setOrders] = useState([]);
   const [orderStatuses, setOrderStatuses] = useState({});
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const PAGE_SIZE = 50;
+
+  console.log("AdminOrders component - Current User:", user);
 
   const handlePageChange = (event, value) => {
     const newPage = value - 1;
@@ -36,11 +39,30 @@ const AdminOrders = () => {
         pageSize: PAGE_SIZE,
       };
 
-      const res = await getAllOrders(payload);
+      if (user && user.role === "ROLE_SUPER_ADMIN") {
 
+      const res = await getAllOrders(payload);
+      console.log("All Orders Response:", res);
       setOrders(res.orders || []);
       setPage(res.currentPage || 0);
       setTotalPages(res.totalPages || 0);
+
+      }
+      else{
+      const res = await fetchAdminOrders(payload);
+      console.log("Admin Orders Response:", res);
+      setOrders(res.orders || []);
+      setPage(res.currentPage || 0);
+      setTotalPages(res.totalPages || 0);
+      }
+
+      // const res = await getAllOrders(payload);
+      // const adminOrdersRes = await fetchAdminOrders(payload);
+      // console.log("Admin Orders Response:", adminOrdersRes);
+
+      // setOrders(res.orders || []);
+      // setPage(res.currentPage || 0);
+      // setTotalPages(res.totalPages || 0);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -165,6 +187,7 @@ const AdminOrders = () => {
 
                 {/* STATUS DROPDOWN */}
                 <TableCell>
+                  {/* Only SUPER_ADMIN can change status; ROLE_ADMIN sees disabled control */}
                   <Select
                     size="small"
                     fullWidth
@@ -172,6 +195,7 @@ const AdminOrders = () => {
                     onChange={(e) =>
                       handleStatusChange(order.orderId, e.target.value)
                     }
+                    disabled={!(user && user.role === "ROLE_SUPER_ADMIN")}
                   >
                     <MenuItem value="IN_PROGRESS">IN_PROGRESS</MenuItem>
                     <MenuItem value="ORDER_RECE">ORDER_RECEIVED</MenuItem>
@@ -184,13 +208,15 @@ const AdminOrders = () => {
 
                 {/* ACTION */}
                 <TableCell>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => handleUpdateClick(order.orderId)}
-                  >
-                    Update
-                  </Button>
+                  {user && user.role === "ROLE_SUPER_ADMIN" && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleUpdateClick(order.orderId)}
+                    >
+                      Update
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

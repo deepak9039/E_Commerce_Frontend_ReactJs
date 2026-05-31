@@ -23,10 +23,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { logoutUser } from "../../services/apiService";
 
 // Pages
-import AdminDashboard from "./AdminDashboard";
 import AdminDashboard1 from "./AdminDashboard1";
 import AddCategory from "../Category/AddCategory";
 import ViewProduct from "../Product/ViewProduct";
@@ -57,14 +55,28 @@ export default function AdminLayout({ user, signOut }) {
   const [value, setValue] = React.useState(0);
   const [editProductId, setEditProductId] = React.useState(null);
 
+  const isSuperAdmin = user?.role === "ROLE_SUPER_ADMIN";
+
+  // Dynamic indexes
+  const INDEX = {
+    DASHBOARD: 0,
+    CATEGORY: isSuperAdmin ? 1 : null,
+    PRODUCTS: isSuperAdmin ? 2 : 1,
+    ADD_PRODUCT: isSuperAdmin ? 3 : 2,
+    ORDERS: isSuperAdmin ? 4 : 3,
+    USERS: isSuperAdmin ? 5 : null,
+    SETTINGS: isSuperAdmin ? 6 : 4,
+    REPORTS: isSuperAdmin ? 7 : 5,
+  };
+
   const handleEditProduct = (productId) => {
     setEditProductId(productId);
-    setValue(3); // Switch to "Add Product" tab (index 3)
+    setValue(INDEX.ADD_PRODUCT);
   };
 
   const handleProductSaved = () => {
     setEditProductId(null);
-    setValue(2); // Switch back to "Products" tab (index 2)
+    setValue(INDEX.PRODUCTS);
   };
 
   return (
@@ -73,7 +85,7 @@ export default function AdminLayout({ user, signOut }) {
         display: "flex",
         height: "100vh",
         bgcolor: "#f4f6f8",
-        overflow: "hidden", // ✅ VERY IMPORTANT
+        overflow: "hidden",
       }}
     >
       {/* ================= TOP BAR ================= */}
@@ -102,11 +114,11 @@ export default function AdminLayout({ user, signOut }) {
             />
 
             <Avatar sx={{ bgcolor: "primary.main", width: 32, height: 32 }}>
-              {user?.name?.[0] || "A"}
+              {user?.email?.[0] || "A"}
             </Avatar>
 
             <Typography fontWeight={600}>
-              {user?.name || "Admin"}
+              {user?.email || "Admin"}
             </Typography>
 
             <IconButton color="error" onClick={signOut}>
@@ -120,9 +132,6 @@ export default function AdminLayout({ user, signOut }) {
       <Box
         sx={{
           width: drawerWidth,
-          // position: "fixed",
-          // top: topBarHeight,
-          bottom: 0,
           bgcolor: "#fff",
           borderRight: "1px solid #e0e0e0",
         }}
@@ -132,8 +141,8 @@ export default function AdminLayout({ user, signOut }) {
           value={value}
           onChange={(e, v) => {
             setValue(v);
-            // Clear edit mode when clicking "Add Product" tab
-            if (v === 3) {
+
+            if (v === INDEX.ADD_PRODUCT) {
               setEditProductId(null);
             }
           }}
@@ -145,7 +154,6 @@ export default function AdminLayout({ user, signOut }) {
               gap: 1.5,
               textAlign: "left",
               minHeight: 56,
-              // px: 3,
               fontWeight: 600,
               textTransform: "none",
             },
@@ -157,51 +165,110 @@ export default function AdminLayout({ user, signOut }) {
             },
           }}
         >
-          <Tab icon={<DashboardIcon />} iconPosition="start" label="Dashboard" />
-          <Tab icon={<CategoryIcon />} iconPosition="start" label="Categories" />
-          <Tab icon={<InventoryIcon />} iconPosition="start" label="Products" />
-          <Tab icon={<AddBoxIcon />} iconPosition="start" label="Add Product" />
-          <Tab icon={<ShoppingCartIcon />} iconPosition="start" label="Orders" />
-          <Tab icon={<PeopleIcon />} iconPosition="start" label="Users" />
-          <Tab icon={<SettingsIcon />} iconPosition="start" label="Settings" />
-          <Tab icon={<BarChartIcon />} iconPosition="start" label="Reports" />
+          <Tab
+            icon={<DashboardIcon />}
+            iconPosition="start"
+            label="Dashboard"
+          />
+
+          {isSuperAdmin && (
+            <Tab
+              icon={<CategoryIcon />}
+              iconPosition="start"
+              label="Categories"
+            />
+          )}
+
+          <Tab
+            icon={<InventoryIcon />}
+            iconPosition="start"
+            label="Products"
+          />
+
+          <Tab
+            icon={<AddBoxIcon />}
+            iconPosition="start"
+            label="Add Product"
+          />
+
+          <Tab
+            icon={<ShoppingCartIcon />}
+            iconPosition="start"
+            label="Orders"
+          />
+
+          {isSuperAdmin && (
+            <Tab
+              icon={<PeopleIcon />}
+              iconPosition="start"
+              label="Users"
+            />
+          )}
+
+          <Tab
+            icon={<SettingsIcon />}
+            iconPosition="start"
+            label="Settings"
+          />
+
+          <Tab
+            icon={<BarChartIcon />}
+            iconPosition="start"
+            label="Reports"
+          />
         </Tabs>
       </Box>
 
       {/* ================= RIGHT CONTENT ================= */}
       <Box
         sx={{
-          // marginLeft: `${drawerWidth}px`,
-        //   marginTop: `${topBarHeight}px`,
           height: `calc(100vh - ${topBarHeight}px)`,
           overflowY: "auto",
           flexGrow: 1,
-        //   p: 3,
         }}
       >
-        <TabPanel value={value} index={0}>
-          <AdminDashboard1 />
+        <TabPanel value={value} index={INDEX.DASHBOARD}>
+          <AdminDashboard1 user={user} />
         </TabPanel>
-        <TabPanel value={value} index={1}>
-          <AddCategory />
+
+        {isSuperAdmin && (
+          <TabPanel value={value} index={INDEX.CATEGORY}>
+            <AddCategory />
+          </TabPanel>
+        )}
+
+        <TabPanel value={value} index={INDEX.PRODUCTS}>
+          <ViewProduct
+            onEditProduct={handleEditProduct}
+            user={user}
+          />
         </TabPanel>
-        <TabPanel value={value} index={2}>
-          <ViewProduct onEditProduct={handleEditProduct} />
+
+        <TabPanel value={value} index={INDEX.ADD_PRODUCT}>
+          <AddProduct
+            editProductId={editProductId}
+            onProductSaved={handleProductSaved}
+          />
         </TabPanel>
-        <TabPanel value={value} index={3}>
-          <AddProduct editProductId={editProductId} onProductSaved={handleProductSaved} />
+
+        <TabPanel value={value} index={INDEX.ORDERS}>
+          <AdminOrders user={user} />
         </TabPanel>
-        <TabPanel value={value} index={4}>
-          <AdminOrders />
+
+        {isSuperAdmin && (
+          <TabPanel value={value} index={INDEX.USERS}>
+            <UsersTable />
+          </TabPanel>
+        )}
+
+        <TabPanel value={value} index={INDEX.SETTINGS}>
+          <Typography variant="h5" textAlign="center" justifyContent="center" sx={{mt:5}}>Setting Coming Soon</Typography>
         </TabPanel>
-        <TabPanel value={value} index={5}>
-          <UsersTable />
-        </TabPanel>
-        <TabPanel value={value} index={6}>
-          <Typography>Settings</Typography>
-        </TabPanel>
-        <TabPanel value={value} index={7}>
-          <Typography>Reports</Typography>
+
+        <TabPanel value={value} index={INDEX.REPORTS}>
+          <Typography variant="h5" textAlign="center" justifyContent="center" sx={{mt:5}}>
+            Report Coming Soon
+          </Typography>
         </TabPanel>
       </Box>
     </Box>

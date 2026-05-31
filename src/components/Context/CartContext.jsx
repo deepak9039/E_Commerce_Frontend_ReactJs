@@ -16,8 +16,9 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Add clearCartCount to context
   return (
-    <CartContext.Provider value={{ cartCount, refreshCartCount }}>
+    <CartContext.Provider value={{ cartCount, refreshCartCount, clearCartCount: () => setCartCount(0) }}>
       {children}
     </CartContext.Provider>
   );

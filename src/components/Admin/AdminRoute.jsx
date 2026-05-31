@@ -7,7 +7,8 @@ const AdminRoute = ({ user, children }) => {
   }
 
   // logged in but not admin
-  if (user.role !== "ROLE_ADMIN") {
+  // logged in but not admin (allow SUPER_ADMIN as well)
+  if (!(user.role === "ROLE_ADMIN" || user.role === "ROLE_SUPER_ADMIN")) {
     return <Navigate to="/signin" replace />;
   }
 

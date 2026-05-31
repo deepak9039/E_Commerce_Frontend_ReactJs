@@ -11,10 +11,10 @@ import {
   CardContent,
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
-import { registerUser } from "../../services/apiService";
-import registerImage from "../../../public/images/cash-register.png";
+import { createSeller } from "../../services/adminService";
+import storeImage from "../../../public/images/store.png";
 
-const UserPage = () => {
+const SellerPage = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
@@ -43,12 +43,14 @@ const UserPage = () => {
     };
 
     try {
-      const response = await registerUser(userJson);
+      const response = await createSeller(userJson);
       setAlertType("success");
       setAlertMessage(response);
     } catch (error) {
       setAlertType("error");
-      setAlertMessage("Error creating user!");
+      setAlertMessage(
+        error?.response?.data || "Error creating seller!"
+      );
     }
   };
 
@@ -92,7 +94,7 @@ const UserPage = () => {
               fontWeight="bold"
               mb={2}
             >
-              Register
+              Sell Online
             </Typography>
 
             <Typography
@@ -102,17 +104,17 @@ const UserPage = () => {
                 lineHeight: 1.8,
               }}
             >
-              Create your account and
+              Join us as a seller and
               <br />
-              start shopping with ease.
+              start growing your business.
             </Typography>
           </Box>
 
           {/* Bottom Image */}
           <Box textAlign="center">
             <img
-              src={registerImage}
-              alt="register"
+              src={storeImage}
+              alt="seller"
               style={{
                 width: "80%",
                 objectFit: "contain",
@@ -151,14 +153,14 @@ const UserPage = () => {
                 fontWeight="bold"
                 color="#0f172a"
               >
-                Create Account
+                Become a Seller
               </Typography>
 
               <Typography
                 variant="body2"
                 color="text.secondary"
               >
-                Register to continue
+                Register to start selling
               </Typography>
             </Box>
 
@@ -166,7 +168,7 @@ const UserPage = () => {
               <Stack spacing={3}>
                 {alertMessage && (
                   <Alert severity={alertType}>
-                    {alertMessage}
+                    {alertMessage.message || alertMessage}
                   </Alert>
                 )}
 
@@ -175,7 +177,9 @@ const UserPage = () => {
                   type="email"
                   variant="standard"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) =>
+                    setEmail(e.target.value)
+                  }
                   fullWidth
                   required
                 />
@@ -185,7 +189,9 @@ const UserPage = () => {
                   type="password"
                   variant="standard"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) =>
+                    setPassword(e.target.value)
+                  }
                   fullWidth
                   required
                 />
@@ -231,7 +237,7 @@ const UserPage = () => {
                     },
                   }}
                 >
-                  Create Account
+                  Become a Seller
                 </Button>
 
                 <Typography
@@ -260,4 +266,4 @@ const UserPage = () => {
   );
 };
 
-export default UserPage;
+export default SellerPage;

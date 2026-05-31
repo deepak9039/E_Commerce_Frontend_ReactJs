@@ -2,10 +2,11 @@ import React from 'react';
 import { Grid, Typography, Box, Button } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { findAllProductAdmin } from '../../services/apiService';
+import { fetchAdminProducts } from '../../services/adminService';
 import { useNavigate } from 'react-router-dom';
 import Pagination from '@mui/material/Pagination';
 
-const ViewProduct = ({ onEditProduct }) => {
+const ViewProduct = ({ onEditProduct, user }) => {
     const navigate = useNavigate();
 
     const PAGE_SIZE = 50;
@@ -17,7 +18,7 @@ const ViewProduct = ({ onEditProduct }) => {
     const [products, setProducts] = useState([]);
 
     console.log("Products i am view product:", products);
-
+    console.log("User in view product:", user);
     // const fetchProducts = async () => {
     //     try {
     //         const response = await findAllProduct();
@@ -30,11 +31,34 @@ const ViewProduct = ({ onEditProduct }) => {
     const fetchProducts = async (pageNo = 0) => {
     try {
         const payload = { page: pageNo, pageSize: PAGE_SIZE };
+
+
+        if (user && user.role === "ROLE_SUPER_ADMIN") {
+
         const response = await findAllProductAdmin(payload);
 
-            setProducts(response.products || []);
-            setPage(response.page || 0);
-            setTotalPages(response.totalPages || 0);
+        console.log("All Products Response:", response);
+
+        setProducts(response.products || []);
+        setPage(response.page || 0);
+        setTotalPages(response.totalPages || 0);
+
+        }else{
+        const response = await fetchAdminProducts(payload);
+        console.log("Admin Products Response:", response);
+        setProducts(response.products || []);
+        setPage(response.page || 0);
+        setTotalPages(response.totalPages || 0);
+        }
+
+        // const response = await findAllProductAdmin(payload);
+
+        // const adminProductsRes = await fetchAdminProducts(payload);
+        // console.log("Admin Products Response:", adminProductsRes);
+
+        // setProducts(response.products || []);
+        // setPage(response.page || 0);
+        // setTotalPages(response.totalPages || 0);
 
         } catch (error) {
             console.error('Error fetching products:', error);

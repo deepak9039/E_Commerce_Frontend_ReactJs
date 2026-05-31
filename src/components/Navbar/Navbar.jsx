@@ -41,7 +41,7 @@ const CartBadge = styled(Badge)(({ theme }) => ({
 /* ================= COMPONENT ================= */
 const Navbar = ({ user, setUser }) => {
   const navigate = useNavigate();
-  const { cartCount, refreshCartCount } = useCart();
+  const { cartCount, refreshCartCount, clearCartCount } = useCart();
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -63,8 +63,11 @@ const Navbar = ({ user, setUser }) => {
 
   const signOut = async () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     setUser(null);
     await logoutUser();
+    // Force clear cart count after logout
+    clearCartCount();
     navigate("/signin");
   };
 
@@ -127,6 +130,20 @@ const Navbar = ({ user, setUser }) => {
             <>
               <Button
                 component={RouterLink}
+                to="/become-seller"
+                sx={{
+                  color: "#e5e7eb",
+                  textTransform: "none",
+                  fontWeight: 500,
+                  "&:hover": {
+                    backgroundColor: "rgba(255,255,255,0.08)",
+                  },
+                }}
+              >
+                Become a Seller
+              </Button>
+              <Button
+                component={RouterLink}
                 to="/signin"
                 sx={{
                   color: "#e5e7eb",
@@ -151,7 +168,7 @@ const Navbar = ({ user, setUser }) => {
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
 
               {/* ADMIN */}
-              {user.role === "ROLE_ADMIN" && (
+              {(user.role === "ROLE_ADMIN" || user.role === "ROLE_SUPER_ADMIN") && (
                 <Button
                   component={RouterLink}
                   to="/admin"

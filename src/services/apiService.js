@@ -2,6 +2,36 @@ import { common } from '@mui/material/colors';
 import axios from 'axios';
 import { useEffect } from 'react';
 
+// Read base URL from Vite env variable. Set VITE_API_BASE_URL in .env, .env.development, .env.production
+const BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL)
+  ? import.meta.env.VITE_API_BASE_URL
+  : '';
+if (BASE_URL) {
+  axios.defaults.baseURL = BASE_URL;
+}
+// Ensure cookies are sent for cross-site requests (session-based auth)
+axios.defaults.withCredentials = true;
+
+// Attach Authorization header from localStorage token when present
+axios.interceptors.request.use(
+  (config) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers = config.headers || {};
+        // Preserve any existing Authorization header
+        if (!config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+    } catch (e) {
+      // ignore localStorage errors
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 // Category endpoints
 export const createCategory = async (payload) => {
   try {
@@ -12,7 +42,7 @@ export const createCategory = async (payload) => {
       // DO NOT set Content-Type header here; let the browser/axios set the correct
       // multipart/form-data boundary automatically. Setting it manually causes 415.
     }
-    const res = await axios.post('/api/admin/createCategory', data);
+    const res = await axios.post('/admin/createCategory', data);
     return res.data;
   } catch (err) {
     console.error('API call error createCategory:', err);
@@ -22,7 +52,7 @@ export const createCategory = async (payload) => {
 
 export const getCategoryById = async (payload) => {
   try {
-    const res = await axios.post(`/api/getCategoryById`, payload);
+    const res = await axios.post(`/getCategoryById`, payload);
     return res.data;
   } catch (err) {
     console.error('API call error getCategoryById:', err);
@@ -32,7 +62,7 @@ export const getCategoryById = async (payload) => {
 
 export const updateCategory = async (payload) => {
   try {
-    const res = await axios.post(`/api/admin/updateCategory`, payload);
+    const res = await axios.post(`/admin/updateCategory`, payload);
     return res.data;
   } catch (err) {
     console.error('API call error updateCategory:', err);
@@ -42,7 +72,7 @@ export const updateCategory = async (payload) => {
 
 export const findAllCategory = async () => {
   try {
-    const res = await axios.get('/api/getAllCategory')
+    const res = await axios.get('/getAllCategory')
     return res.data
   } catch (err) {
     console.error('API call error getAllCategories:', err)
@@ -54,7 +84,7 @@ export const findAllCategory = async () => {
 
 export const addToCart = async (payload) => {
   try {
-    const res = await axios.post('/api/addToCart', payload)
+    const res = await axios.post('/addToCart', payload)
     return res.data
   } catch (err) {
     console.error('API call error addToCart:', err)
@@ -64,7 +94,7 @@ export const addToCart = async (payload) => {
 
 export const getCartByUserId = async (userId) => {
   try {
-    const res = await axios.post('/api/cart', { userId : userId });
+    const res = await axios.post('/cart', { userId : userId });
     return res.data
   } catch (err) {
     console.error('API call error getCartByUserId:', err)
@@ -74,7 +104,7 @@ export const getCartByUserId = async (userId) => {
 
 export const cartCountByUserId = async (userId) => {
   try {
-    const res = await axios.post('/api/cartCount', { userId : userId });
+    const res = await axios.post('/cartCount', { userId : userId });
     return res.data
   } catch (err) {
     console.error('API call error cartCountByUserId:', err)
@@ -84,7 +114,7 @@ export const cartCountByUserId = async (userId) => {
 
 export const quntityUpdatePlus = async (id, userId, productId) => {
   try {
-    const res = await axios.post('/api/updateCartQuantityPlus', { id : id, userId : userId, productId: productId });
+    const res = await axios.post('/updateCartQuantityPlus', { id : id, userId : userId, productId: productId });
     return res.data
   } catch (err) {
     console.error('API call error quntityUpdatePlus:', err)
@@ -94,7 +124,7 @@ export const quntityUpdatePlus = async (id, userId, productId) => {
 
 export const quntityUpdateMinus = async (id, userId, productId) => {
   try {
-    const res = await axios.post('/api/updateCartQuantityMinus', { id : id, userId : userId, productId: productId });
+    const res = await axios.post('/updateCartQuantityMinus', { id : id, userId : userId, productId: productId });
     return res.data
   } catch (err) {
     console.error('API call error quntityUpdateMinus:', err)
@@ -104,7 +134,7 @@ export const quntityUpdateMinus = async (id, userId, productId) => {
 
 export const removeCartItem = async (id, userId, productId) => {
   try {
-    const res = await axios.post('/api/removeFromCart', { id : id, userId : userId, productId: productId });
+    const res = await axios.post('/removeFromCart', { id : id, userId : userId, productId: productId });
     return res.data
   } catch (err) {
     console.error('API call error removeCartItem:', err)
@@ -116,7 +146,7 @@ export const removeCartItem = async (id, userId, productId) => {
 export const createProduct = async (payload) => {
   try {
     // Accept either snake_case keys or camelCase
-    const res = await axios.post('/api/admin/createProduct', payload)
+    const res = await axios.post('/admin/createProduct', payload)
     return res.data
   } catch (err) {
     console.error('API call error createProduct:', err)
@@ -126,7 +156,7 @@ export const createProduct = async (payload) => {
 
 export const getProduct = async (productId) => {
   try {
-    const res = await axios.get(`/api/product/${productId}`)    
+    const res = await axios.get(`/product/${productId}`)    
     return res.data;
   } catch (err) {
     console.error('API call error getProduct:', err);
@@ -136,7 +166,7 @@ export const getProduct = async (productId) => {
 
  export const updateProduct = async (payload) => {
   try {
-    const res = await axios.post(`/api/admin/updateProduct`, payload)
+    const res = await axios.post(`/admin/updateProduct`, payload)
     return res.data
   } catch (err) {
     console.error('API call error updateProduct:', err);
@@ -147,7 +177,7 @@ export const getProduct = async (productId) => {
 //Get all products
 export const findAllProduct = async (payload) => {
   try {
-    const res = await axios.post('/api/findAllProducts', payload)
+    const res = await axios.post('/findAllProducts', payload)
     console.log("findAllProduct response:", res.data);
     return res.data
   } catch (err) {
@@ -159,7 +189,7 @@ export const findAllProduct = async (payload) => {
 //Get all products
 export const findAllProductAdmin = async (payload) => {
   try {
-    const res = await axios.post('/api/admin/findAllProducts', payload)
+    const res = await axios.post('/admin/findAllProducts', payload)
     console.log("findAllProduct response:", res.data);
     return res.data
   } catch (err) {
@@ -171,7 +201,7 @@ export const findAllProductAdmin = async (payload) => {
 // Get products with out pagination
 export const findAllSponsoredProducts = async () => {
   try {
-    const res = await axios.post('/api/findAllSponsoredProducts');
+    const res = await axios.post('/findAllSponsoredProducts');
     return res.data;
   } catch (err) {
     console.error('API call error findAllSponsoredProducts:', err);
@@ -182,7 +212,7 @@ export const findAllSponsoredProducts = async () => {
 //User Endpoints
 export const registerUser = async (payload) => {
   try {
-    const res = await axios.post('/api/createUser', payload)
+    const res = await axios.post('/createUser', payload)
     return res.data
   } catch (err) {
     console.error('API call error registerUser:', err)
@@ -193,7 +223,7 @@ export const registerUser = async (payload) => {
 //User Signin
 export const loginUser = async (payload) => {
   try {
-    const res = await axios.post('/api/signin', payload,{ withCredentials: true })
+    const res = await axios.post('/signin', payload,{ withCredentials: true })
     return res.data
   } catch (err) {
     console.error('API call error loginUser:', err)
@@ -204,7 +234,7 @@ export const loginUser = async (payload) => {
 //User Logout
 export const logoutUser = async () => {
   try {
-    const res = await axios.post('/api/signout',{},{ withCredentials: true })
+    const res = await axios.post('/signout',{},{ withCredentials: true })
     return res.data
   } catch (err) {
     console.error('API call error logoutUser:', err)
@@ -215,7 +245,7 @@ export const logoutUser = async () => {
 // Get User by ID
 export const getUserById = async (userId) => {
   try {
-    const res = await axios.post('/api/getUser', { userId : userId });
+    const res = await axios.post('/getUser', { userId : userId });
     return res.data;
   } catch (err) {
     console.error('API call error getUserById:', err)
@@ -226,7 +256,7 @@ export const getUserById = async (userId) => {
 // Update User Profile
 export const updateUserProfile = async (payload) => {
   try {
-    const res = await axios.post('/api/updateUser', payload);
+    const res = await axios.post('/updateUser', payload);
     return res.data;
   } catch (err) {
     console.error('API call error updateUserProfile:', err)
@@ -237,7 +267,7 @@ export const updateUserProfile = async (payload) => {
 // Update User Address
 export const updateUserAddress = async (payload) => {
   try {
-    const res = await axios.post('/api/updateUserAddress', payload);
+    const res = await axios.post('/updateUserAddress', payload);
     return res.data;
   } catch (err) {
     console.error('API call error updateUserAddress:', err)
@@ -248,7 +278,7 @@ export const updateUserAddress = async (payload) => {
 //Get User Addresses
 export const userAddress = async (userId) => {
   try {
-    const res = await axios.post('/api/userAddress', { userId : userId });
+    const res = await axios.post('/userAddress', { userId : userId });
     return res.data;
   } catch (err) {
     console.error('API call error userAddress:', err)
@@ -259,7 +289,7 @@ export const userAddress = async (userId) => {
 //Get all users
 export const getAllUsers = async () => {
   try {
-    const res = await axios.get('/api/findAllUsers')
+    const res = await axios.get('/findAllUsers')
     return res.data
   } catch (err) {
     console.error('API call error findAllUsers:', err)
@@ -270,7 +300,7 @@ export const getAllUsers = async () => {
 // Get User Addresses
 export const getUserAddresses = async (userId) => {
   try {
-    const res = await axios.post('/api/userAddress', { userId : userId });
+    const res = await axios.post('/userAddress', { userId : userId });
     return res.data;
   } catch (err) {
     console.error('API call error getUserAddresses:', err)
@@ -280,7 +310,7 @@ export const getUserAddresses = async (userId) => {
 
 export const addUserAddress = async (payload) => {
   try {
-    const res = await axios.post('/api/createUserAddress', payload);
+    const res = await axios.post('/createUserAddress', payload);
     return res.data;
   } catch (err) {
     console.error('API call error addUserAddress:', err)
@@ -291,7 +321,7 @@ export const addUserAddress = async (payload) => {
 //Get product by ID
 export const getProductById = async (productId) => {
   try {
-    const res = await axios.get(`/api/product/${productId}`);
+    const res = await axios.get(`/product/${productId}`);
     return res.data;
   } catch (err) {
     console.error('API call error getProductById:', err);
@@ -302,7 +332,7 @@ export const getProductById = async (productId) => {
 export const getProductsByCategory = async (categoryName, page, pageSize) => {
   console.log("API call getProductsByCategory with categoryName:", categoryName, page, pageSize);
   try {
-    const res = await axios.post('/api/findProductsByCategoryName', { categoryName : categoryName, page: page, pageSize: pageSize });
+    const res = await axios.post('/findProductsByCategoryName', { categoryName : categoryName, page: page, pageSize: pageSize });
     return res.data;
   } catch (err) {
     console.error('API call error getProductsByCategory:', err);
@@ -313,7 +343,7 @@ export const getProductsByCategory = async (categoryName, page, pageSize) => {
 // Order Endpoints
 export const saveOrder = async (payload) => {
   try {
-    const res = await axios.post('/api/saveOrder', payload);
+    const res = await axios.post('/saveOrder', payload);
     return res.data;
   } catch (err) {
     console.error('API call error saveOrder:', err);
@@ -323,7 +353,7 @@ export const saveOrder = async (payload) => {
 
 export const findOrdersByUserId = async (userId, page = 0, pageSize = 10) => {
   try {
-    const res = await axios.post('/api/getOrdersByUserId', { userId : userId, page: page, pageSize: pageSize });
+    const res = await axios.post('/getOrdersByUserId', { userId : userId, page: page, pageSize: pageSize });
     return res.data;
   } catch (err) {
     console.error('API call error findOrdersByUserId:', err)
@@ -334,7 +364,7 @@ export const findOrdersByUserId = async (userId, page = 0, pageSize = 10) => {
 // Admin Order Endpoints
 export const getAllOrders = async (payload) => {
   try {
-    const res = await axios.post('/api/admin/getAllOrders', payload);
+    const res = await axios.post('/admin/getAllOrders', payload);
     return res.data;
   } catch (err) {
     console.error('API call error getAllOrders:', err)
@@ -345,7 +375,7 @@ export const getAllOrders = async (payload) => {
 
 export const updateOrderStatus = async (payload) => {
   try {
-    const res = await axios.post('/api/admin/updateOrderStatus', payload);
+    const res = await axios.post('/admin/updateOrderStatus', payload);
     return res.data;
   } catch (err) {
     console.error('API call error updateOrderStatus:', err)
@@ -355,7 +385,7 @@ export const updateOrderStatus = async (payload) => {
 
 export const ordersCount = async () => {
   try {
-    const res = await axios.post('/api/ordersCount');
+    const res = await axios.post('/ordersCount');
     return res.data;
   } catch (err) {
     console.error('API call error ordersCount:', err)
@@ -365,7 +395,7 @@ export const ordersCount = async () => {
 
 export const productsCount = async () => {
   try {
-    const res = await axios.post('/api/productsCount');
+    const res = await axios.post('/productsCount');
     return res.data;
   } catch (err) {
     console.error('API call error productsCount:', err)
@@ -375,7 +405,7 @@ export const productsCount = async () => {
 
 export const usersCount = async () => {
   try {
-    const res = await axios.post('/api/usersCount');
+    const res = await axios.post('/usersCount');
     return res.data;
   } catch (err) {
     console.error('API call error usersCount:', err)
@@ -385,7 +415,7 @@ export const usersCount = async () => {
 
 export const categorySales = async () => {
   try {
-    const res = await axios.post('/api/categorySales');
+    const res = await axios.post('/categorySales');
     console.log("categorySales response:", res.data);
     return res.data;
   } catch (err) {
@@ -397,7 +427,7 @@ export const categorySales = async () => {
 //product search
 export const searchProducts = async (query) =>{
   try{
-    const res = await axios.post("/api/searchProducts", query);
+    const res = await axios.post("/searchProducts", query);
     return res.data;
   }catch (err){
     console.log("API call error product search", err)
@@ -407,7 +437,7 @@ export const searchProducts = async (query) =>{
 //top selling product
 export const topSellingproducts = async () => {
   try{
-    const res = await axios.post("/api/topSellingProducts");
+    const res = await axios.post("/topSellingProducts");
     return res.data;
   }catch(err) {
     console.log("error while feachin top selling products", err)
@@ -417,7 +447,7 @@ export const topSellingproducts = async () => {
 //dashboard order desceding
 export const ordersDesc = async () =>{
   try{
-    const res = await axios.post("/api/orderDesc");
+    const res = await axios.post("/orderDesc");
     return res.data;
   }catch(err) {
     console.log("error while feachin orderDesc", err)
@@ -427,7 +457,7 @@ export const ordersDesc = async () =>{
 // total revenue
 export const totalRevenue = async () => {
   try{
-    const res = await axios.post("/api/totalRevenue");
+    const res = await axios.post("/totalRevenue");
     return res.data;
   }catch(err) {
     console.log("error while feachin total revenue", err)
@@ -437,7 +467,7 @@ export const totalRevenue = async () => {
 //write review
 export const writeReview = async (payload) => {
   try {
-    const res = await axios.post('/api/reviews', payload);
+    const res = await axios.post('/reviews', payload);
     return res.data;
   } catch (err) {
     console.error('API call error writeReview:', err)
@@ -448,7 +478,7 @@ export const writeReview = async (payload) => {
 //get reviews by product id
 export const getProductReviews = async (productId) => {
   try {
-    const res = await axios.get(`/api/reviews/product/${productId}`);
+    const res = await axios.get(`/reviews/product/${productId}`);
     return res.data;
   } catch (err) {
     console.error('API call error getProductReviews:', err)
@@ -459,7 +489,7 @@ export const getProductReviews = async (productId) => {
 //sales-overview
 export const salesOverview = async () => {
   try {
-    const res = await axios.get('/api/sales-overview');
+    const res = await axios.get('/sales-overview');
     return res.data;
   } catch (err) {
     console.error('API call error salesOverview:', err)
@@ -470,7 +500,7 @@ export const salesOverview = async () => {
 // Api service to download Product Invoice
 export const downloadInvoice = async (userId, orderId) => {
   try {
-    const res = await axios.post('/api/downloadInvoice', { userId, orderId }, { responseType: 'blob' });
+    const res = await axios.post('/downloadInvoice', { userId, orderId }, { responseType: 'blob' });
     // Create a URL for the blob and trigger a download
     const url = window.URL.createObjectURL(new Blob([res.data]));
     const link = document.createElement('a');
@@ -487,7 +517,7 @@ export const downloadInvoice = async (userId, orderId) => {
 // API service to fetch recordRecentView
 export const recentViewPost = async (userId, productId) => {
   try {
-    const res = await axios.post('/api/api/recommendations/recent-view', null, { params: { userId, productId } });
+    const res = await axios.post('/api/recommendations/recent-view', null, { params: { userId, productId } });
     return res.data;
   } catch (err) {
     console.error('API call error recordRecentView:', err)
@@ -498,7 +528,7 @@ export const recentViewPost = async (userId, productId) => {
 //API service to fetch recentViews
 export const recentViewGet = async (userId, limit = 10) => {
   try {
-    const res = await axios.get('/api/api/recommendations/recent-view', { params: { userId, limit } });
+    const res = await axios.get('/api/recommendations/recent-view', { params: { userId, limit } });
     return res.data;
   } catch (err) {
     console.error('API call error fetchRecentViews:', err)
@@ -509,7 +539,7 @@ export const recentViewGet = async (userId, limit = 10) => {
 // API service to fetch recommended products
 export const fetchRecommendedProducts = async (userId, limit = 10) => {
   try {
-    const res = await axios.get('/api/api/recommendations/similar', { params: { userId, limit } });
+    const res = await axios.get('/api/recommendations/similar', { params: { userId, limit } });
     return res.data;
   } catch (err) {
     console.error('API call error fetchRecommendedProducts:', err)
@@ -521,13 +551,28 @@ export const fetchRecommendedProducts = async (userId, limit = 10) => {
 export const fetchSimilarProducts = async (productId, limit = 10) => {
   console.log("API call fetchSimilarProducts with productId:", productId, "limit:", limit);
   try {
-    const res = await axios.get('/api/api/recommendations/similar', { params: { productId, limit } });
+    const res = await axios.get('/api/recommendations/similar', { params: { productId, limit } });
     return res.data;
   } catch (err) {
     console.error('API call error fetchSimilarProducts:', err)
     throw err
   }
 }
+
+// API service to fetch discounted products for slider
+export const fetchDiscountedProducts = async (minPercent = 10) => {
+  try {
+    const res = await axios.post('/discountsProducts', { minPercent });
+    return res.data;
+  } catch (err) {
+    console.error('API call error fetchDiscountedProducts:', err)
+    throw err
+  }
+}
+
+
+
+
 
 // API service to fetch initial data on app load
 const apiService = () => {

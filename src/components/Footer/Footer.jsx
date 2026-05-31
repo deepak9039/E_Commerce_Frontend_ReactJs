@@ -7,8 +7,41 @@ import {
   Link,
   Divider,
   Stack,
+  IconButton,
 } from "@mui/material";
+
+import InstagramIcon from "@mui/icons-material/Instagram";
+import YouTubeIcon from "@mui/icons-material/YouTube";
+import XIcon from "@mui/icons-material/X";
+
 import logo from "../../../public/logoNew1.png";
+
+const footerLinkStyle = {
+  color: "#94a3b8",
+  textDecoration: "none",
+  transition: "all 0.3s ease",
+  fontSize: "14px",
+  width: "fit-content",
+
+  "&:hover": {
+    color: "#ff008c",
+    transform: "translateX(5px)",
+  },
+};
+
+const socialIconStyle = {
+  border: "1px solid rgba(255,255,255,0.12)",
+  color: "#fff",
+  borderRadius: "4px",
+  transition: "0.3s ease",
+
+  "&:hover": {
+    background: "#ff008c",
+    borderColor: "#ff008c",
+    transform: "translateY(-4px)",
+    boxShadow: "0 0 20px rgba(255,0,140,0.5)",
+  },
+};
 
 const Footer = () => {
   return (
@@ -16,131 +49,282 @@ const Footer = () => {
       component="footer"
       sx={{
         mt: "auto",
-        backgroundColor: "#0f172a",
-        color: "#e2e8f0",
-        pt: 5,
+        background: "#050505",
+        color: "#fff",
+        position: "relative",
+        overflow: "hidden",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={4}>
-          {/* ===== BRAND ===== */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom color="#e2e8f0">
-                <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              textDecoration: "none",
-            }}
-          >
-            <img
-              src={logo}
-              alt="YourStore Logo"
-              style={{
-                height: "60px",
-                objectFit: "contain",
+      {/* TOP PINK LINE */}
+      <Box
+        sx={{
+          height: "2px",
+          background:
+            "linear-gradient(90deg, transparent, #ff008c, transparent)",
+        }}
+      />
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          pt: 8,
+          pb: 4,
+          position: "relative",
+          zIndex: 2,
+        }}
+      >
+        <Grid container spacing={6}>
+          {/* ===== LOGO ===== */}
+          <Grid item xs={12} md={3}>
+            <Box sx={{ mb: 3 }}>
+              <img
+                src={logo}
+                alt="logo"
+                style={{
+                  height: "60px",
+                  objectFit: "contain",
+                }}
+              />
+            </Box>
+
+            <Typography
+              sx={{
+                color: "#94a3b8",
+                lineHeight: 1.9,
+                fontSize: "14px",
               }}
-            />
-          </Box>
-            </Typography>
-
-            <Typography variant="body2" color="#e2e8f0" sx={{ mt: 2 }}>
-              Your one-stop destination for quality products, fast delivery,
-              and a seamless shopping experience.
-            </Typography>
-
-            <Typography variant="body2" sx={{ mt: 2 }} color="#e2e8f0">
-              Trusted by thousands of customers across India.
+            >
+              Premium shopping experience with fast delivery, secure payments,
+              and quality products for modern customers.
             </Typography>
           </Grid>
 
-          {/* ===== QUICK LINKS ===== */}
+          {/* ===== SHOP ===== */}
           <Grid item xs={6} md={2}>
+            <Typography
+              sx={{
+                color: "#fff",
+                fontWeight: 700,
+                mb: 3,
+                letterSpacing: "3px",
+                fontSize: "13px",
+              }}
+            >
+              • SHOP
+            </Typography>
 
-            <Stack spacing={1}>
-              <Link href="/" color="#e2e8f0" underline="hover">
+            <Stack spacing={2}>
+              <Link href="/" sx={footerLinkStyle}>
                 Home
               </Link>
-              <Link href="/products" color="#e2e8f0" underline="hover">
+
+              <Link href="/products" sx={footerLinkStyle}>
                 Products
               </Link>
-              <Link href="/orders" color="#e2e8f0" underline="hover">
-                My Orders
+
+              <Link href="/wishlist" sx={footerLinkStyle}>
+                Wishlist
               </Link>
-              <Link href="/cart" color="#e2e8f0" underline="hover">
+
+              <Link href="/cart" sx={footerLinkStyle}>
                 Cart
+              </Link>
+
+              <Link href="/orders" sx={footerLinkStyle}>
+                My Orders
               </Link>
             </Stack>
           </Grid>
 
           {/* ===== ACCOUNT ===== */}
           <Grid item xs={6} md={2}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom color="#e2e8f0">
-              Account
+            <Typography
+              sx={{
+                color: "#fff",
+                fontWeight: 700,
+                mb: 3,
+                letterSpacing: "3px",
+                fontSize: "13px",
+              }}
+            >
+              • ACCOUNT
             </Typography>
 
-            <Stack spacing={1}>
-              <Link href="/login" color="#e2e8f0" underline="hover">
+            <Stack spacing={2}>
+              <Link href="/login" sx={footerLinkStyle}>
                 Login
               </Link>
-              <Link href="/register" color="#e2e8f0" underline="hover">
+
+              <Link href="/register" sx={footerLinkStyle}>
                 Register
               </Link>
-              <Link href="/profile" color="#e2e8f0" underline="hover">
+
+              <Link href="/profile" sx={footerLinkStyle}>
                 Profile
               </Link>
-              <Link href="/settings" color="#e2e8f0" underline="hover">
+
+              <Link href="/settings" sx={footerLinkStyle}>
                 Settings
               </Link>
             </Stack>
           </Grid>
 
-          {/* ===== SUPPORT ===== */}
-          <Grid item xs={12} md={4}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom color="#e2e8f0">
-              Support
+          {/* ===== CONTACT ===== */}
+          <Grid item xs={12} md={3}>
+            <Typography
+              sx={{
+                color: "#fff",
+                fontWeight: 700,
+                mb: 3,
+                letterSpacing: "3px",
+                fontSize: "13px",
+              }}
+            >
+              • HEADQUARTERS
             </Typography>
 
-            <Typography variant="body2" color="#e2e8f0">
-              Need help? Our support team is available 24/7.
+            <Stack spacing={2}>
+              <Typography sx={{ color: "#cbd5e1", fontSize: "14px" }}>
+                📍 Kerala, India
+              </Typography>
+
+              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+                support@yourstore.com
+              </Typography>
+
+              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+                Partnerships
+              </Typography>
+
+              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+                Press & Media
+              </Typography>
+            </Stack>
+          </Grid>
+
+          {/* ===== SOCIAL ===== */}
+          <Grid item xs={12} md={2}>
+            <Typography
+              sx={{
+                color: "#fff",
+                fontWeight: 700,
+                mb: 3,
+                letterSpacing: "3px",
+                fontSize: "13px",
+              }}
+            >
+              • NETWORK
             </Typography>
 
-            <Typography variant="body2" sx={{ mt: 1 }} color="#e2e8f0">
-              📧 support@yourstore.com
+            <Typography
+              sx={{
+                color: "#94a3b8",
+                fontSize: "14px",
+                lineHeight: 1.8,
+                mb: 3,
+              }}
+            >
+              Follow the brand across drops, offers and latest updates.
             </Typography>
 
-            <Typography variant="body2" color="#e2e8f0">
-              📞 +91 90000 00000
-            </Typography>
+            <Stack direction="row" spacing={2}>
+              <IconButton sx={socialIconStyle}>
+                <InstagramIcon />
+              </IconButton>
 
-            <Typography variant="body2" sx={{ mt: 1 }} color="#e2e8f0">
-              Secure payments • Easy returns • Fast delivery
-            </Typography>
+              <IconButton sx={socialIconStyle}>
+                <YouTubeIcon />
+              </IconButton>
+
+              <IconButton sx={socialIconStyle}>
+                <XIcon />
+              </IconButton>
+            </Stack>
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 4, borderColor: "#1e293b" }} />
+        {/* HUGE BACKGROUND TEXT */}
+        <Box
+          sx={{
+            position: "relative",
+            mt: 10,
+            mb: 3,
+            textAlign: "center",
+          }}
+        >
+<Typography
+  sx={{
+    fontSize: { xs: "70px", sm: "90px", md: "100px" },
+    fontWeight: 900,
+    lineHeight: 1,
+    letterSpacing: "-8px",
+    cursor: "pointer",
+    userSelect: "none",
+    display: "inline-block",
+    position: "relative",
 
+    /* DEFAULT OUTLINE */
+    color: "transparent",
+    WebkitTextStroke: "1px rgba(255,255,255,0.18)",
+
+    transition: "all 0.6s ease",
+
+    /* HOVER EFFECT */
+    "&:hover": {
+      background:
+        "linear-gradient(90deg, #ffffff 0%, #ffffff 45%, #ff008c 75%, #ff008c 100%)",
+
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+
+      WebkitTextStroke: "0px transparent",
+
+      filter: "drop-shadow(0 0 20px rgba(255,0,140,0.45))",
+
+      transform: "scale(1.02)",
+    },
+  }}
+>
+  Infinity Your Store
+</Typography>
+        </Box>
+
+        <Divider
+          sx={{
+            my: 4,
+            borderColor: "rgba(255,255,255,0.08)",
+          }}
+        />
+
+        {/* ===== BOTTOM ===== */}
         <Stack
           direction={{ xs: "column", md: "row" }}
           spacing={2}
           justifyContent="space-between"
           alignItems="center"
-          pb={3}
         >
-          <Typography variant="body2" color="#e2e8f0">
-            © {new Date().getFullYear()} YourStore. All rights reserved.
+          <Typography
+            sx={{
+              color: "#64748b",
+              fontSize: "13px",
+              letterSpacing: "2px",
+            }}
+          >
+            © {new Date().getFullYear()} INFINITY STORE. ALL RIGHTS RESERVED.
           </Typography>
 
           <Stack direction="row" spacing={3}>
-            <Link href="#" color="#e2e8f0" underline="hover">
-              Privacy Policy
+            <Link href="#" sx={footerLinkStyle}>
+              Privacy
             </Link>
-            <Link href="#" color="#e2e8f0" underline="hover">
-              Terms & Conditions
+
+            <Link href="#" sx={footerLinkStyle}>
+              Terms
             </Link>
-            <Link href="#" color="#e2e8f0" underline="hover">
-              Refund Policy
+
+            <Link href="#" sx={footerLinkStyle}>
+              Shipping Policy
             </Link>
           </Stack>
         </Stack>

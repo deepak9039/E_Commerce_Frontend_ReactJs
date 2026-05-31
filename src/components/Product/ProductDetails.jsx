@@ -21,6 +21,7 @@ import { useCart } from "../Context/CartContext";
 import RelatedProducts from "./RelatedProducts";
 import ProductReviews from "../Review/ProductReviews";
 import SimilarProduct from "./SimilarProduct";
+import Toast from "../Common/Toast";
 
 const ProductDetails = ({ user }) => {
   const { id } = useParams();
@@ -31,9 +32,14 @@ const ProductDetails = ({ user }) => {
   const [relatedTotalPages, setRelatedTotalPages] = useState(0);
   const [reviews, setReviews] = useState([]);
   const RELATED_PAGE_SIZE = 10;
-  const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [similarProductsData, setSimilarProductsData] = useState([]);
+
+  // Toast state
+  const [toastOpen, setToastOpen] = React.useState(false);
+  const [toastMessage, setToastMessage] = React.useState("");
+  const [toastSeverity, setToastSeverity] = React.useState("success");
+  
   console.log("simlarProductsData", similarProductsData);
   console.log("erer", relatedProducts);
   console.log("Product reviews:", reviews);
@@ -74,15 +80,23 @@ const ProductDetails = ({ user }) => {
       await addToCart({ productId: product?.productId, userId: user?.userId });
       await cartCountByUserId(user?.userId);
       refreshCartCount(user?.userId);
+      setToastMessage('Item added to cart. GO TO CART');
+      setToastSeverity('success');
+      setToastOpen(true);
       setSuccessMessage("Item added to cart successfully!");
 
     } catch (err) {
       console.error("Add to cart error:", err.response?.data?.message || err.message);
       const errorMessage = err.response?.data?.message || "Failed to add to cart";
       if (errorMessage === "User not found") {
-        setError("Please log in to add items to your cart.");
+        setToastMessage('Please log in to add items to your cart.');
+        setToastSeverity('error');
+        setToastOpen(true);
       } else {
-        setError(errorMessage);
+        // setError(errorMessage);
+        setToastMessage(errorMessage);
+        setToastSeverity('error');
+        setToastOpen(true);
       }
     }
   };
@@ -93,6 +107,11 @@ const ProductDetails = ({ user }) => {
     } catch (err) {
       console.error("Error fetching similar products:", err);
     }
+  };
+
+    const handleToastClose = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setToastOpen(false);
   };
 
   useEffect(() => {
@@ -271,7 +290,7 @@ const ProductDetails = ({ user }) => {
               }
             </Typography>
 
-            {successMessage && (
+            {/* {successMessage && (
               <Box
                 sx={{
                   mb: 2,
@@ -285,23 +304,7 @@ const ProductDetails = ({ user }) => {
                   ✔ {successMessage}
                 </Typography>
               </Box>
-            )}
-
-            {error && (
-              <Box
-                sx={{
-                  mb: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  backgroundColor: "#fdecea",
-                  border: "1px solid #f5c6cb",
-                }}
-              >
-                <Typography sx={{ color: "#c62828", fontWeight: 500 }}>
-                  ✖ {error}
-                </Typography>
-              </Box>
-            )}
+            )} */}
 
             {/* CTA */}
             <Button
@@ -359,6 +362,7 @@ const ProductDetails = ({ user }) => {
           
         </Box>
       </Container>
+      <Toast open={toastOpen} message={toastMessage} severity={toastSeverity} onClose={handleToastClose} />
 
     </>
 

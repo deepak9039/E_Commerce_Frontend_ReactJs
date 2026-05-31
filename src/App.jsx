@@ -30,6 +30,7 @@ import UserAddress from "./components/UserDetails/UserAddress";
 import AdminLayout from "./components/Admin/AdminLayout";
 import { logoutUser } from "./services/apiService";
 import OrderSuccess from "./components/OrderPage/OrderSuccess";
+import SellerPage from "./components/UserDetails/SellerPage";
 
 const theme = createTheme({
   palette: {
@@ -51,6 +52,17 @@ function App() {
 
     if (response.status === "FAILED") return response;
 
+    // Persist user and token (if present) so axios interceptor can attach it
+    try {
+      if (response) {
+        localStorage.setItem('user', JSON.stringify(response));
+        if (response.token) localStorage.setItem('token', response.token);
+        else if (response.accessToken) localStorage.setItem('token', response.accessToken);
+      }
+    } catch (e) {
+      console.warn('Could not persist login data to localStorage', e);
+    }
+
     setUser(response);
     return response;
 
@@ -65,11 +77,15 @@ function App() {
 };
 
   const signOut = async () => {
+    try {
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       setUser(null);
       await logoutUser();
-      navigate("/signin");
-    };
+    } catch (e) {
+      console.warn('Error during sign out', e);
+    }
+  };
   
 
   return (
@@ -103,6 +119,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails user={user} />} />
             <Route path="/edit-product/:id" element={<AddProduct />} />
             <Route path="/register" element={<UserPage />} />
+            <Route path="/become-seller" element={<SellerPage />} />
             <Route path="/profile" element={<UserProfile user={user} setUser={setUser} />} />
             <Route path="/user/address" element={<UserAddress user={user} />} />
             <Route path="/users" element={<UsersTable />} />

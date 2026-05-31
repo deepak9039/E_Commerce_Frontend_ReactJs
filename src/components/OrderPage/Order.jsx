@@ -233,17 +233,17 @@ const Order = ({ user }) => {
 
                   {paymentMethod === "CREDIT_CARD" && (
                     <>
-                      <TextField size="small" label="Card Number" fullWidth />
+                      <TextField size="small" label="Card Number" fullWidth required/>
                       <Box display="flex" gap={2}>
-                        <TextField size="small" label="Expiry" fullWidth />
-                        <TextField size="small" label="CVV" fullWidth />
+                        <TextField size="small" label="Expiry" fullWidth required/>
+                        <TextField size="small" label="CVV" fullWidth required />
                       </Box>
-                      <TextField size="small" label="Card Holder Name" fullWidth />
+                      <TextField size="small" label="Card Holder Name" fullWidth required />
                     </>
                   )}
 
                   {paymentMethod === "UPI" && (
-                    <TextField label="UPI ID" fullWidth />
+                    <TextField label="UPI ID" fullWidth required />
                   )}
                 </Box>
               )}
