@@ -2,19 +2,12 @@ import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
   Select,
   MenuItem,
   Button,
   Box,
 } from "@mui/material";
-import Pagination from "@mui/material/Pagination";
+import { DataGrid } from "@mui/x-data-grid";
 import { getAllOrders, updateOrderStatus } from "../../services/apiService";
 import { fetchAdminOrders } from "../../services/adminService";
 
@@ -23,16 +16,21 @@ const AdminOrders = ( { user }) => {
   const [orderStatuses, setOrderStatuses] = useState({});
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(false);
   const PAGE_SIZE = 50;
 
   console.log("AdminOrders component - Current User:", user);
 
-  const handlePageChange = (event, value) => {
-    const newPage = value - 1;
-    fetchOrders(newPage);
+  const handlePaginationModelChange = (newModel) => {
+    const newPage = newModel.page;
+    if (newPage !== page) {
+      setPage(newPage);
+      fetchOrders(newPage);
+    }
   };
 
   const fetchOrders = async (pageNo = 0) => {
+    setLoading(true);
     try {
       const payload = {
         page: pageNo,
@@ -65,6 +63,8 @@ const AdminOrders = ( { user }) => {
       // setTotalPages(res.totalPages || 0);
     } catch (error) {
       console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,136 +111,156 @@ const AdminOrders = ( { user }) => {
     }
   };
 
-  return (
-    <Container maxWidth="xl" sx={{ mt: 5}}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
-        Admin – All Orders
-      </Typography>
+  const rows = orders.map((order) => ({
+    id: order.orderId,
+    orderId: order.orderId,
+    userName: `${order.orderAddress?.firstName || ""} ${order.orderAddress?.lastName || ""}`.trim(),
+    address: `${order.orderAddress?.address || ""}, ${order.orderAddress?.city || ""}, ${order.orderAddress?.state || ""} - ${order.orderAddress?.pinCode || ""}`,
+    phone: order.orderAddress?.phoneNumber || "",
+    email: order.orderAddress?.email || "",
+    orderDate: order.orderDate,
+    productName: order.product?.productName || "",
+    quantity: order.quantity,
+    price: order.price,
+    total: order.price * order.quantity,
+    status: order.status,
+  }));
 
-      <TableContainer component={Paper}>
-        <Table>
-          {/* ================= TABLE HEADER ================= */}
-          <TableHead>
-            <TableRow>
-              <TableCell><b>ID</b></TableCell>
-              <TableCell><b>User</b></TableCell>
-              <TableCell><b>Address</b></TableCell>
-              <TableCell><b>Order Date</b></TableCell>
-              <TableCell><b>Price Details</b></TableCell>
-              <TableCell><b>Status</b></TableCell>
-              <TableCell><b>Action</b></TableCell>
-            </TableRow>
-          </TableHead>
-
-          {/* ================= TABLE BODY ================= */}
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id}>
-                {/* ID */}
-                <TableCell>{order.id}</TableCell>
-
-                {/* USER + ADDRESS */}
-                <TableCell>
-                  <Typography fontWeight="bold">
-                    {order.orderAddress.firstName}{" "}
-                    {order.orderAddress.lastName}
-                  </Typography>
-
-                </TableCell>
-                <TableCell>
-                  
-
-                  <Typography variant="body2">
-                    {order.orderAddress.address},{" "}
-                    {order.orderAddress.city},{" "}
-                  </Typography>
-                  <Typography>
-
-                    {order.orderAddress.state} -{" "}
-                    {order.orderAddress.pinCode}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    📞 {order.orderAddress.phoneNumber}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    ✉ {order.orderAddress.email}
-                  </Typography>
-                </TableCell>
-
-                {/* DATE */}
-                <TableCell>
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </TableCell>
-
-                {/* PRICE */}
-
-                <TableCell>
-                  <Typography>{order.product.productName}</Typography>
-                  <Typography>Qty: {order.quantity}</Typography>
-                  <Typography>Price: ₹{order.price}</Typography>
-                  <Typography fontWeight="bold">
-                    Total: ₹{order.price * order.quantity}
-                  </Typography>
-                </TableCell>
-
-                {/* STATUS DROPDOWN */}
-                <TableCell>
-                  {/* Only SUPER_ADMIN can change status; ROLE_ADMIN sees disabled control */}
-                  <Select
-                    size="small"
-                    fullWidth
-                    value={orderStatuses[order.orderId] || order.status}
-                    onChange={(e) =>
-                      handleStatusChange(order.orderId, e.target.value)
-                    }
-                    disabled={!(user && user.role === "ROLE_SUPER_ADMIN")}
-                  >
-                    <MenuItem value="IN_PROGRESS">IN_PROGRESS</MenuItem>
-                    <MenuItem value="ORDER_RECE">ORDER_RECEIVED</MenuItem>
-                    <MenuItem value="PRODUCT_PACK">PRODUCT_PACKED</MenuItem>
-                    <MenuItem value="OUT_FOR_DEL">OUT_FOR_DEL</MenuItem>
-                    <MenuItem value="DELIVERED">DELIVERED</MenuItem>
-                    <MenuItem value="CANCEL">CANCELLED</MenuItem>
-                  </Select>
-                </TableCell>
-
-                {/* ACTION */}
-                <TableCell>
-                  {user && user.role === "ROLE_SUPER_ADMIN" && (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleUpdateClick(order.orderId)}
-                    >
-                      Update
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-
-            {orders.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} align="center">
-                  No orders found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      {totalPages > 1 && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
-          <Pagination
-            count={totalPages}
-            page={page + 1}
-            onChange={handlePageChange}
-            color="primary"
-          />
+  const columns = [
+    { field: "orderId", headerName: "ID", width: 90 },
+    {
+      field: "userName",
+      headerName: "User",
+      width: 170,
+      renderCell: (params) => (
+        <Box sx={{ py: 1, width: '100%' }}>
+          <Typography fontWeight="bold" sx={{ wordBreak: 'break-word' }}>{params.value}</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
+            {params.row.phone}
+          </Typography>
         </Box>
-      )}
+      ),
+    },
+    {
+      field: "address",
+      headerName: "Address",
+      flex: 1,
+      minWidth: 230,
+      maxWidth: 320,
+      renderCell: (params) => (
+        <Box sx={{ py: 1, width: '100%' }}>
+          <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{params.value}</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>
+            {params.row.email}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      field: "orderDate",
+      headerName: "Order Date",
+      width: 140,
+      renderCell: (params) => new Date(params.value).toLocaleDateString(),
+    },
+    {
+      field: "productName",
+      headerName: "Product",
+      width: 200,
+      renderCell: (params) => <Typography sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{params.value}</Typography>,
+    },
+    {
+      field: "quantity",
+      headerName: "Qty",
+      width: 90,
+      renderCell: (params) => <Typography>{params.value}</Typography>,
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      width: 110,
+      renderCell: (params) => <Typography>₹{params.value}</Typography>,
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      width: 110,
+      renderCell: (params) => <Typography fontWeight="bold">₹{params.value}</Typography>,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 160,
+      renderCell: (params) => (
+        <Select
+          size="small"
+          fullWidth
+          value={orderStatuses[params.row.orderId] || params.value}
+          onChange={(e) => handleStatusChange(params.row.orderId, e.target.value)}
+          disabled={!(user && user.role === "ROLE_SUPER_ADMIN")}
+        >
+          <MenuItem value="IN_PROGRESS">IN_PROGRESS</MenuItem>
+          <MenuItem value="ORDER_RECE">ORDER_RECEIVED</MenuItem>
+          <MenuItem value="PRODUCT_PACK">PRODUCT_PACKED</MenuItem>
+          <MenuItem value="OUT_FOR_DEL">OUT_FOR_DEL</MenuItem>
+          <MenuItem value="DELIVERED">DELIVERED</MenuItem>
+          <MenuItem value="CANCEL">CANCELLED</MenuItem>
+        </Select>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 140,
+      sortable: false,
+      renderCell: (params) => (
+        user && user.role === "ROLE_SUPER_ADMIN" ? (
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handleUpdateClick(params.row.orderId)}
+          >
+            Update
+          </Button>
+        ) : null
+      ),
+    },
+  ];
+
+  return (
+    <Container maxWidth="xl" sx={{ mt: 5 }}>
+      {/* <Typography variant="h5" fontWeight="bold" gutterBottom>
+        Admin – All Orders
+      </Typography> */}
+
+      <Box sx={{ height: 700, width: "100%" }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          rowCount={totalPages > 0 ? totalPages * PAGE_SIZE : orders.length}
+          paginationMode="server"
+          paginationModel={{ page, pageSize: PAGE_SIZE }}
+          onPaginationModelChange={handlePaginationModelChange}
+          pageSizeOptions={[PAGE_SIZE]}
+          disableRowSelectionOnClick
+          sx={{
+            border: "1px solid #e0e0e0",
+            borderRadius: 2,
+            '& .MuiDataGrid-columnHeaders': {
+              backgroundColor: '#f5f5f5',
+              fontWeight: 600,
+            },
+            '& .MuiDataGrid-cell': {
+              whiteSpace: 'normal',
+              alignItems: 'flex-start',
+              py: 1.2,
+            },
+            '& .MuiDataGrid-root': {
+              overflow: 'auto',
+            },
+          }}
+        />
+      </Box>
     </Container>
   );
 };

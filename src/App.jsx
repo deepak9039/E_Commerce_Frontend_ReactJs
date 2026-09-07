@@ -30,7 +30,8 @@ import UserAddress from "./components/UserDetails/UserAddress";
 import AdminLayout from "./components/Admin/AdminLayout";
 import { logoutUser } from "./services/apiService";
 import OrderSuccess from "./components/OrderPage/OrderSuccess";
-import SellerPage from "./components/UserDetails/SellerPage";
+import SellerPage from "./components/SellersPages/SellerPage";
+import PaymentPage from "./components/Payment/PaymentPage";
 
 const theme = createTheme({
   palette: {
@@ -130,6 +131,7 @@ function App() {
             <Route path="/search" element={<SearchResults />} />
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/productReview" element={<ProductReviewPage />} />
+            <Route path="/process-payment" element={<PaymentPage user={user} />} />
           </Routes>
           <Footer />
         </Router>

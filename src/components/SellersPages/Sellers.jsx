@@ -9,21 +9,22 @@ import {
   Stack
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
-import { getAllUsers, featchAllUsers } from "../../services/apiService";
 
-const UsersTable = () => {
+import { featchAllSellers } from "../../services/apiService";
+
+const Sellers = () => {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = async () => {
     try {
       // const response = await getAllUsers();
-      const response = await featchAllUsers();
+      const response = await featchAllSellers();
       // DataGrid requires id field
-      console.log("Fetched users:", response);
-      const formatted = response?.users?.map((u, index) => ({ ...u, id: u.id || index }));
+      console.log("Fetched sellers:", response);
+      const formatted = response?.sellers?.map((u, index) => ({ ...u, id: u.id || index }));
       setUsers(formatted);
     } catch (error) {
-      console.log("Error fetching users:", error);
+      console.log("Error fetching sellers:", error);
     }
   };
 
@@ -55,17 +56,17 @@ const UsersTable = () => {
     },
     {
       field: "email",
-      headerName: "Email",
+      headerName: "Seller Email",
       width: 200
     },
     {
       field: "firstName",
-      headerName: "First Name",
+      headerName: "Seller First Name",
       width: 150
     },
     {
       field: "lastName",
-      headerName: "Last Name",
+      headerName: "Seller Last Name",
       width: 150
     },
     {
@@ -128,4 +129,4 @@ const UsersTable = () => {
   );
 };
 
-export default UsersTable;
+export default Sellers

@@ -165,118 +165,253 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
     }, [productPrice, discount]);
 
     return (
-        <Container maxWidth="sm" sx={{ py: 4 }}>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-                {productId ? "Edit Product" : "Add Product"}
-            </Typography>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+        <Box
+            sx={{
+                bgcolor: "#fff",
+                borderRadius: 4,
+                p: 4,
+                boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+            }}
+        >
+            {/* Header */}
+            <Box textAlign="center" mb={4}>
+                {/* <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    color="primary"
+                >
+                    {productId ? "Edit Product" : "Add Product"}
+                </Typography> */}
+
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    mt={1}
+                >
+                    Manage your store products easily
+                </Typography>
+            </Box>
 
             {apiResponse && (
-                <Stack sx={{ width: '100%', mb: 2 }} spacing={2}>
-                    <Alert severity="success">{apiResponse}</Alert>
-                </Stack>
+                <Alert
+                    severity="success"
+                    sx={{
+                        mb: 3,
+                        borderRadius: 2,
+                    }}
+                >
+                    {apiResponse}
+                </Alert>
             )}
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gap: 2 }}>
-
-                <TextField
-                    label="Product Name"
-                    value={productName}
-                    onChange={(e) => setProductName(e.target.value)}
-                    required
-                />
-
-                <TextField
-                    label="Product Description"
-                    value={productDescription}
-                    onChange={(e) => setProductDescription(e.target.value)}
-                    multiline
-                    rows={3}
-                />
-
-                <FormControl fullWidth>
-                    <InputLabel id="category-label">Category</InputLabel>
-                    <Select
-                        labelId="category-label"
-                        value={categoryName}
-                        label="Category"
-                        onChange={(e) => setCategoryName(e.target.value)}
-                    >
-                        <MenuItem value="">None</MenuItem>
-                        {categories.map((c, i) => (
-                            <MenuItem key={i} value={c.categoryName}>{c.categoryName}</MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
-
-                <TextField
-                    label="Product Price"
-                    type="number"
-                    value={productPrice}
-                    onChange={(e) => setProductPrice(e.target.value)}
-                />
-
-                <TextField
-                    label="Discount"
-                    type="number"
-                    value={discount}
-                    onChange={(e) => setDiscount(e.target.value)}
-                />
-
-                <TextField
-                    label="Discount Price"
-                    type="number"
-                    value={discountPrice}
-                    InputProps={{
-                        readOnly: true,
-                    }}
+            <Box component="form" onSubmit={handleSubmit}>
+                <Box
                     sx={{
-                        backgroundColor: "#f5f5f5"
+                        display: "grid",
+                        gridTemplateColumns: {
+                            xs: "1fr",
+                            md: "1fr 1fr",
+                        },
+                        gap: 3,
                     }}
-                />
+                >
+                    {/* Product Name */}
+                    <TextField
+                        label="Product Name"
+                        value={productName}
+                        onChange={(e) => setProductName(e.target.value)}
+                        required
+                        fullWidth
+                    />
 
-                <TextField
-                    label="Stock Quantity"
-                    type="number"
-                    value={stockQuantity}
-                    onChange={(e) => setStockQuantity(e.target.value)}
-                />
+                    {/* Category */}
+                    <FormControl fullWidth>
+                        <InputLabel>Category</InputLabel>
+                        <Select
+                            value={categoryName}
+                            label="Category"
+                            onChange={(e) => setCategoryName(e.target.value)}
+                        >
+                            <MenuItem value="">None</MenuItem>
 
-                <Box>
-                    <Typography variant="body2" sx={{ mb: 1 }}>Product Image</Typography>
+                            {categories.map((c, i) => (
+                                <MenuItem
+                                    key={i}
+                                    value={c.categoryName}
+                                >
+                                    {c.categoryName}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
 
-                    {/* Image preview */}
-                    {existingImage && !imageFile && (
-                        <img
-                            src={`http://localhost:8080/image/product/${existingImage}`}
-                            alt="Existing"
-                            width="120"
-                            style={{ marginBottom: 8, borderRadius: 8 }}
+                    {/* Description */}
+                    <Box sx={{ gridColumn: "1 / -1" }}>
+                        <TextField
+                            label="Product Description"
+                            value={productDescription}
+                            onChange={(e) =>
+                                setProductDescription(e.target.value)
+                            }
+                            multiline
+                            rows={4}
+                            fullWidth
                         />
-                    )}
+                    </Box>
 
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            setImageFile(file || null);
+                    {/* Price */}
+                    <TextField
+                        label="Product Price"
+                        type="number"
+                        value={productPrice}
+                        onChange={(e) =>
+                            setProductPrice(e.target.value)
+                        }
+                        fullWidth
+                    />
+
+                    {/* Discount */}
+                    <TextField
+                        label="Discount (%)"
+                        type="number"
+                        value={discount}
+                        onChange={(e) =>
+                            setDiscount(e.target.value)
+                        }
+                        fullWidth
+                    />
+
+                    {/* Discount Price */}
+                    <TextField
+                        label="Discount Price"
+                        type="number"
+                        value={discountPrice}
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                        fullWidth
+                        sx={{
+                            "& .MuiInputBase-root": {
+                                bgcolor: "#f5f5f5",
+                                fontWeight: 600,
+                            },
                         }}
                     />
 
+                    {/* Stock */}
+                    <TextField
+                        label="Stock Quantity"
+                        type="number"
+                        value={stockQuantity}
+                        onChange={(e) =>
+                            setStockQuantity(e.target.value)
+                        }
+                        fullWidth
+                    />
+                </Box>
+
+                {/* Image Upload */}
+                <Box
+                    sx={{
+                        mt: 4,
+                        p: 3,
+                        border: "2px dashed #d1d5db",
+                        borderRadius: 3,
+                        textAlign: "center",
+                    }}
+                >
+                    <Typography
+                        fontWeight={600}
+                        mb={2}
+                    >
+                        Product Image
+                    </Typography>
+
+                    {existingImage && !imageFile && (
+                        <Box mb={2}>
+                            <img
+                                src={`http://localhost:8080/image/product/${existingImage}`}
+                                alt="Existing"
+                                width="180"
+                                style={{
+                                    borderRadius: 12,
+                                    boxShadow:
+                                        "0 4px 12px rgba(0,0,0,0.12)",
+                                }}
+                            />
+                        </Box>
+                    )}
+
                     {imageFile && (
-                        <Typography variant="caption">
-                            Selected: {imageFile.name}
+                        <Box mb={2}>
+                            <img
+                                src={URL.createObjectURL(imageFile)}
+                                alt="Preview"
+                                width="180"
+                                style={{
+                                    borderRadius: 12,
+                                    boxShadow:
+                                        "0 4px 12px rgba(0,0,0,0.12)",
+                                }}
+                            />
+                        </Box>
+                    )}
+
+                    <Button
+                        component="label"
+                        variant="outlined"
+                    >
+                        Upload Image
+                        <input
+                            hidden
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file =
+                                    e.target.files?.[0];
+                                setImageFile(file || null);
+                            }}
+                        />
+                    </Button>
+
+                    {imageFile && (
+                        <Typography
+                            variant="body2"
+                            mt={1}
+                            color="text.secondary"
+                        >
+                            {imageFile.name}
                         </Typography>
                     )}
                 </Box>
 
-                <Button type="submit" variant="contained" disabled={submitting}>
-                    {submitting ? "Saving..." : productId ? "Update Product" : "Create Product"}
+                {/* Submit */}
+                <Button
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    disabled={submitting}
+                    sx={{
+                        mt: 4,
+                        py: 1.6,
+                        fontSize: "1rem",
+                        fontWeight: 700,
+                        borderRadius: 3,
+                        textTransform: "none",
+                    }}
+                >
+                    {submitting
+                        ? "Saving..."
+                        : productId
+                        ? "Update Product"
+                        : "Create Product"}
                 </Button>
-
             </Box>
-        </Container>
-    );
+        </Box>
+    </Container>
+);
 };
 
 export default AddProduct;

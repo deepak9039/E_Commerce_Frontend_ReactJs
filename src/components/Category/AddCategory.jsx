@@ -1,19 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-    Container,
-    Typography,
-    TextField,
-    Switch,
-    FormControlLabel,
-    Button,
-    Box,
-    Alert,
-    Stack,
-    Grid,
-    Card,
-    CardContent
-} from '@mui/material';
-import { createCategory, findAllCategory, getCategoryById, updateCategory } from '../../services/apiService';
+  Container,
+  Typography,
+  TextField,
+  Switch,
+  FormControlLabel,
+  Button,
+  Box,
+  Alert,
+  Stack,
+  Grid,
+  Card,
+  Avatar,
+  Chip,
+  IconButton,
+} from "@mui/material";
+
+import { DataGrid } from "@mui/x-data-grid";
+
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CategoryIcon from "@mui/icons-material/Category";
+
+import {
+  createCategory,
+  findAllCategory,
+  getCategoryById,
+  updateCategory,
+} from "../../services/apiService";
 
 const AddCategory = () => {
     const [categoryName, setCategoryName] = useState('');
@@ -25,6 +40,90 @@ const AddCategory = () => {
     const [apiResponse, setApiResponse] = useState(null);
     const [categories, setCategories] = useState([]);
     const [editingId, setEditingId] = useState(null);
+
+
+    const columns = [
+  {
+    field: "categoryId",
+    headerName: "ID",
+    width: 90,
+  },
+  {
+    field: "image",
+    headerName: "Image",
+    width: 100,
+    sortable: false,
+    renderCell: (params) => (
+      <Avatar
+        variant="rounded"
+        src={params.row.categoryImage}
+        sx={{
+          width: 45,
+          height: 45,
+          bgcolor: "#f5f5f5",
+        }}
+      >
+        <CategoryIcon />
+      </Avatar>
+    ),
+  },
+  {
+    field: "categoryName",
+    headerName: "Category",
+    flex: 1,
+    renderCell: (params) => (
+      <Box sx={{ py: 1 }}>
+        <Typography
+          variant="subtitle2"
+          sx={{ fontWeight: 700 }}
+        >
+          {params.row.categoryName}
+        </Typography>
+
+        <Typography
+          variant="caption"
+          color="text.secondary"
+        >
+          {params.row.categoryDescription}
+        </Typography>
+      </Box>
+    ),
+  },
+  {
+    field: "active",
+    headerName: "Status",
+    width: 130,
+    renderCell: (params) => (
+      <Chip
+        label={params.value ? "Active" : "Inactive"}
+        color={params.value ? "success" : "error"}
+        size="small"
+      />
+    ),
+  },
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 140,
+    sortable: false,
+    renderCell: (params) => (
+      <>
+        <IconButton
+          color="primary"
+          onClick={() =>
+            handleEdit(params.row.categoryId)
+          }
+        >
+          <EditIcon />
+        </IconButton>
+
+        <IconButton color="error">
+          <DeleteIcon />
+        </IconButton>
+      </>
+    ),
+  },
+];
 
 
     const loadCategories = async () => {
@@ -157,158 +256,226 @@ const AddCategory = () => {
     }, []);
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Grid container spacing={3}>
+  <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Grid container spacing={3}>
+      {/* LEFT SIDE */}
+      <Grid size={3}>
+        <Card
+          elevation={3}
+          sx={{
+            p: 3,
+            borderRadius: 3,
+            position: "sticky",
+            top: 20,
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 700,
+              color: "#2874f0",
+              mb: 3,
+            }}
+          >
+            {editingId
+              ? "Edit Category"
+              : "Add Category"}
+          </Typography>
 
-                {/* LEFT SIDE — 3 GRID (Add Category Form) */}
-                <Grid item xs={12} md={3}>
+          {apiResponse && (
+            <Stack spacing={2} sx={{ mb: 2 }}>
+              <Alert severity="success">
+                {apiResponse}
+              </Alert>
+            </Stack>
+          )}
 
-                    <Typography variant="h6" sx={{ mb: 2 }}>
-                        {editingId ? "Edit Category" : "Add Category"}</Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            <TextField
+              label="Category Name"
+              value={categoryName}
+              onChange={(e) =>
+                setCategoryName(e.target.value)
+              }
+              fullWidth
+              required
+            />
 
-                    {apiResponse && (
-                        <Stack sx={{ width: '100%', mb: 2 }} spacing={2}>
-                            <Alert severity="success">{apiResponse}</Alert>
-                        </Stack>
-                    )}
+            <TextField
+              label="Category Description"
+              value={categoryDescription}
+              onChange={(e) =>
+                setCategoryDescription(
+                  e.target.value
+                )
+              }
+              multiline
+              rows={3}
+            />
 
-                    <Box component="form" onSubmit={handleSubmit} sx={{ display: 'grid', gap: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+              startIcon={<CloudUploadIcon />}
+            >
+              Upload Image
 
-                        <TextField
-                            label="Category Name"
-                            value={categoryName}
-                            onChange={(e) => setCategoryName(e.target.value)}
-                            required
-                        />
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file =
+                    e.target.files?.[0];
 
-                        <TextField
-                            label="Category Description"
-                            value={categoryDescription}
-                            onChange={(e) => setCategoryDescription(e.target.value)}
-                            multiline
-                            rows={3}
-                        />
+                  if (file) {
+                    setCategoryImage(file.name);
+                    setImageFile(file);
+                  }
+                }}
+              />
+            </Button>
 
-                        <Box>
-                            <Typography variant="body2" sx={{ mb: 1 }}>Category Image</Typography>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        setCategoryImage(file.name);
-                                        setImageFile(file);
-                                    } else {
-                                        setCategoryImage('');
-                                        setImageFile(null);
-                                    }
-                                }}
-                                style={{ width: '100%' }}
-                            />
-                            {categoryImage && (
-                                <Box sx={{ mt: 1 }}>
-                                    <Typography variant="caption">Selected: {categoryImage}</Typography>
-                                </Box>
-                            )}
-                        </Box>
+            {categoryImage && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+              >
+                Selected: {categoryImage}
+              </Typography>
+            )}
 
-                        <FormControlLabel
-                            control={<Switch checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />}
-                            label="Is Active"
-                        />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={isActive}
+                  onChange={(e) =>
+                    setIsActive(
+                      e.target.checked
+                    )
+                  }
+                />
+              }
+              label="Active"
+            />
 
-                        <Button type="submit" variant="contained" disabled={submitting}>
-                            {submitting
-                                ? (editingId ? "Updating..." : "Saving...")
-                                : (editingId ? "Update Category" : "Create Category")}
-                        </Button>
-                    </Box>
-                </Grid>
-                {/* RIGHT SIDE — 9 GRID (Show Category List as rows with header) */}
-                <Grid item xs={12} md={9}>
-                    <Typography variant="h6" sx={{ mb: 2 }}>All Categories</Typography>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={submitting}
+              sx={{
+                py: 1.2,
+                borderRadius: 2,
+                backgroundColor: "#2874f0",
+              }}
+            >
+              {submitting
+                ? editingId
+                  ? "Updating..."
+                  : "Saving..."
+                : editingId
+                ? "Update Category"
+                : "Create Category"}
+            </Button>
+          </Box>
+        </Card>
+      </Grid>
 
-                    <Box sx={{ border: "1px solid #ccc", borderRadius: 2 }}>
+      {/* RIGHT SIDE */}
+      <Grid size={9}>
+        <Card
+          elevation={3}
+          sx={{
+            borderRadius: 3,
+            overflow: "hidden",
+          }}
+        >
+          <Box
+            sx={{
+              p: 2,
+              borderBottom:
+                "1px solid #eeeeee",
+              display: "flex",
+              justifyContent:
+                "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 700 }}
+            >
+              All Categories
+            </Typography>
 
-                        {/* Header Row */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                padding: "12px 16px",
-                                backgroundColor: "#f5f5f5",
-                                fontWeight: 600,
-                                borderBottom: "1px solid #ccc"
-                            }}
-                        >
-                            <Box sx={{ width: "120px" }}>Category Id</Box>
-                            <Box sx={{ flex: 1 }}>Category Name</Box>
-                            <Box sx={{ width: "120px" }}>Status</Box>
-                            <Box sx={{ width: "160px" }}>Actions</Box>
-                        </Box>
+            <Chip
+              label={`${categories.length} Categories`}
+              color="primary"
+            />
+          </Box>
 
-                        {/* Data Rows */}
-                        {categories.map((cat) => (
-                            <Box
-                                key={cat.categoryId}
-                                sx={{
-                                    display: "flex",
-                                    padding: "12px 16px",
-                                    alignItems: "center",
-                                    borderBottom: "1px solid #eee"
-                                }}
-                            >
-                                {/* Category Id */}
-                                <Box sx={{ width: "120px" }}>{cat.categoryId}</Box>
+          <Box
+            sx={{
+              height: 650,
+              width: "100%",
+            }}
+          >
+            <DataGrid
+              rows={categories}
+              columns={columns}
+              getRowId={(row) =>
+                row.categoryId
+              }
+              pageSizeOptions={[
+                5,
+                10,
+                20,
+              ]}
+              initialState={{
+                pagination: {
+                  paginationModel: {
+                    pageSize: 10,
+                  },
+                },
+              }}
+              disableRowSelectionOnClick
+              sx={{
+                border: 0,
 
-                                {/* Category Name */}
-                                <Box sx={{ width: "200px", flex: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                        {cat.categoryName}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                                        {cat.categoryDescription}
-                                    </Typography>
-                                </Box>
+                "& .MuiDataGrid-columnHeaders":
+                  {
+                    backgroundColor:
+                      "#fafafa",
+                    fontWeight: 700,
+                  },
 
-                                {/* Status */}
-                                <Box sx={{ width: "120px" }}>
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: cat.active ? "green" : "red",
-                                            fontWeight: 600
-                                        }}
-                                    >
-                                        {cat.active ? "Active" : "Inactive"}
-                                    </Typography>
-                                </Box>
+                "& .MuiDataGrid-row:hover":
+                  {
+                    backgroundColor:
+                      "#f5f7ff",
+                  },
 
-                                {/* Actions */}
-                                <Box sx={{ width: "160px", display: "flex", gap: 1 }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        color="primary"
-                                        onClick={() => handleEdit(cat.categoryId)}
-                                    >
-                                        Edit
-                                    </Button>
-
-                                    <Button variant="outlined" size="small" color="error">
-                                        Delete
-                                    </Button>
-                                </Box>
-                            </Box>
-                        ))}
-                    </Box>
-                </Grid>
-
-
-
-            </Grid>
-        </Container>
-    );
+                "& .MuiDataGrid-cell":
+                  {
+                    borderBottom:
+                      "1px solid #f1f1f1",
+                  },
+              }}
+            />
+          </Box>
+        </Card>
+      </Grid>
+    </Grid>
+  </Container>
+);
 };
 
 export default AddCategory;

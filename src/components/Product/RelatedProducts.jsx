@@ -6,7 +6,10 @@ import {
   CardMedia,
   CardContent,
   Rating
+  , IconButton
 } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useNavigate } from "react-router-dom";
 
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -21,8 +24,6 @@ const RelatedProducts = ({ relatedProducts }) => {
 
   const products = relatedProducts?.products || [];
 
-  const slidesToShow = products.length >= 4 ? 4 : products.length;
-
   if (!products.length) {
     return (
       <Typography sx={{ mt: 4 }}>
@@ -31,65 +32,117 @@ const RelatedProducts = ({ relatedProducts }) => {
     );
   }
 
-  const limitWords = (text, limit = 3) => {
-  if (!text) return "";
-  const words = text.split(" ");
-  return words.length <= limit ? text : words.slice(0, limit).join(" ") + "...";
-};
+  const limitWords = (text, limit = 4) => {
+    if (!text) return "";
+    const words = text.split(" ");
+    return words.length <= limit ? text : words.slice(0, limit).join(" ") + "...";
+  };
+
+  const swiperRef = React.useRef(null);
+
+  const slidesPerViewSetting = Math.min(products.length, 4);
 
   return (
-    <Box sx={{ mt: 6 }}>
+    <Box sx={{ mt: 6, position: 'relative' }}>
       <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
         Related Products
       </Typography>
 
-      <Swiper
-        modules={[Navigation]}
-        spaceBetween={20}
-        slidesPerView={slidesToShow}
-        navigation={products.length > 4}
-      >
-        {products.map((product) => (
-          <SwiperSlide key={product.productId}>
-            <Card
-              sx={{
-                borderRadius: 3,
-                transition: "0.3s",
-                cursor: "pointer",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                  boxShadow: 4
-                },
-                mb: 1
-              }}
-              onClick={() => navigate(`/product/${product.productId}`)}
-            >
-              <CardMedia
-                component="img"
-                height="180"
-                image={`http://localhost:1234/image/product/${product.productImageUrl}`}
-              />
-
-              <CardContent>
-                <Typography fontWeight={600}>
-                  {limitWords(product.productName)}
-                </Typography>
-
-                <Typography sx={{ color: "green", fontWeight: 600 }}>
-                  ₹{product.discountPrice || product.productPrice}
-                </Typography>
-
-                <Rating
-                  value={product.rating || 0}
-                  precision={0.5}
-                  readOnly
-                  size="small"
+      <Box sx={{ position: 'relative' }}>
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={20}
+          slidesPerView={slidesPerViewSetting}
+          onSwiper={(swiper) => (swiperRef.current = swiper)}
+          breakpoints={{
+            1200: { slidesPerView: Math.min(products.length, 4) },
+            900: { slidesPerView: Math.min(products.length, 3) },
+            600: { slidesPerView: Math.min(products.length, 2) },
+            0: { slidesPerView: 1 }
+          }}
+        >
+          {products.map((product) => (
+            <SwiperSlide key={product.productId}>
+              <Card
+                sx={{
+                  borderRadius: 3,
+                  transition: "0.3s",
+                  cursor: "pointer",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: 6
+                  },
+                  mb: 1
+                }}
+                onClick={() => navigate(`/product/${product.productId}`)}
+              >
+                <CardMedia
+                  component="img"
+                  height="180"
+                  image={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                  sx={{ objectFit: 'cover' }}
                 />
-              </CardContent>
-            </Card>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+
+                <CardContent>
+                  <Typography fontWeight={600} sx={{ fontSize: 15, mb: 0.5 }}>
+                    {limitWords(product.productName)}
+                  </Typography>
+
+                  <Typography sx={{ color: "#059669", fontWeight: 700, mb: 0.5 }}>
+                    ₹{product.discountPrice || product.productPrice}
+                  </Typography>
+
+                  <Rating
+                    value={product.rating || 0}
+                    precision={0.5}
+                    readOnly
+                    size="small"
+                  />
+                </CardContent>
+              </Card>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        {/* Custom navigation buttons to avoid conflicts between multiple Swipers */}
+        {products.length > 1 && (
+          <>
+            <IconButton
+              aria-label="previous"
+              onClick={() => swiperRef.current?.slidePrev()}
+              sx={{
+                position: 'absolute',
+                left: -10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 20,
+                backgroundColor: '#fff',
+                border: '1px solid #e5e7eb',
+                '&:hover': { backgroundColor: '#f8fafc' }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+
+            <IconButton
+              aria-label="next"
+              onClick={() => swiperRef.current?.slideNext()}
+              sx={{
+                position: 'absolute',
+                right: -10,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                zIndex: 20,
+                backgroundColor: '#fff',
+                border: '1px solid #e5e7eb',
+                '&:hover': { backgroundColor: '#f8fafc' }
+              }}
+            >
+              <ArrowForwardIcon />
+            </IconButton>
+          </>
+        )}
+      </Box>
     </Box>
   );
 };

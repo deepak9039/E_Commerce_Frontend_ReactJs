@@ -9,6 +9,9 @@ import {
     CardContent,
     Grid,
     Avatar,
+    Stack,
+    Chip,
+    Divider,
 } from "@mui/material";
 import {
     ordersCount,
@@ -145,11 +148,17 @@ export default function AdminDashboard({ user }) {
             label: "Total Revenue",
             value: `₹${counts?.revenue?.toLocaleString()}`,
             icon: <MonetizationOnIcon />,
+            bg: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+            textColor: "#fff",
+            accent: "rgba(255,255,255,0.18)",
         },
         {
             label: "Orders",
             value: counts?.orders?.toLocaleString(),
             icon: <ShoppingCartIcon />,
+            bg: "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)",
+            textColor: "#fff",
+            accent: "rgba(255,255,255,0.18)",
         },
         // Show only for SUPER ADMIN
         ...(user?.role === "ROLE_SUPER_ADMIN"
@@ -157,12 +166,18 @@ export default function AdminDashboard({ user }) {
                 label: "Customers",
                 value: counts?.users?.toLocaleString(),
                 icon: <PeopleIcon />,
+                bg: "linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)",
+                textColor: "#fff",
+                accent: "rgba(255,255,255,0.18)",
             }]
             : []),
         {
             label: "Products",
             value: counts?.products?.toLocaleString(),
             icon: <InventoryIcon />,
+            bg: "linear-gradient(135deg, #ea580c 0%, #f59e0b 100%)",
+            textColor: "#fff",
+            accent: "rgba(255,255,255,0.18)",
         },
     ];
 
@@ -242,75 +257,118 @@ export default function AdminDashboard({ user }) {
         // fetchOrders();
     }, []);
 
+    const todayLabel = new Date().toLocaleDateString("en-IN", {
+        weekday: "long",
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+
     return (
-        <Box sx={{ backgroundColor: "#f8fafc", minHeight: "100vh" }}>
+        <Box sx={{ background: "linear-gradient(135deg, #f8fbff 0%, #f8fafc 100%)", minHeight: "100vh", py: 3 }}>
             <CssBaseline />
 
-            {/* Top Title Bar */}
-            {/* <AppBar position="static" elevation={0} color="transparent">
-                <Toolbar>
-                    <Typography variant="h6" fontWeight="bold">
-                        Dashboard
-                    </Typography>
-                    <Box sx={{ flexGrow: 1 }} />
-                    <Avatar>J</Avatar>
-                </Toolbar>
-            </AppBar> */}
+            <Box sx={{ px: { xs: 2, md: 3 } }}>
+                <Box
+                    sx={{
+                        background: "linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #6366f1 100%)",
+                        borderRadius: 4,
+                        p: { xs: 3, md: 4 },
+                        color: "#fff",
+                        boxShadow: "0 18px 45px rgba(15, 23, 42, 0.24)",
+                        mb: 3,
+                        overflow: "hidden",
+                        position: "relative",
+                    }}
+                >
+                    <Box sx={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top right, rgba(255,255,255,0.18), transparent 38%)" }} />
+                    <Box sx={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2 }}>
+                        <Box>
+                            <Typography variant="h4" fontWeight="700" mb={1}>
+                                Admin Dashboard
+                            </Typography>
+                            <Typography sx={{ opacity: 0.92, maxWidth: 720 }}>
+                                Welcome back! Here’s a quick view of your store performance, recent activity, and growth insights.
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,0.14)", px: 1.8, py: 1.2, borderRadius: 999 }}>
+                            <Avatar sx={{ bgcolor: "rgba(255,255,255,0.2)", width: 40, height: 40 }}>{user?.name?.charAt(0) || "A"}</Avatar>
+                            <Box>
+                                <Typography variant="body2" fontWeight="700">{user?.name || "Admin"}</Typography>
+                                <Typography variant="caption" sx={{ opacity: 0.85 }}>{todayLabel}</Typography>
+                            </Box>
+                        </Box>
+                    </Box>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1} mt={2.2} sx={{ position: "relative" }}>
+                        <Chip label="Live analytics" sx={{ bgcolor: "rgba(255,255,255,0.18)", color: "#fff", fontWeight: 600 }} />
+                        <Chip label="Orders & inventory" sx={{ bgcolor: "rgba(255,255,255,0.14)", color: "#fff", fontWeight: 600 }} />
+                        <Chip label="Customer insights" sx={{ bgcolor: "rgba(255,255,255,0.14)", color: "#fff", fontWeight: 600 }} />
+                    </Stack>
+                </Box>
 
-            <Box sx={{ p: 3 }}>
-                <Typography color="text.secondary" mb={3}>
-                    Welcome back! Here's what's happening today. dd
-                </Typography>
-
-                {/* Stat Cards (4 grid with icons) */}
-                <Grid container spacing={2} mb={4}>
+                <Grid container spacing={2} mb={3}>
                     {stats.map((item) => (
-                        <Grid size={
-                            user?.role === "ROLE_SUPER_ADMIN" ? 3 : 4
-                        } key={item.label}>
-                            <Card sx={{ borderRadius: 3 }}>
-                                <CardContent sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                    <Avatar sx={{ bgcolor: item.color }}>{item.icon}</Avatar>
+                        <Grid size={user?.role === "ROLE_SUPER_ADMIN" ? 3 : 4} key={item.label}>
+                            <Card
+                                sx={{
+                                    borderRadius: 3,
+                                    background: item.bg,
+                                    color: item.textColor,
+                                    boxShadow: "0 16px 35px rgba(15, 23, 42, 0.12)",
+                                    border: "1px solid rgba(255,255,255,0.22)",
+                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                                    cursor: "default",
+                                    '&:hover': {
+                                        transform: "translateY(-3px)",
+                                        boxShadow: "0 20px 45px rgba(15, 23, 42, 0.16)",
+                                    },
+                                }}
+                            >
+                                <CardContent sx={{ display: "flex", alignItems: "center", gap: 2, pb: 1 }}>
+                                    <Avatar sx={{ bgcolor: item.accent, color: "#fff", width: 48, height: 48 }}>
+                                        {item.icon}
+                                    </Avatar>
                                     <Box>
-
+                                        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                            {item.label}
+                                        </Typography>
+                                        <Typography variant="h5" fontWeight="700">
+                                            {item.value}
+                                        </Typography>
                                     </Box>
-                                </CardContent>
-                                <CardContent sx={{ pt: 0 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {item.label}
-                                    </Typography>
-                                    <Typography variant="h5" fontWeight="bold">
-                                        {item.value}
-                                    </Typography>
                                 </CardContent>
                             </Card>
                         </Grid>
                     ))}
                 </Grid>
 
-                {/* Charts (6 / 6 grid) */}
                 {user?.role === "ROLE_SUPER_ADMIN" && (
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} mb={3}>
                         <Grid size={6}>
-                            <Card sx={{ borderRadius: 3, height: 360 }}>
+                            <Card sx={{ borderRadius: 3, height: 360, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)", border: "1px solid #eef2ff" }}>
                                 <CardContent>
-                                    <Typography fontWeight="bold">Sales Overview</Typography>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                        <Typography fontWeight="700">Sales Overview</Typography>
+                                        <Typography variant="caption" color="primary" fontWeight="600">This week</Typography>
+                                    </Box>
                                     <ResponsiveContainer width="100%" height={280}>
                                         <LineChart data={salesData}>
-                                            <XAxis dataKey="day" />
-                                            <YAxis />
+                                            <XAxis dataKey="day" tickLine={false} axisLine={false} />
+                                            <YAxis tickLine={false} axisLine={false} />
                                             <Tooltip />
                                             <Line
                                                 type="monotone"
                                                 dataKey="totalSales"
                                                 stroke="#2563eb"
-                                                strokeWidth={2}
+                                                strokeWidth={3}
+                                                dot={{ r: 3 }}
                                             />
                                             <Line
                                                 type="monotone"
                                                 dataKey="totalOrders"
                                                 stroke="#10b981"
-                                                strokeWidth={2}
+                                                strokeWidth={3}
+                                                dot={{ r: 3 }}
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
@@ -318,9 +376,12 @@ export default function AdminDashboard({ user }) {
                             </Card>
                         </Grid>
                         <Grid size={6}>
-                            <Card sx={{ borderRadius: 3, height: 360 }}>
+                            <Card sx={{ borderRadius: 3, height: 360, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)", border: "1px solid #eef2ff" }}>
                                 <CardContent>
-                                    <Typography fontWeight="bold">Sales by Category</Typography>
+                                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                                        <Typography fontWeight="700">Sales by Category</Typography>
+                                        <Typography variant="caption" color="primary" fontWeight="600">Live split</Typography>
+                                    </Box>
                                     <ResponsiveContainer width="100%" height={280}>
                                         <PieChart>
                                             <Tooltip content={<CustomPieTooltip />} />
@@ -329,7 +390,7 @@ export default function AdminDashboard({ user }) {
                                                 dataKey="totalSales"
                                                 nameKey="categoryName"
                                                 outerRadius={95}
-                                                label={renderPieLabel}   // 👈 always visible
+                                                label={renderPieLabel}
                                                 labelLine={true}
                                             >
                                                 {categorySalesData?.map((entry, index) => (
@@ -338,50 +399,55 @@ export default function AdminDashboard({ user }) {
                                             </Pie>
                                         </PieChart>
                                     </ResponsiveContainer>
-
                                 </CardContent>
                             </Card>
                         </Grid>
                     </Grid>
                 )}
 
-                {/* Recent Orders & Top Products (6 / 6) */}
-                <Grid container spacing={2} mt={1}>
-                    {/* Recent Orders */}
+                <Grid container spacing={2}>
                     <Grid size={6}>
-                        <Card sx={{ borderRadius: 3, height: 500 }}>
+                        <Card sx={{ borderRadius: 3, height: 500, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)", border: "1px solid #eef2ff" }}>
                             <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-
-                                <Box display="flex" justifyContent="space-between" mb={2}>
-                                    <Typography fontWeight="bold">Recent Orders</Typography>
-                                    <Typography color="primary" sx={{ cursor: "pointer" }}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.2}>
+                                    <Box>
+                                        <Typography fontWeight="700">Recent Orders</Typography>
+                                        <Typography variant="caption" color="text.secondary">Latest updates from your store</Typography>
+                                    </Box>
+                                    <Typography color="primary" sx={{ cursor: "pointer", fontWeight: 600 }}>
                                         View all
                                     </Typography>
                                 </Box>
 
-                                {/* Scroll Area */}
-                                <Box sx={{ overflowY: "auto", pr: 1 }}>
+                                <Box sx={{ overflowY: "auto", pr: 1, flexGrow: 1 }}>
                                     {orders.map((order) => (
-                                        <Box key={order.id} mb={2}>
+                                        <Box
+                                            key={order.id}
+                                            mb={2}
+                                            p={2}
+                                            sx={{
+                                                border: "1px solid #e2e8f0",
+                                                borderRadius: 2,
+                                                background: "#fff",
+                                                '&:hover': { background: "#f8fafc" },
+                                            }}
+                                        >
                                             <Grid container alignItems="center" spacing={2}>
-
-                                                {/* Left Side - Order Info */}
                                                 <Grid size={8}>
-                                                    <Typography fontWeight="500">
+                                                    <Typography fontWeight="600">
                                                         {order.orderId.slice(0, 5)}
                                                     </Typography>
-
                                                     <Typography variant="body2" color="text.secondary">
                                                         {order.product.productName}
                                                     </Typography>
-                                                    <Typography
-                                                        variant="caption"
+                                                    <Box
+                                                        component="span"
                                                         sx={{
                                                             px: 1.5,
-                                                            py: 0.3,
+                                                            py: 0.45,
                                                             borderRadius: 2,
                                                             display: "inline-block",
-                                                            mt: 0.5,
+                                                            mt: 0.7,
                                                             bgcolor:
                                                                 order.status === "DELIVERED"
                                                                     ? "#dcfce7"
@@ -394,13 +460,14 @@ export default function AdminDashboard({ user }) {
                                                                     : order.status === "IN_PROGRESS"
                                                                         ? "#1d4ed8"
                                                                         : "#92400e",
+                                                            fontSize: 12,
+                                                            fontWeight: 600,
                                                         }}
                                                     >
                                                         {order.status}
-                                                    </Typography>
+                                                    </Box>
                                                 </Grid>
 
-                                                {/* Middle - Order Date */}
                                                 <Grid size={2} textAlign="center">
                                                     <Typography variant="caption" color="text.secondary">
                                                         {new Date(order.orderDate).toLocaleDateString("en-IN", {
@@ -411,9 +478,8 @@ export default function AdminDashboard({ user }) {
                                                     </Typography>
                                                 </Grid>
 
-                                                {/* Right Side - Price + Status */}
                                                 <Grid size={2} textAlign="right">
-                                                    <Typography fontWeight="500">
+                                                    <Typography fontWeight="600">
                                                         ₹ {order.price}
                                                     </Typography>
                                                 </Grid>
@@ -421,39 +487,46 @@ export default function AdminDashboard({ user }) {
                                         </Box>
                                     ))}
                                 </Box>
-
                             </CardContent>
                         </Card>
                     </Grid>
 
-                    {/* Top Products */}
                     <Grid size={6}>
-                        <Card sx={{ borderRadius: 3, height: 500 }}>
+                        <Card sx={{ borderRadius: 3, height: 500, boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)", border: "1px solid #eef2ff" }}>
                             <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-
-                                <Box display="flex" justifyContent="space-between" mb={2}>
-                                    <Typography fontWeight="bold">Top Products</Typography>
-                                    <Typography color="primary" sx={{ cursor: "pointer" }}>
+                                <Box display="flex" justifyContent="space-between" alignItems="center" mb={2.2}>
+                                    <Box>
+                                        <Typography fontWeight="700">Top Products</Typography>
+                                        <Typography variant="caption" color="text.secondary">Best performers this month</Typography>
+                                    </Box>
+                                    <Typography color="primary" sx={{ cursor: "pointer", fontWeight: 600 }}>
                                         View all
                                     </Typography>
                                 </Box>
 
-                                {/* Scroll Area */}
-                                <Box sx={{ overflowY: "auto", pr: 1 }}>
+                                <Box sx={{ overflowY: "auto", pr: 1, flexGrow: 1 }}>
                                     {topSellingProducts?.map((product) => (
                                         <Box
                                             key={product.productId}
                                             display="flex"
                                             justifyContent="space-between"
+                                            alignItems="center"
                                             mb={2}
+                                            p={2}
+                                            sx={{
+                                                border: "1px solid #e2e8f0",
+                                                borderRadius: 2,
+                                                background: "#fff",
+                                                '&:hover': { background: "#f8fafc" },
+                                            }}
                                         >
-                                            <Box display="flex" gap={2}>
-                                                <Avatar sx={{ bgcolor: "#f1f5f9", color: "#334155" }}>
+                                            <Box display="flex" gap={2} alignItems="center">
+                                                <Avatar sx={{ bgcolor: "linear-gradient(135deg, #e0f2fe 0%, #bfdbfe 100%)", color: "#1d4ed8" }}>
                                                     {product.productId}
                                                 </Avatar>
 
                                                 <Box>
-                                                    <Typography fontWeight="500">
+                                                    <Typography fontWeight="600">
                                                         {product.productName}
                                                     </Typography>
                                                     <Typography variant="body2" color="text.secondary">
@@ -462,94 +535,64 @@ export default function AdminDashboard({ user }) {
                                                 </Box>
                                             </Box>
 
-                                            <Typography fontWeight="500">
+                                            <Typography fontWeight="600">
                                                 ₹ {product.totalAmount}
                                             </Typography>
                                         </Box>
                                     ))}
                                 </Box>
-
                             </CardContent>
                         </Card>
                     </Grid>
                 </Grid>
 
-                {/* Quick Actions (3 / 3 / 3 / 3) */}
-                <Grid container spacing={2} mt={3}>
-                    <Grid size={3}>
-                        <Card
-                            variant="outlined"
-                            sx={{
-                                borderStyle: "dashed",
-                                borderRadius: 3,
-                                textAlign: "center",
-                                py: 4,
-                                cursor: "pointer",
-                            }}
-                        >
-                            <CardContent>
-                                <InventoryIcon sx={{ fontSize: 32, color: "#64748b" }} />
-                                <Typography mt={1} fontWeight="500">Add Product</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-
-                    <Grid size={3}>
-                        <Card
-                            variant="outlined"
-                            sx={{
-                                borderStyle: "dashed",
-                                borderRadius: 3,
-                                textAlign: "center",
-                                py: 4,
-                                cursor: "pointer",
-                            }}
-                        >
-                            <CardContent>
-                                <ShoppingCartIcon sx={{ fontSize: 32, color: "#64748b" }} />
-                                <Typography mt={1} fontWeight="500">Create Order</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-
-                    <Grid size={3}>
-                        <Card
-                            variant="outlined"
-                            sx={{
-                                borderStyle: "dashed",
-                                borderRadius: 3,
-                                textAlign: "center",
-                                py: 4,
-                                cursor: "pointer",
-                            }}
-                        >
-                            <CardContent>
-                                <PeopleIcon sx={{ fontSize: 32, color: "#64748b" }} />
-                                <Typography mt={1} fontWeight="500">Add Customer</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-
-                    <Grid size={3}>
-                        <Card
-                            variant="outlined"
-                            sx={{
-                                borderStyle: "dashed",
-                                borderRadius: 3,
-                                textAlign: "center",
-                                py: 4,
-                                cursor: "pointer",
-                            }}
-                        >
-                            <CardContent>
-                                <MonetizationOnIcon sx={{ fontSize: 32, color: "#64748b" }} />
-                                <Typography mt={1} fontWeight="500">View Reports</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                <Grid container spacing={2} mt={1}>
+                    {[
+                        { label: "Add Product", icon: <InventoryIcon sx={{ fontSize: 30 }} />, color: "#2563eb" },
+                        { label: "Create Order", icon: <ShoppingCartIcon sx={{ fontSize: 30 }} />, color: "#0f766e" },
+                        { label: "Add Customer", icon: <PeopleIcon sx={{ fontSize: 30 }} />, color: "#7c3aed" },
+                        { label: "View Reports", icon: <MonetizationOnIcon sx={{ fontSize: 30 }} />, color: "#ea580c" },
+                    ].map((item) => (
+                        <Grid size={3} key={item.label}>
+                            <Card
+                                variant="outlined"
+                                sx={{
+                                    borderRadius: 3,
+                                    textAlign: "center",
+                                    py: 4,
+                                    cursor: "pointer",
+                                    borderColor: "#e2e8f0",
+                                    boxShadow: "0 8px 22px rgba(15, 23, 42, 0.04)",
+                                    background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+                                    transition: "transform 0.2s ease, box-shadow 0.2s ease",
+                                    '&:hover': {
+                                        transform: "translateY(-2px)",
+                                        boxShadow: "0 16px 35px rgba(15, 23, 42, 0.08)",
+                                    },
+                                }}
+                            >
+                                <CardContent>
+                                    <Box
+                                        sx={{
+                                            width: 56,
+                                            height: 56,
+                                            borderRadius: "50%",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            mx: "auto",
+                                            mb: 1.5,
+                                            background: `linear-gradient(135deg, ${item.color}22 0%, ${item.color}10 100%)`,
+                                            color: item.color,
+                                        }}
+                                    >
+                                        {item.icon}
+                                    </Box>
+                                    <Typography fontWeight="600">{item.label}</Typography>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
                 </Grid>
             </Box>
         </Box>

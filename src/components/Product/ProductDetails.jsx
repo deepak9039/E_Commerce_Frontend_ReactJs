@@ -34,6 +34,7 @@ const ProductDetails = ({ user }) => {
   const RELATED_PAGE_SIZE = 10;
   const [successMessage, setSuccessMessage] = useState(null);
   const [similarProductsData, setSimilarProductsData] = useState([]);
+  const [imageTilt, setImageTilt] = useState({ rotateX: 0, rotateY: 0, scale: 1 });
 
   // Toast state
   const [toastOpen, setToastOpen] = React.useState(false);
@@ -109,7 +110,25 @@ const ProductDetails = ({ user }) => {
     }
   };
 
-    const handleToastClose = (event, reason) => {
+  const handleImageHover = (event) => {
+    const box = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - box.left;
+    const y = event.clientY - box.top;
+    const rotateY = ((x / box.width) - 0.5) * 18;
+    const rotateX = ((y / box.height) - 0.5) * -18;
+
+    setImageTilt({
+      rotateX,
+      rotateY,
+      scale: 1.06,
+    });
+  };
+
+  const handleImageLeave = () => {
+    setImageTilt({ rotateX: 0, rotateY: 0, scale: 1 });
+  };
+
+  const handleToastClose = (event, reason) => {
     if (reason === 'clickaway') return;
     setToastOpen(false);
   };
@@ -143,23 +162,39 @@ const ProductDetails = ({ user }) => {
           {/* IMAGE */}
           <Grid size={5}>
             <Box
+              onMouseMove={handleImageHover}
+              onMouseLeave={handleImageLeave}
               sx={{
-                border: "1px solid #ddd",
-                borderRadius: 1,
-                p: 2,
+                position: "relative",
+                border: "1px solid rgba(148, 163, 184, 0.25)",
+                borderRadius: 4,
+                p: 3,
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 minHeight: 420,
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(238,242,255,0.9) 100%)",
+                boxShadow: "0 20px 45px rgba(15, 23, 42, 0.08)",
+                overflow: "hidden",
+                transition: "transform 0.35s ease, box-shadow 0.35s ease",
+                transform: "perspective(1000px) rotateX(0deg) rotateY(0deg)",
+                "&:hover": {
+                  boxShadow: "0 26px 60px rgba(15, 23, 42, 0.18)",
+                },
               }}
             >
-              <CardMedia
+              <Box
                 component="img"
-                image={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                className="product-image"
+                src={`http://localhost:1234/image/product/${product.productImageUrl}`}
                 alt={product.productName}
                 sx={{
                   maxHeight: 380,
                   objectFit: "contain",
+                  transition: "transform 0.2s ease, filter 0.2s ease",
+                  transform: `perspective(1000px) rotateX(${imageTilt.rotateX}deg) rotateY(${imageTilt.rotateY}deg) scale(${imageTilt.scale})`,
+                  filter: imageTilt.scale > 1 ? "drop-shadow(0 25px 35px rgba(15, 23, 42, 0.25))" : "none",
                 }}
               />
             </Box>

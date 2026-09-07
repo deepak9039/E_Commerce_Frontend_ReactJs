@@ -15,12 +15,16 @@ import {
   Divider,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
 } from "@mui/material";
 import { Person } from "@mui/icons-material";
 import { getUserById, updateUserProfile, logoutUser } from "../../services/apiService";
+import UserAddress from "./UserAddress";
+import UserOrders from "../OrderPage/UserOrders";
 
 const UserProfile = ({ user, setUser }) => {
+  const [selectedTab, setSelectedTab] = useState("profile");
 
   const navigate = useNavigate();
 
@@ -106,13 +110,25 @@ const UserProfile = ({ user, setUser }) => {
                 </Box>
               </Stack>
 
-              <Divider sx={{ mb: 2 }} />
+              <Divider sx={{ mb: 0 }} />
 
               {/* MENU */}
               <List>
-                <ListItem button onClick={() => navigate("/user-orders")}>
+                <ListItemButton
+                  selected={selectedTab === "orders"}
+                  onClick={() => setSelectedTab("orders")}
+                  sx={{
+                    borderLeft: "4px solid transparent",
+                    "&.Mui-selected": {
+                      backgroundColor: "#e0f2fe",
+                      borderLeftColor: "#0284c7",
+                      color: "#0369a1",
+                      "&:hover": { backgroundColor: "#bae6fd" },
+                    },
+                  }}
+                >
                   <ListItemText primary="MY ORDERS" />
-                </ListItem>
+                </ListItemButton>
 
                 <Divider />
 
@@ -123,13 +139,37 @@ const UserProfile = ({ user, setUser }) => {
                   />
                 </ListItem>
 
-                <ListItem button selected>
+                <ListItemButton
+                  selected={selectedTab === "profile"}
+                  onClick={() => setSelectedTab("profile")}
+                  sx={{
+                    borderLeft: "4px solid transparent",
+                    "&.Mui-selected": {
+                      backgroundColor: "#e0f2fe",
+                      borderLeftColor: "#0284c7",
+                      color: "#0369a1",
+                      "&:hover": { backgroundColor: "#bae6fd" },
+                    },
+                  }}
+                >
                   <ListItemText primary="Profile Information" />
-                </ListItem>
+                </ListItemButton>
 
-                <ListItem button onClick={() => navigate("/user/address")}>
+                <ListItemButton
+                  selected={selectedTab === "addresses"}
+                  onClick={() => setSelectedTab("addresses")}
+                  sx={{
+                    borderLeft: "4px solid transparent",
+                    "&.Mui-selected": {
+                      backgroundColor: "#e0f2fe",
+                      borderLeftColor: "#0284c7",
+                      color: "#0369a1",
+                      "&:hover": { backgroundColor: "#bae6fd" },
+                    },
+                  }}
+                >
                   <ListItemText primary="Manage Addresses" />
-                </ListItem>
+                </ListItemButton>
 
                 <Divider sx={{ my: 1 }} />
 
@@ -161,87 +201,88 @@ const UserProfile = ({ user, setUser }) => {
 
         {/* ===== RIGHT PROFILE SECTION ===== */}
         <Grid size={9}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent>
+          {selectedTab === "orders" ? (
+            <UserOrders user={user} />
+          ) : selectedTab === "addresses" ? (
+            <UserAddress user={user} />
+          ) : (
+            <Card sx={{ borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h6" fontWeight="bold" mb={3}>
+                  Personal Information
+                </Typography>
 
-              <Typography variant="h6" fontWeight="bold" mb={3}>
-                Personal Information
-              </Typography>
+                <Box component="form" onSubmit={handleSubmit}>
+                  {alertMessage && (
+                    <Alert severity={alertType} sx={{ mb: 2 }}>
+                      {alertMessage}
+                    </Alert>
+                  )}
 
-              <Box component="form" onSubmit={handleSubmit}>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="First Name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        fullWidth
+                      />
+                    </Grid>
 
-                {alertMessage && (
-                  <Alert severity={alertType} sx={{ mb: 2 }}>
-                    {alertMessage}
-                  </Alert>
-                )}
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Last Name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        fullWidth
+                      />
+                    </Grid>
 
-                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <TextField
+                        label="Username"
+                        value={userName}
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                      />
+                    </Grid>
 
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="First Name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      fullWidth
-                    />
+                    <Grid item xs={12} md={6}>
+                      {/* <TextField
+                        label="Role"
+                        value={role}
+                        disabled
+                        fullWidth
+                      /> */}
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <TextField
+                        label="Email Address"
+                        value={email}
+                        disabled
+                        fullWidth
+                      />
+                    </Grid>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Last Name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Username"
-                      value={userName}
-                      fullWidth
-                      InputProps={{ readOnly: true }}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Role"
-                      value={role}
-                      disabled
-                      fullWidth
-                    />
-                  </Grid>
-
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Email Address"
-                      value={email}
-                      disabled
-                      fullWidth
-                    />
-                  </Grid>
-
-                </Grid>
-
-                <Box mt={4}>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{
-                      px: 5,
-                      backgroundColor: "#0f172a",
-                      "&:hover": { backgroundColor: "#1e293b" },
-                    }}
-                  >
-                    Save
-                  </Button>
+                  <Box mt={4}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      sx={{
+                        px: 5,
+                        backgroundColor: "#0f172a",
+                        "&:hover": { backgroundColor: "#1e293b" },
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </Box>
                 </Box>
-
-              </Box>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </Grid>
 
       </Grid>

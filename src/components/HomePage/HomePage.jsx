@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React from 'react';
 import {
   Grid,
   Typography,
@@ -19,8 +19,9 @@ import { useCart } from '../Context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import CarouselHome from './CarouselHome';
 import DiscountProductsSlider from '../Product/DiscountProductsSlider';
+import OfferModal from '../OfferComponent/OfferModal';
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 52;
 
 const HomePage = ({ user }) => {
   const [products, setProducts] = React.useState([]);
@@ -41,6 +42,8 @@ const HomePage = ({ user }) => {
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState("");
   const [toastSeverity, setToastSeverity] = React.useState("success");
+  const [offerOpen, setOfferOpen] = React.useState(false);
+  const offerTimerRef = React.useRef(null);
 
   console.log("HomePage Component - User:", user?.userId);
 
@@ -146,6 +149,14 @@ const HomePage = ({ user }) => {
     setToastOpen(false);
   };
 
+  const handleOfferClose = () => {
+    setOfferOpen(false);
+    if (offerTimerRef.current) {
+      clearTimeout(offerTimerRef.current);
+      offerTimerRef.current = null;
+    }
+  };
+
   React.useEffect(() => {
     if (user?.userId) {
       fetchRecentViews(user.userId);
@@ -156,6 +167,21 @@ const HomePage = ({ user }) => {
     }
     fetchCategories();
     fetchAllProducts(0);
+  }, []);
+
+  // Show offer modal on first visit and auto-close after 20s
+  React.useEffect(() => {
+    setOfferOpen(true);
+    offerTimerRef.current = setTimeout(() => {
+      setOfferOpen(false);
+      offerTimerRef.current = null;
+    }, 200000);
+
+    return () => {
+      if (offerTimerRef.current) {
+        clearTimeout(offerTimerRef.current);
+      }
+    };
   }, []);
 
   const sliderProducts = products.filter(p => p.isSponsored === true);
@@ -196,6 +222,7 @@ const HomePage = ({ user }) => {
 
   return (
     <>
+      <OfferModal open={offerOpen} handleClose={handleOfferClose} />
       {/* ================= CATEGORY BAR ================= */}
       <Box
         sx={{

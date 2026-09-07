@@ -570,6 +570,27 @@ export const fetchDiscountedProducts = async (minPercent = 10) => {
   }
 }
 
+export const featchAllSellers = async () => {
+  try {
+    const res = await axios.post('/admin/getAllSellers');
+    return res.data;
+  } catch (err) {
+    console.error('API call error featchAllSellers:', err)
+    throw err
+  }
+}
+
+export const featchAllUsers = async () => {
+  try {
+    const res = await axios.post('/admin/getAllUsers');
+    return res.data;
+  } catch (err) {
+    console.error('API call error featchAllUsers:', err)
+    throw err
+  }
+}
+
+
 
 
 

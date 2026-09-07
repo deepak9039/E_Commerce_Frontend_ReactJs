@@ -31,6 +31,7 @@ import ViewProduct from "../Product/ViewProduct";
 import AddProduct from "../Product/AddProduct";
 import AdminOrders from "./AdminOrders";
 import UsersTable from "../UserDetails/UsersTable";
+import Sellers from "../SellersPages/Sellers";
 
 const drawerWidth = 260;
 const topBarHeight = 64;
@@ -65,8 +66,9 @@ export default function AdminLayout({ user, signOut }) {
     ADD_PRODUCT: isSuperAdmin ? 3 : 2,
     ORDERS: isSuperAdmin ? 4 : 3,
     USERS: isSuperAdmin ? 5 : null,
-    SETTINGS: isSuperAdmin ? 6 : 4,
-    REPORTS: isSuperAdmin ? 7 : 5,
+    SELLERS: isSuperAdmin ? 6 : null,
+    SETTINGS: isSuperAdmin ? 7 : 4,
+    REPORTS: isSuperAdmin ? 8 : 5,
   };
 
   const handleEditProduct = (productId) => {
@@ -205,6 +207,14 @@ export default function AdminLayout({ user, signOut }) {
             />
           )}
 
+          {isSuperAdmin && (
+            <Tab
+              icon={<PeopleIcon />}
+              iconPosition="start"
+              label="Sellers"
+            />
+          )}
+
           <Tab
             icon={<SettingsIcon />}
             iconPosition="start"
@@ -258,6 +268,12 @@ export default function AdminLayout({ user, signOut }) {
         {isSuperAdmin && (
           <TabPanel value={value} index={INDEX.USERS}>
             <UsersTable />
+          </TabPanel>
+        )}
+
+        {isSuperAdmin && (
+          <TabPanel value={value} index={INDEX.SELLERS}>
+            <Sellers />
           </TabPanel>
         )}
 

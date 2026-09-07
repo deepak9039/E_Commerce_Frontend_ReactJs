@@ -10,17 +10,22 @@ import {
     Button,
     Box,
     Divider,
+    IconButton,
 } from '@mui/material';
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 import { useNavigate } from 'react-router-dom';
-import { getCartByUserId, quntityUpdatePlus, quntityUpdateMinus, removeCartItem } from '../../services/apiService';
+import { getCartByUserId, quntityUpdatePlus, quntityUpdateMinus, removeCartItem, recentViewGet } from '../../services/apiService';
 import { useCart } from '../Context/CartContext';
 
 const CartPage = ({ user }) => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
+    const [recentViewsProducts, setRecentViewsProducts] = React.useState([]);
+    const recentRef = React.useRef(null);
     const { refreshCartCount } = useCart();
 
     console.log("cart items in cart page:", cartItems);
@@ -74,9 +79,34 @@ const CartPage = ({ user }) => {
     console.log("totalOrderPrice", totalOrderPrice);
     console.log("totalOrderDiscount", totalOrderDiscount);
 
+    const fetchRecentViews = async (userId) => {
+        try {
+          const res = await recentViewGet(userId);
+          setRecentViewsProducts(res || []);
+        } catch (err) {
+          console.error("User not logged in. Cannot fetch recent views:", err);
+        }
+      };
+
+      const limitWords = (text, limit = 10) => {
+    if (!text) return '';
+    const words = text.split(' ');
+    return words.length <= limit ? text : words.slice(0, limit).join(' ') + '...';
+  };
+
+  const scrollSponsoredRecentViews = (dir = 'right') => {
+    const el = recentRef.current;
+    if (el) {
+      const scrollAmount = 300;
+      el.scrollLeft += dir === 'right' ? scrollAmount : -scrollAmount;
+    }
+  };
     
     useEffect(() => {
         fetchCartItems();
+        if (user?.userId) {
+            fetchRecentViews(user.userId);
+        }
     }, []);
 
     return (
@@ -315,7 +345,21 @@ const CartPage = ({ user }) => {
                                     - ₹ {totalOrderDiscount}
                                 </Typography>
                             </Box>
-
+                            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+                                <Typography sx={{ color: "#475569" }}>
+                                Delivery Charges
+                                </Typography>
+                
+                                {totalOrderPrice > 1000 ? (
+                                <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
+                                    FREE
+                                </Typography>
+                                ) : (
+                                <Typography>
+                                    ₹ 50
+                                </Typography>
+                                )}
+                            </Box>
                             <Divider sx={{ mb: 2 }} />
 
                             {/* TOTAL */}
@@ -384,6 +428,89 @@ const CartPage = ({ user }) => {
                 )}
 
             </Grid>
+            {user !== null &&(
+                <Box>
+                    {recentViewsProducts && (
+                        <Box maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                        <Box sx={{ position: 'relative' }}>
+                            <Box
+                            sx={{
+                                borderRadius: 3,
+                                background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
+                                p: 3,
+                                overflow: 'hidden'
+                            }}
+                            >
+                            <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
+                                Your browsing history
+                            </Typography>
+        
+                            <Box
+                                ref={recentRef}
+                                sx={{
+                                display: 'flex',
+                                gap: 3,
+                                overflowX: 'auto',
+                                px: 1,
+                                py: 1,
+                                '&::-webkit-scrollbar': { display: 'none' }
+                                }}
+                            >
+                                {recentViewsProducts.length === 0 && (
+                                <Typography sx={{ mt: 2 }}>
+                                    No recently viewed products found.
+                                </Typography>
+                                )}
+                                {recentViewsProducts.map((sp) => (
+                                <Box
+                                    key={sp.productId}
+                                    sx={{
+                                    minWidth: 240,
+                                    flex: '0 0 auto',
+                                    borderRadius: 3,
+                                    backgroundColor: '#fff',
+                                    p: 1,
+                                    boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+                                    transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
+                                    '&:hover': {
+                                        transform: 'translateY(-6px)',
+                                        boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
+                                        backgroundColor: '#fbfdff'
+                                    }
+                                    }}
+                                    onClick={() => navigate(`/product/${sp.productId}`)}
+                                >
+                                    <Box
+                                    component="img"
+                                    src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
+                                    sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
+                                    />
+                                    <Typography sx={{ mt: 1 }}>
+                                    {limitWords(sp.productName, 3)}
+                                    </Typography>
+                                </Box>
+                                ))}
+                            </Box>
+                            </Box>
+        
+                            <IconButton
+                            onClick={() => scrollSponsoredRecentViews('left')}
+                            sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                            >
+                            <ArrowBackIosNewIcon />
+                            </IconButton>
+        
+                            <IconButton
+                            onClick={() => scrollSponsoredRecentViews('right')}
+                            sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                            >
+                            <ArrowForwardIosIcon />
+                            </IconButton>
+                        </Box>
+                        </Box>
+                    )}
+                </Box>
+            ) }
         </Container>
     );
 };
