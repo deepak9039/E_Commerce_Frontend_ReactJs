@@ -56,11 +56,11 @@ const SearchBar = () => {
   }, [location.search]);
 
   return (
-    <Box sx={{ position: "relative", display: "flex", alignItems: "center" }}>
+    <Box sx={{ position: "relative", display: "flex", alignItems: "center", width: "100%" }}>
       <TextField
         variant="outlined"
         size="small"
-        placeholder="Search products..."
+        placeholder="Search for products, brands and more"
         value={searchQuery}
         onChange={(e) => handleSearch(e.target.value)}
         onKeyDown={(e) => {
@@ -75,25 +75,38 @@ const SearchBar = () => {
               <IconButton
                 onClick={performSearch}
                 edge="end"
-                sx={{ cursor: "pointer" }}
+                sx={{
+                  cursor: "pointer",
+                  color: "#0f766e",
+                  "&:hover": { backgroundColor: "#f0fdfa" },
+                }}
               >
-                <SearchIcon sx={{ color: "#666" }} />
+                <SearchIcon sx={{ fontSize: 21 }} />
               </IconButton>
             </InputAdornment>
           ),
         }}
         sx={{
-          width: 400,
-          backgroundColor: "white",
-          borderRadius: 1,
+          width: "1000px",
+          backgroundColor: "transparent",
           "& .MuiOutlinedInput-root": {
-            color: "#333",
+            color: "#0f172a",
+            fontSize: 14,
+            borderRadius: "8px",
             "& fieldset": {
-              borderColor: "gray",
+              borderColor: "transparent",
             },
             "&:hover fieldset": {
-              borderColor: "#1976d2",
+              borderColor: "#ccfbf1",
             },
+            "&.Mui-focused fieldset": {
+              borderColor: "#0f766e",
+              borderWidth: "1.5px",
+            },
+          },
+          "& .MuiOutlinedInput-input::placeholder": {
+            color: "#94a3b8",
+            opacity: 1,
           },
         }}
       />
@@ -101,32 +114,40 @@ const SearchBar = () => {
       {/* SEARCH RESULTS DROPDOWN */}
       {showResults && searchResults.length > 0 && (
         <Paper
+          elevation={0}
           sx={{
             position: "absolute",
             top: "100%",
             left: 0,
             right: 0,
-            maxHeight: 300,
+            maxHeight: 320,
             overflowY: "auto",
             zIndex: 10,
             mt: 1,
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 16px 36px rgba(15,23,42,0.16)",
           }}
         >
-          <List>
+          <List sx={{ py: 0.5 }}>
             {searchResults.map((product) => (
               <ListItem
                 key={product.productId}
                 onClick={() => handleSelectProduct(product.productId)}
                 sx={{
                   "&:hover": {
-                    backgroundColor: "#f5f5f5",
+                    backgroundColor: "#f0fdfa",
                   },
                   cursor: "pointer",
+                  px: 2,
+                  py: 1,
                 }}
               >
                 <ListItemText
                   primary={product.productName}
                   secondary={`₹${product.productPrice}`}
+                  primaryTypographyProps={{ fontSize: 14, fontWeight: 600, color: "#0f172a" }}
+                  secondaryTypographyProps={{ fontSize: 13, color: "#0f766e", fontWeight: 700 }}
                 />
               </ListItem>
             ))}
@@ -137,6 +158,7 @@ const SearchBar = () => {
       {/* NO RESULTS */}
       {showResults && searchResults.length === 0 && searchQuery && (
         <Paper
+          elevation={0}
           sx={{
             position: "absolute",
             top: "100%",
@@ -144,8 +166,13 @@ const SearchBar = () => {
             right: 0,
             zIndex: 10,
             mt: 1,
-            p: 2,
+            p: 2.5,
             textAlign: "center",
+            borderRadius: "12px",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 16px 36px rgba(15,23,42,0.16)",
+            color: "#64748b",
+            fontSize: 14,
           }}
         >
           No products found

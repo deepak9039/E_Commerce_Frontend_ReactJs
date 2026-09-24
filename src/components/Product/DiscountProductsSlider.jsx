@@ -59,32 +59,53 @@ const DiscountProductsSlider = () => {
         background: "#fff",
         position: "relative",
         overflow: "hidden",
+        borderRadius: "18px",
+        border: "1px solid #e2e8f0",
+        p: { xs: 2, md: 3 },
       }}
     >
       {/* HEADER */}
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
           gap: 2,
           mb: 3,
+          pb: 2,
+          borderBottom: "1px solid #eef1f6",
         }}
       >
-        <Typography
-          sx={{
-            fontSize: { xs: "22px", md: "30px" },
-            fontWeight: 600,
-            color: "#111",
-          }}
-        >
-          Up to 40% off | Best Deals
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+          <Box sx={{ width: 4, height: 28, borderRadius: 2, background: "#e11d48" }} />
+          <Box>
+            <Typography
+              sx={{
+                fontSize: { xs: "20px", md: "26px" },
+                fontWeight: 700,
+                color: "#0f172a",
+                lineHeight: 1.2,
+              }}
+            >
+              Up to 40% off, today only
+            </Typography>
+            <Typography sx={{ color: "#64748b", fontSize: 13, mt: 0.3 }}>
+              Deals refresh daily &mdash; grab them before they're gone
+            </Typography>
+          </Box>
+        </Box>
 
         <Typography
           sx={{
-            color: "#2874f0",
+            color: "#2563eb",
             fontWeight: 600,
+            fontSize: 14,
             cursor: "pointer",
+            whiteSpace: "nowrap",
+            borderBottom: "1px solid transparent",
+            "&:hover": {
+              borderBottom: "1px solid #2563eb",
+            },
           }}
         >
           Explore more
@@ -97,21 +118,21 @@ const DiscountProductsSlider = () => {
         sx={{
           position: "absolute",
           left: 10,
-          top: "50%",
+          top: "58%",
           transform: "translateY(-50%)",
           zIndex: 2,
           background: "#fff",
-          width: 25,
-          height: 50,
-          borderRadius: "0 8px 8px 0",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+          width: 38,
+          height: 38,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 4px 14px rgba(15,23,42,0.12)",
 
           "&:hover": {
-            background: "#fff",
+            background: "#f8fafc",
           },
         }}
       >
-        <ArrowBackIosNewIcon />
+        <ArrowBackIosNewIcon sx={{ fontSize: 16 }} />
       </IconButton>
 
       {/* RIGHT BUTTON */}
@@ -120,21 +141,21 @@ const DiscountProductsSlider = () => {
         sx={{
           position: "absolute",
           right: 10,
-          top: "50%",
+          top: "58%",
           transform: "translateY(-50%)",
           zIndex: 2,
           background: "#fff",
-          width: 25,
-          height: 50,
-          borderRadius: "8px 0 0 8px",
-          boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
+          width: 38,
+          height: 38,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 4px 14px rgba(15,23,42,0.12)",
 
           "&:hover": {
-            background: "#fff",
+            background: "#f8fafc",
           },
         }}
       >
-        <ArrowForwardIosIcon />
+        <ArrowForwardIosIcon sx={{ fontSize: 16 }} />
       </IconButton>
 
       {/* PRODUCTS */}
@@ -142,10 +163,11 @@ const DiscountProductsSlider = () => {
         ref={sliderRef}
         sx={{
           display: "flex",
-          gap: 3,
+          gap: 2.5,
           overflowX: "auto",
           scrollBehavior: "smooth",
           scrollbarWidth: "none",
+          pb: 0.5,
 
           "&::-webkit-scrollbar": {
             display: "none",
@@ -157,16 +179,25 @@ const DiscountProductsSlider = () => {
             component={RouterLink}
             to={`/product/${product.productId}`}
             key={product.productId}
+            elevation={0}
             sx={{
-              minWidth: 220,
+              minWidth: 168,
               flexShrink: 0,
               boxShadow: "none",
-              borderRadius: 0,
+              border: "1px solid #eef1f6",
+              borderRadius: "14px",
               textAlign: "center",
               cursor: "pointer",
-              background: "transparent",
+              background: "#fff",
               textDecoration: 'none',
+              p: 1.5,
+              transition: "border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease",
 
+              "&:hover": {
+                borderColor: "#cbd5e1",
+                boxShadow: "0 10px 20px rgba(15,23,42,0.08)",
+                transform: "translateY(-3px)",
+              },
               "&:hover img": {
                 transform: "scale(1.06)",
               },
@@ -175,11 +206,11 @@ const DiscountProductsSlider = () => {
             {/* CIRCLE BACKGROUND */}
             <Box
               sx={{
-                width: 100,
-                height: 100,
+                width: 96,
+                height: 96,
                 borderRadius: "50%",
                 background:
-                  "linear-gradient(180deg, #9ff5ff 0%, #82ecf5 100%)",
+                  "linear-gradient(180deg, #eaf1ff 0%, #dbe7fe 100%)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -200,12 +231,13 @@ const DiscountProductsSlider = () => {
               />
             </Box>
 
-            <CardContent>
+            <CardContent sx={{ p: '10px 0 0', "&:last-child": { pb: 0 } }}>
               <Typography
               sx={{
                     fontWeight: 600,
-                    fontSize: 14,
-                    height: 36,
+                    fontSize: 13,
+                    color: "#1e293b",
+                    height: 34,
                     overflow: "hidden",
                   }}
               >

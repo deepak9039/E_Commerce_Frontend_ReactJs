@@ -66,17 +66,11 @@ const PaymentPage = ({ user }) => {
     fullState: orderState
   });
 
-  const mrp = totalAmount;
-  const delivery = mrp < 1000 ? 50 : 0;
-  const discount = totalOrderDiscount;
-  const paymentFee = 0; // Set to 0 or calculate as needed
-  const finalTotal = (mrp + delivery - discount) + paymentFee;
-
   const handlePayment = async () => {
     console.log("Initiating payment with the following details:");
     const orders = res?.orders?.length
       ? res.orders
-      : [{ orderId, amount: finalTotal }];
+      : [{ orderId, amount: totalAmount }];
 
     const paymentResults = await Promise.all(
       orders.map((order) => {
@@ -316,10 +310,10 @@ const PaymentPage = ({ user }) => {
                   cvv={cvv}
                   setCvv={setCvv}
                   handlePayment={handlePayment}
-                  totalAmount={finalTotal}
+                  totalAmount={totalAmount}
                 />
               ) : selectedMethod === "UPI" ? (
-                <UpiPayment handlePayment={handlePayment} totalAmount={finalTotal} />
+                <UpiPayment handlePayment={handlePayment} totalAmount={totalAmount} />
               ) : selectedMethod === "CASH_ON_DELIVERY" ? (
                 <CodPayment />
               ) : (
@@ -329,7 +323,7 @@ const PaymentPage = ({ user }) => {
                   cvv={cvv}
                   setCvv={setCvv}
                   handlePayment={handlePayment}
-                  totalAmount={finalTotal}
+                  totalAmount={totalAmount}
                 />
               )}
             </Box>
@@ -338,10 +332,9 @@ const PaymentPage = ({ user }) => {
           {/* RIGHT SUMMARY */}
           <Box>
             <OrderSummary
-              mrp={mrp}
-              discount={discount}
-              paymentFee={paymentFee}
-              totalAmount={finalTotal}
+              totalOrderDiscount={totalOrderDiscount}
+              paymentFee={0}
+              totalAmount={totalAmount}
             />
 
             <DiscountOffer />
@@ -549,7 +542,7 @@ const CardPayment = ({
             },
           }}
         >
-          Pay ₹{typeof totalAmount === 'number' ? totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : totalAmount}
+          Pay ₹{totalAmount}
         </Button>
 
         {/* Payment Fee Info */}
@@ -768,8 +761,7 @@ const CodPayment = () => {
 ========================================================= */
 
 const OrderSummary = ({
-  mrp,
-  discount,
+  totalOrderDiscount,
   paymentFee,
   totalAmount,
 }) => {
@@ -794,7 +786,7 @@ const OrderSummary = ({
         </Typography>
 
         <Typography fontSize="17px">
-          ₹{mrp.toLocaleString("en-IN")}
+          ₹{totalAmount}
         </Typography>
       </Box>
 
@@ -817,7 +809,7 @@ const OrderSummary = ({
           <Typography color="#666">MRP Discount</Typography>
 
           <Typography color="#188038">
-            -₹{discount.toLocaleString("en-IN")}
+            -₹{totalOrderDiscount}
           </Typography>
         </Box>
       </Box>
@@ -847,7 +839,7 @@ const OrderSummary = ({
             fontWeight: 700,
           }}
         >
-          ₹{typeof totalAmount === 'number' ? totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : totalAmount}
+          ₹{totalAmount}
         </Typography>
       </Box>
     </Box>

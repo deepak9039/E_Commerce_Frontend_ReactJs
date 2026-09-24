@@ -53,12 +53,6 @@ const Order = ({ user }) => {
     pinCode: "",
   });
 
-  const subtotal = totalAmount;
-  const discount = totalOrderDiscount;
-  const tax = subtotal * 0.05;
-  const delivery = subtotal < 1000 ? 50 : 0;
-  // const total = subtotal + tax + delivery;
-  const total = subtotal + delivery;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const fetchAddresses = async () => {
@@ -384,7 +378,7 @@ const Order = ({ user }) => {
               </Typography>
 
               <Typography fontWeight={500}>
-                ₹ {subtotal}
+                ₹ {totalAmount}
               </Typography>
             </Box>
 
@@ -395,7 +389,7 @@ const Order = ({ user }) => {
               </Typography>
 
               <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
-                − ₹ {discount}
+                − ₹ {totalOrderDiscount}
               </Typography>
             </Box>
 
@@ -416,13 +410,13 @@ const Order = ({ user }) => {
                 Delivery Charges
               </Typography>
 
-              {delivery === 0 ? (
+              {totalAmount > 1000 ? (
                 <Typography sx={{ color: "#16a34a", fontWeight: 600 }}>
                   FREE
                 </Typography>
               ) : (
                 <Typography>
-                  ₹ {delivery}
+                  ₹ 50
                 </Typography>
               )}
             </Box>
@@ -442,7 +436,7 @@ const Order = ({ user }) => {
               </Typography>
 
               <Typography sx={{ fontWeight: 800, fontSize: 20, color: "#0f172a" }}>
-                ₹ {total.toFixed(2)}
+                ₹ {totalAmount}
               </Typography>
             </Box>
 
@@ -462,7 +456,7 @@ const Order = ({ user }) => {
                 border: "1px solid #bbf7d0"
               }}
             >
-                You saved ₹ {discount} on this order
+                You saved ₹ {totalOrderDiscount} on this order
             </Box>
 
             {/* PLACE ORDER */}

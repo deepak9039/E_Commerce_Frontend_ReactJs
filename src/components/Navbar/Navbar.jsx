@@ -30,9 +30,10 @@ import SearchBar from "../Search/SearchBar";
 /* ================= STYLED CART BADGE ================= */
 const CartBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    backgroundColor: theme.palette.error.main,
+    backgroundColor: "#e11d48",
     color: "#fff",
     fontSize: "0.7rem",
+    fontWeight: 700,
     top: -3,
     right: -2,
   },
@@ -75,27 +76,28 @@ const Navbar = ({ user, setUser }) => {
   return (
     <AppBar
       position="fixed"
+      elevation={0}
       sx={{
-        backgroundColor: "#0f172a",
-        color: "#e5e7eb",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+        background: "linear-gradient(180deg, #2d6df6 0%, #2563eb 100%)",
+        color: "#fff",
+        boxShadow: "0 2px 10px rgba(15,23,42,0.18)",
       }}
     >
       <Container maxWidth="lg">
-        <Toolbar sx={{ minHeight: 72 }}>
+        <Toolbar sx={{ minHeight: 68 }}>
 
         <Box
           component={RouterLink}
           to="/"
           sx={{
-            ml: 2,
+            ml: { xs: 0, md: 1 },
             display: "flex",
             alignItems: "center",
             gap: 1,
             textDecoration: "none",
           }}
         >
-          <img src={logo} alt="logo" style={{ height: "50px" }} />
+          <img src={logo} alt="logo" style={{ height: "42px" }} />
         </Box>
 
 
@@ -119,7 +121,16 @@ const Navbar = ({ user, setUser }) => {
           <Box sx={{ flexGrow: 1 }} />
 
           {/* SEARCH */}
-          <Box sx={{ flex: 1, maxWidth: 420 }}>
+          <Box
+            sx={{
+              flex: 1,
+              maxWidth: 480,
+              backgroundColor: "#fff",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(15,23,42,0.12)",
+              overflow: "hidden",
+            }}
+          >
             <SearchBar />
           </Box>
 
@@ -132,11 +143,12 @@ const Navbar = ({ user, setUser }) => {
                 component={RouterLink}
                 to="/become-seller"
                 sx={{
-                  color: "#e5e7eb",
+                  color: "#fff",
                   textTransform: "none",
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  borderRadius: "8px",
                   "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.08)",
+                    backgroundColor: "rgba(255,255,255,0.12)",
                   },
                 }}
               >
@@ -145,12 +157,18 @@ const Navbar = ({ user, setUser }) => {
               <Button
                 component={RouterLink}
                 to="/signin"
+                variant="contained"
                 sx={{
-                  color: "#e5e7eb",
+                  ml: 1,
+                  color: "#2563eb",
+                  backgroundColor: "#fff",
                   textTransform: "none",
-                  fontWeight: 500,
+                  fontWeight: 700,
+                  borderRadius: "8px",
+                  boxShadow: "none",
                   "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.08)",
+                    backgroundColor: "#f1f5f9",
+                    boxShadow: "none",
                   },
                 }}
               >
@@ -158,21 +176,27 @@ const Navbar = ({ user, setUser }) => {
               </Button>
 
               {/* CART */}
-              <IconButton component={RouterLink} to="/cart" sx={{ ml: 1 }}>
+              <IconButton component={RouterLink} to="/cart" sx={{ ml: 1.5 }}>
                 <CartBadge badgeContent={cartCount || 0}>
                   <ShoppingCartIcon sx={{ color: "white" }} />
                 </CartBadge>
               </IconButton>
             </>
           ) : (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
 
               {/* ADMIN */}
               {(user.role === "ROLE_ADMIN" || user.role === "ROLE_SUPER_ADMIN") && (
                 <Button
                   component={RouterLink}
                   to="/admin"
-                  sx={{ color: "#e5e7eb", textTransform: "none" }}
+                  sx={{
+                    color: "#fff",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    borderRadius: "8px",
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.12)" },
+                  }}
                 >
                   Dashboard
                 </Button>
@@ -193,17 +217,17 @@ const Navbar = ({ user, setUser }) => {
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 1,
+                  gap: 0.75,
                   cursor: "pointer",
-                  px: 1,
-                  py: 0.5,
-                  borderRadius: 2,
+                  px: 1.25,
+                  py: 0.75,
+                  borderRadius: "8px",
                   "&:hover": {
-                    backgroundColor: "rgba(255,255,255,0.08)",
+                    backgroundColor: "rgba(255,255,255,0.12)",
                   },
                 }}
               >
-                <Typography sx={{ fontWeight: 500 }}>
+                <Typography sx={{ fontWeight: 600, fontSize: 14, color: "#fff" }}>
                   {user.email || "User"}
                 </Typography>
                 {/* <Avatar
@@ -218,7 +242,7 @@ const Navbar = ({ user, setUser }) => {
                   {/* {user?.userName?.charAt(0)?.toUpperCase()} */}
                 {/* </Avatar> */}
                   {/* {user?.userName?.charAt(0)?.toUpperCase()} */}
-                <KeyboardArrowDownIcon sx={{ color: '#e5e7eb', ml: 0.5 }} />
+                <KeyboardArrowDownIcon sx={{ color: '#fff', ml: 0.5, fontSize: 20 }} />
               </Box>
 
               {/* DROPDOWN */}
@@ -226,41 +250,55 @@ const Navbar = ({ user, setUser }) => {
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
-                MenuListProps={{ onMouseLeave: handleMenuClose }}
+                MenuListProps={{ onMouseLeave: handleMenuClose, sx: { py: 0.75 } }}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 transformOrigin={{ vertical: "top", horizontal: "right" }}
                 PaperProps={{
                   sx: {
                     mt: 1,
-                    minWidth: 200,
-                    borderRadius: 2,
+                    minWidth: 210,
+                    borderRadius: "12px",
+                    border: "1px solid #e2e8f0",
+                    boxShadow: "0 16px 36px rgba(15,23,42,0.16)",
                   },
                 }}
               >
-                <MenuItem onClick={() => navigate("/profile")}>
+                <MenuItem
+                  onClick={() => navigate("/profile")}
+                  sx={{ fontSize: 14, fontWeight: 500, py: 1.1, "&:hover": { backgroundColor: "#eaf1ff" } }}
+                >
                   <ListItemIcon>
-                    <AccountCircleIcon fontSize="small" />
+                    <AccountCircleIcon fontSize="small" sx={{ color: "#2563eb" }} />
                   </ListItemIcon>
                   Profile
                 </MenuItem>
 
-                <MenuItem onClick={() => navigate("/user/address")}>
+                <MenuItem
+                  onClick={() => navigate("/user/address")}
+                  sx={{ fontSize: 14, fontWeight: 500, py: 1.1, "&:hover": { backgroundColor: "#eaf1ff" } }}
+                >
                   <ListItemIcon>
-                    <LocationOnIcon fontSize="small" />
+                    <LocationOnIcon fontSize="small" sx={{ color: "#2563eb" }} />
                   </ListItemIcon>
                   Address
                 </MenuItem>
 
-                <MenuItem onClick={() => navigate("/user-orders")}>
+                <MenuItem
+                  onClick={() => navigate("/user-orders")}
+                  sx={{ fontSize: 14, fontWeight: 500, py: 1.1, "&:hover": { backgroundColor: "#eaf1ff" } }}
+                >
                   <ListItemIcon>
-                    <ReceiptLongIcon fontSize="small" />
+                    <ReceiptLongIcon fontSize="small" sx={{ color: "#2563eb" }} />
                   </ListItemIcon>
                   Orders
                 </MenuItem>
 
-                <Divider />
+                <Divider sx={{ borderColor: "#eef1f6" }} />
 
-                <MenuItem onClick={signOut}>
+                <MenuItem
+                  onClick={signOut}
+                  sx={{ fontSize: 14, fontWeight: 500, py: 1.1, color: "#e11d48", "&:hover": { backgroundColor: "#fef2f4" } }}
+                >
                   <ListItemIcon>
                     <LogoutIcon fontSize="small" color="error" />
                   </ListItemIcon>

@@ -425,9 +425,9 @@ export const categorySales = async () => {
 }   
 
 //product search
-export const searchProducts = async (query) =>{
+export const searchProducts = async (payload) =>{
   try{
-    const res = await axios.post("/searchProducts", query);
+    const res = await axios.post("/searchProducts", payload);
     return res.data;
   }catch (err){
     console.log("API call error product search", err)

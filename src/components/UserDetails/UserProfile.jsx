@@ -93,49 +93,69 @@ const UserProfile = ({ user, setUser }) => {
 
         {/* ===== LEFT SIDEBAR ===== */}
         <Grid size={3}>
-          <Card sx={{ borderRadius: 3 }}>
-            <CardContent>
+          <Card
+            elevation={0}
+            sx={{
+              borderRadius: "18px",
+              border: "1px solid #e2e8f0",
+              position: "sticky",
+              top: 90,
+            }}
+          >
+            <CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
 
               {/* USER HEADER */}
-              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-                <Avatar sx={{ bgcolor: "#facc15" }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                alignItems="center"
+                sx={{
+                  p: 2.5,
+                  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                }}
+              >
+                <Avatar sx={{ bgcolor: "#fff", color: "#2563eb", fontWeight: 700 }}>
                   <Person />
                 </Avatar>
 
                 <Box>
-                  <Typography variant="body2">Hello,</Typography>
-                  <Typography fontWeight="bold">
+                  <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.8)" }}>
+                    Hello,
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700, color: "#fff", fontSize: 15 }}>
                     {firstName} {lastName}
                   </Typography>
                 </Box>
               </Stack>
 
-              <Divider sx={{ mb: 0 }} />
-
               {/* MENU */}
-              <List>
+              <List sx={{ py: 0.5 }}>
                 <ListItemButton
                   selected={selectedTab === "orders"}
                   onClick={() => setSelectedTab("orders")}
                   sx={{
                     borderLeft: "4px solid transparent",
+                    py: 1.25,
                     "&.Mui-selected": {
-                      backgroundColor: "#e0f2fe",
-                      borderLeftColor: "#0284c7",
-                      color: "#0369a1",
-                      "&:hover": { backgroundColor: "#bae6fd" },
+                      backgroundColor: "#eaf1ff",
+                      borderLeftColor: "#2563eb",
+                      color: "#2563eb",
+                      "&:hover": { backgroundColor: "#dbe7fe" },
                     },
                   }}
                 >
-                  <ListItemText primary="MY ORDERS" />
+                  <ListItemText
+                    primary="MY ORDERS"
+                    primaryTypographyProps={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.4px" }}
+                  />
                 </ListItemButton>
 
-                <Divider />
+                <Divider sx={{ borderColor: "#eef1f6" }} />
 
                 <ListItem>
                   <ListItemText
                     primary="ACCOUNT SETTINGS"
-                    primaryTypographyProps={{ fontWeight: "bold" }}
+                    primaryTypographyProps={{ fontWeight: 700, fontSize: 12, color: "#94a3b8", letterSpacing: "0.5px" }}
                   />
                 </ListItem>
 
@@ -144,15 +164,19 @@ const UserProfile = ({ user, setUser }) => {
                   onClick={() => setSelectedTab("profile")}
                   sx={{
                     borderLeft: "4px solid transparent",
+                    py: 1.1,
                     "&.Mui-selected": {
-                      backgroundColor: "#e0f2fe",
-                      borderLeftColor: "#0284c7",
-                      color: "#0369a1",
-                      "&:hover": { backgroundColor: "#bae6fd" },
+                      backgroundColor: "#eaf1ff",
+                      borderLeftColor: "#2563eb",
+                      color: "#2563eb",
+                      "&:hover": { backgroundColor: "#dbe7fe" },
                     },
                   }}
                 >
-                  <ListItemText primary="Profile Information" />
+                  <ListItemText
+                    primary="Profile Information"
+                    primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+                  />
                 </ListItemButton>
 
                 <ListItemButton
@@ -160,37 +184,45 @@ const UserProfile = ({ user, setUser }) => {
                   onClick={() => setSelectedTab("addresses")}
                   sx={{
                     borderLeft: "4px solid transparent",
+                    py: 1.1,
                     "&.Mui-selected": {
-                      backgroundColor: "#e0f2fe",
-                      borderLeftColor: "#0284c7",
-                      color: "#0369a1",
-                      "&:hover": { backgroundColor: "#bae6fd" },
+                      backgroundColor: "#eaf1ff",
+                      borderLeftColor: "#2563eb",
+                      color: "#2563eb",
+                      "&:hover": { backgroundColor: "#dbe7fe" },
                     },
                   }}
                 >
-                  <ListItemText primary="Manage Addresses" />
+                  <ListItemText
+                    primary="Manage Addresses"
+                    primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+                  />
                 </ListItemButton>
 
-                <Divider sx={{ my: 1 }} />
+                <Divider sx={{ my: 1, borderColor: "#eef1f6" }} />
 
                 <ListItem>
                   <ListItemText
                     primary="PAYMENTS"
-                    primaryTypographyProps={{ fontWeight: "bold" }}
+                    primaryTypographyProps={{ fontWeight: 700, fontSize: 12, color: "#94a3b8", letterSpacing: "0.5px" }}
                   />
                 </ListItem>
 
-                <ListItem button>
-                  <ListItemText primary="Saved UPI" />
+                <ListItem button sx={{ py: 1.1, cursor: "pointer", "&:hover": { backgroundColor: "#f8fafc" } }}>
+                  <ListItemText primary="Saved UPI" primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }} />
                 </ListItem>
 
-                <ListItem button>
-                  <ListItemText primary="Saved Cards" />
+                <ListItem button sx={{ py: 1.1, cursor: "pointer", "&:hover": { backgroundColor: "#f8fafc" } }}>
+                  <ListItemText primary="Saved Cards" primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }} />
                 </ListItem>
 
-                <Divider />
-                <ListItem button onClick={signOut}>
-                  <ListItemText primary="Logout" />
+                <Divider sx={{ borderColor: "#eef1f6" }} />
+                <ListItem
+                  button
+                  onClick={signOut}
+                  sx={{ py: 1.1, cursor: "pointer", color: "#e11d48", "&:hover": { backgroundColor: "#fef2f4" } }}
+                >
+                  <ListItemText primary="Logout" primaryTypographyProps={{ fontSize: 14, fontWeight: 600 }} />
                 </ListItem>
 
 
@@ -206,15 +238,21 @@ const UserProfile = ({ user, setUser }) => {
           ) : selectedTab === "addresses" ? (
             <UserAddress user={user} />
           ) : (
-            <Card sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Typography variant="h6" fontWeight="bold" mb={3}>
-                  Personal Information
-                </Typography>
+            <Card
+              elevation={0}
+              sx={{ borderRadius: "18px", border: "1px solid #e2e8f0" }}
+            >
+              <CardContent sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 3 }}>
+                  <Box sx={{ width: 4, height: 26, borderRadius: 2, backgroundColor: "#2563eb" }} />
+                  <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 700, color: "#0f172a" }}>
+                    Personal Information
+                  </Typography>
+                </Box>
 
                 <Box component="form" onSubmit={handleSubmit}>
                   {alertMessage && (
-                    <Alert severity={alertType} sx={{ mb: 2 }}>
+                    <Alert severity={alertType} sx={{ mb: 2, borderRadius: "10px" }}>
                       {alertMessage}
                     </Alert>
                   )}
@@ -226,6 +264,13 @@ const UserProfile = ({ user, setUser }) => {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         fullWidth
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            "&.Mui-focused fieldset": { borderColor: "#2563eb" },
+                          },
+                          "& .MuiInputLabel-root.Mui-focused": { color: "#2563eb" },
+                        }}
                       />
                     </Grid>
 
@@ -235,6 +280,13 @@ const UserProfile = ({ user, setUser }) => {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         fullWidth
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            "&.Mui-focused fieldset": { borderColor: "#2563eb" },
+                          },
+                          "& .MuiInputLabel-root.Mui-focused": { color: "#2563eb" },
+                        }}
                       />
                     </Grid>
 
@@ -244,6 +296,12 @@ const UserProfile = ({ user, setUser }) => {
                         value={userName}
                         fullWidth
                         InputProps={{ readOnly: true }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            backgroundColor: "#f8fafc",
+                          },
+                        }}
                       />
                     </Grid>
 
@@ -262,6 +320,12 @@ const UserProfile = ({ user, setUser }) => {
                         value={email}
                         disabled
                         fullWidth
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            borderRadius: "10px",
+                            backgroundColor: "#f8fafc",
+                          },
+                        }}
                       />
                     </Grid>
                   </Grid>
@@ -272,8 +336,16 @@ const UserProfile = ({ user, setUser }) => {
                       variant="contained"
                       sx={{
                         px: 5,
-                        backgroundColor: "#0f172a",
-                        "&:hover": { backgroundColor: "#1e293b" },
+                        py: 1.2,
+                        borderRadius: "10px",
+                        textTransform: "none",
+                        fontWeight: 700,
+                        boxShadow: "none",
+                        backgroundColor: "#2563eb",
+                        "&:hover": {
+                          backgroundColor: "#1d4ed8",
+                          boxShadow: "0 8px 20px rgba(37, 99, 235,0.3)",
+                        },
                       }}
                     >
                       Save

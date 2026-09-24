@@ -231,13 +231,14 @@ const HomePage = ({ user }) => {
           zIndex: 1000,
           backgroundColor: "#ffffff",
           borderBottom: "1px solid #e5e7eb",
+          boxShadow: "0 2px 8px rgba(15,23,42,0.04)",
         }}>
         <Container maxWidth="lg" sx={{
           position: "sticky",
           top: 64,
           zIndex: 1000,
           backgroundColor: "#ffffff",
-          py: 1,
+          py: 1.25,
         }}>
 
           <Box
@@ -246,7 +247,7 @@ const HomePage = ({ user }) => {
               display: "flex",
               alignItems: "center",
               overflowX: "auto",
-              gap: 4,
+              gap: 1,
               "&::-webkit-scrollbar": { display: "none" },
             }}
           >
@@ -257,13 +258,26 @@ const HomePage = ({ user }) => {
               }}
               sx={{
                 cursor: "pointer",
-                fontWeight: 600,
-                color: !selectedCategoryId ? "primary.main" : "#475569",
-                borderBottom: !selectedCategoryId ? "2px solid #1976d2" : "none",
-                pb: 0.5,
+                whiteSpace: "nowrap",
+                px: 1.75,
+                py: 0.6,
+                borderRadius: "999px",
+                backgroundColor: !selectedCategoryId ? "#e8f0fe" : "transparent",
+                transition: "background-color 180ms ease",
+                "&:hover": {
+                  backgroundColor: !selectedCategoryId ? "#e8f0fe" : "#f1f5f9",
+                },
               }}
             >
-              <Typography fontWeight={600}>All</Typography>
+              <Typography
+                sx={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: !selectedCategoryId ? "#2563eb" : "#475569",
+                }}
+              >
+                All
+              </Typography>
             </Box>
 
             {categories.map((cat) => (
@@ -273,18 +287,26 @@ const HomePage = ({ user }) => {
                 sx={{
                   cursor: "pointer",
                   whiteSpace: "nowrap",
-                  color:
-                    selectedCategoryId === cat.categoryName
-                      ? "primary.main"
-                      : "#475569",
-                  borderBottom:
-                    selectedCategoryId === cat.categoryName
-                      ? "2px solid #1976d2"
-                      : "none",
-                  pb: 0.5,
+                  px: 1.75,
+                  py: 0.6,
+                  borderRadius: "999px",
+                  backgroundColor:
+                    selectedCategoryId === cat.categoryName ? "#e8f0fe" : "transparent",
+                  transition: "background-color 180ms ease",
+                  "&:hover": {
+                    backgroundColor:
+                      selectedCategoryId === cat.categoryName ? "#e8f0fe" : "#f1f5f9",
+                  },
                 }}
               >
-                <Typography variant="body2" fontWeight={500}>
+                <Typography
+                  sx={{
+                    fontSize: 14,
+                    fontWeight: selectedCategoryId === cat.categoryName ? 600 : 500,
+                    color:
+                      selectedCategoryId === cat.categoryName ? "#2563eb" : "#475569",
+                  }}
+                >
                   {cat.categoryName}
                 </Typography>
               </Box>
@@ -428,33 +450,37 @@ const HomePage = ({ user }) => {
         <>
           {/* Recent View Products */}
           {recentViewsProducts && (
-            <Container maxWidth="lg" >
+            <Container maxWidth="lg" sx={{ pt: 4 }}>
               <Box sx={{ position: 'relative' }}>
                 <Box
                   sx={{
-                    borderRadius: 3,
-                    background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
-                    p: 3,
+                    borderRadius: '18px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    p: { xs: 2, md: 3 },
                     overflow: 'hidden'
                   }}
                 >
-                  <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-                    You may also like
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+                    <Box sx={{ width: 4, height: 26, borderRadius: 2, background: '#2563eb' }} />
+                    <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 700, color: '#0f172a' }}>
+                      You may also like
+                    </Typography>
+                  </Box>
 
                   <Box
                     ref={recentRef}
                     sx={{
                       display: 'flex',
-                      gap: 3,
+                      gap: 2.5,
                       overflowX: 'auto',
-                      px: 1,
-                      py: 1,
+                      px: 0.5,
+                      py: 0.5,
                       '&::-webkit-scrollbar': { display: 'none' }
                     }}
                   >
                     {recentViewsProducts.length === 0 && (
-                      <Typography sx={{ mt: 2 }}>
+                      <Typography sx={{ color: '#64748b', fontSize: 14 }}>
                         No recently viewed products found.
                       </Typography>
                     )}
@@ -462,27 +488,37 @@ const HomePage = ({ user }) => {
                       <Box
                         key={sp.productId}
                         sx={{
-                          minWidth: 240,
+                          minWidth: 200,
                           flex: '0 0 auto',
-                          borderRadius: 3,
+                          borderRadius: '14px',
+                          border: '1px solid #eef1f6',
                           backgroundColor: '#fff',
-                          p: 1,
-                          boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
-                          transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
+                          p: 1.5,
+                          transition: 'transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease',
                           '&:hover': {
-                            transform: 'translateY(-6px)',
-                            boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
-                            backgroundColor: '#fbfdff'
+                            transform: 'translateY(-4px)',
+                            boxShadow: '0 12px 24px rgba(15,23,42,0.1)',
+                            borderColor: '#cbd5e1',
                           }
                         }}
                         onClick={() => navigate(`/product/${sp.productId}`)}
                       >
-                        <Box
-                          component="img"
-                          src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
-                          sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
-                        />
-                        <Typography sx={{ mt: 1 }}>
+                        <Box sx={{
+                          backgroundColor: '#f8fafc',
+                          borderRadius: '10px',
+                          height: 160,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                        }}>
+                          <Box
+                            component="img"
+                            src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
+                            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        </Box>
+                        <Typography sx={{ mt: 1.25, fontSize: 13, fontWeight: 500, color: '#1e293b' }}>
                           {limitWords(sp.productName, 3)}
                         </Typography>
                       </Box>
@@ -492,16 +528,36 @@ const HomePage = ({ user }) => {
 
                 <IconButton
                   onClick={() => scrollSponsoredRecentViews('left')}
-                  sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                  sx={{
+                    position: 'absolute',
+                    right: 64,
+                    top: 58,
+                    bgcolor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    width: 36,
+                    height: 36,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
+                    '&:hover': { bgcolor: '#f8fafc' },
+                  }}
                 >
-                  <ArrowBackIosNewIcon />
+                  <ArrowBackIosNewIcon sx={{ fontSize: 15 }} />
                 </IconButton>
 
                 <IconButton
                   onClick={() => scrollSponsoredRecentViews('right')}
-                  sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                  sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 58,
+                    bgcolor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    width: 36,
+                    height: 36,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
+                    '&:hover': { bgcolor: '#f8fafc' },
+                  }}
                 >
-                  <ArrowForwardIosIcon />
+                  <ArrowForwardIosIcon sx={{ fontSize: 15 }} />
                 </IconButton>
               </Box>
             </Container>
@@ -513,29 +569,33 @@ const HomePage = ({ user }) => {
               <Box sx={{ position: 'relative' }}>
                 <Box
                   sx={{
-                    borderRadius: 3,
-                    background: 'linear-gradient(180deg,#e6f0ff 0%, #f8fbff 100%)',
-                    p: 3,
+                    borderRadius: '18px',
+                    backgroundColor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    p: { xs: 2, md: 3 },
                     overflow: 'hidden'
                   }}
                 >
-                  <Typography variant="h5" fontWeight={700} sx={{ mb: 2 }}>
-                    Recommended for you
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
+                    <Box sx={{ width: 4, height: 26, borderRadius: 2, background: '#2563eb' }} />
+                    <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 700, color: '#0f172a' }}>
+                      Recommended for you
+                    </Typography>
+                  </Box>
 
                   <Box
                     ref={recommendedRef}
                     sx={{
                       display: 'flex',
-                      gap: 3,
+                      gap: 2.5,
                       overflowX: 'auto',
-                      px: 1,
-                      py: 1,
+                      px: 0.5,
+                      py: 0.5,
                       '&::-webkit-scrollbar': { display: 'none' }
                     }}
                   >
                     {recommendedProducts.length === 0 && (
-                      <Typography sx={{ mt: 2 }}>
+                      <Typography sx={{ color: '#64748b', fontSize: 14 }}>
                         No recommended products found.
                       </Typography>
                     )}
@@ -543,27 +603,37 @@ const HomePage = ({ user }) => {
                       <Box
                         key={sp.productId}
                         sx={{
-                          minWidth: 240,
+                          minWidth: 200,
                           flex: '0 0 auto',
-                          borderRadius: 3,
+                          borderRadius: '14px',
+                          border: '1px solid #eef1f6',
                           backgroundColor: '#fff',
-                          p: 1,
-                          boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
-                          transition: 'transform 200ms, box-shadow 200ms, background-color 200ms',
+                          p: 1.5,
+                          transition: 'transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease',
                           '&:hover': {
-                            transform: 'translateY(-6px)',
-                            boxShadow: '0 8px 20px rgba(15,23,42,0.12)',
-                            backgroundColor: '#fbfdff'
+                            transform: 'translateY(-4px)',
+                            boxShadow: '0 12px 24px rgba(15,23,42,0.1)',
+                            borderColor: '#cbd5e1',
                           }
                         }}
                         onClick={() => navigate(`/product/${sp.productId}`)}
                       >
-                        <Box
-                          component="img"
-                          src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
-                          sx={{ width: '100%', height: 180, objectFit: 'contain', borderRadius: 2 }}
-                        />
-                        <Typography sx={{ mt: 1 }}>
+                        <Box sx={{
+                          backgroundColor: '#f8fafc',
+                          borderRadius: '10px',
+                          height: 160,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                        }}>
+                          <Box
+                            component="img"
+                            src={`http://localhost:1234/image/product/${sp.productImageUrl}`}
+                            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          />
+                        </Box>
+                        <Typography sx={{ mt: 1.25, fontSize: 13, fontWeight: 500, color: '#1e293b' }}>
                           {limitWords(sp.productName, 3)}
                         </Typography>
                       </Box>
@@ -573,16 +643,36 @@ const HomePage = ({ user }) => {
 
                 <IconButton
                   onClick={() => scrollSponsoredRecommended('left')}
-                  sx={{ position: 'absolute', right: 64, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                  sx={{
+                    position: 'absolute',
+                    right: 64,
+                    top: 58,
+                    bgcolor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    width: 36,
+                    height: 36,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
+                    '&:hover': { bgcolor: '#f8fafc' },
+                  }}
                 >
-                  <ArrowBackIosNewIcon />
+                  <ArrowBackIosNewIcon sx={{ fontSize: 15 }} />
                 </IconButton>
 
                 <IconButton
                   onClick={() => scrollSponsoredRecommended('right')}
-                  sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: '#fff' }}
+                  sx={{
+                    position: 'absolute',
+                    right: 16,
+                    top: 58,
+                    bgcolor: '#fff',
+                    border: '1px solid #e2e8f0',
+                    width: 36,
+                    height: 36,
+                    boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
+                    '&:hover': { bgcolor: '#f8fafc' },
+                  }}
                 >
-                  <ArrowForwardIosIcon />
+                  <ArrowForwardIosIcon sx={{ fontSize: 15 }} />
                 </IconButton>
               </Box>
             </Container>
@@ -590,15 +680,18 @@ const HomePage = ({ user }) => {
         </>
       )}
 
-      <Box sx={{ backgroundColor: '#e5e7eb', mx: 4 }} >
+      <Box sx={{ backgroundColor: '#f5f7fa', mx: { xs: 2, md: 4 }, my: 3, borderRadius: '18px' }} >
         <DiscountProductsSlider />
       </Box>
 
       {/* PRODUCT LIST */}
-      <Container maxWidth="lg" sx={{ pb: 5 }}>
-        {/* <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-          Products
-        </Typography> */}
+      <Container maxWidth="lg" sx={{ pb: 6, pt: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <Box sx={{ width: 4, height: 26, borderRadius: 2, background: '#2563eb' }} />
+          <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 700, color: '#0f172a' }}>
+            {selectedCategoryId ? selectedCategoryId : 'All products'}
+          </Typography>
+        </Box>
 
         <Grid container spacing={3}>
           {products.map((product) => (
@@ -607,16 +700,17 @@ const HomePage = ({ user }) => {
                 onClick={() => handleProductClick(product)}
                 sx={{
                   cursor: "pointer",
-                  borderRadius: 3,
+                  borderRadius: "16px",
                   overflow: "hidden",
                   backgroundColor: "#ffffff",
                   border: "1px solid #e5e7eb",
-                  transition: "all 0.3s ease",
+                  transition: "border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease",
                   position: "relative",
 
                   "&:hover": {
+                    borderColor: "#cbd5e1",
                     transform: "translateY(-6px)",
-                    boxShadow: "0 12px 28px rgba(0,0,0,0.18)",
+                    boxShadow: "0 16px 32px rgba(15,23,42,0.14)",
                   },
 
                   "&:hover .addToCartBtn": {
@@ -643,13 +737,13 @@ const HomePage = ({ user }) => {
                         position: "absolute",
                         top: 10,
                         left: 10,
-                        backgroundColor: "#dc2626",
+                        backgroundColor: "#e11d48",
                         color: "#fff",
-                        px: 1,
-                        py: 0.3,
+                        px: 1.1,
+                        py: 0.35,
                         fontSize: 11,
                         fontWeight: 700,
-                        borderRadius: 1,
+                        borderRadius: "6px",
                       }}
                     >
                       {product.discount}% OFF
@@ -677,7 +771,7 @@ const HomePage = ({ user }) => {
                       position: "absolute",
                       bottom: 10,
                       right: 10,
-                      backgroundColor: "#0f172a",
+                      backgroundColor: "#2563eb",
                       color: "#fff",
                       borderRadius: "50%",
                       width: 42,
@@ -685,13 +779,13 @@ const HomePage = ({ user }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      boxShadow: "0 6px 14px rgba(0,0,0,0.25)",
+                      boxShadow: "0 6px 16px rgba(37,99,235,0.35)",
                       opacity: 0,
                       transform: "translateY(10px)",
                       transition: "all 0.3s ease",
 
                       "&:hover": {
-                        backgroundColor: "#1e293b",
+                        backgroundColor: "#1d4ed8",
                       },
                     }}
                   >
@@ -700,11 +794,12 @@ const HomePage = ({ user }) => {
                 </Box>
 
                 {/* DETAILS */}
-                <Box sx={{ p: 1.5 }}>
+                <Box sx={{ p: 1.75 }}>
                   <Typography
                     sx={{
                       fontWeight: 600,
                       fontSize: 14,
+                      color: "#1e293b",
                       height: 36,
                       overflow: "hidden",
                     }}
@@ -712,8 +807,8 @@ const HomePage = ({ user }) => {
                     {limitWords(product.productName, 5)}
                   </Typography>
 
-                  <Box sx={{ mt: 1 }}>
-                    <Typography sx={{ fontWeight: 700, fontSize: 16, mr: 1 }}>
+                  <Box sx={{ mt: 1, display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: 0.75 }}>
+                    <Typography sx={{ fontWeight: 700, fontSize: 17, color: "#0f172a" }}>
                       ₹{product.discount > 0
                         ? product.discountPrice
                         : product.productPrice}
@@ -727,7 +822,6 @@ const HomePage = ({ user }) => {
                             textDecoration: "line-through",
                             color: "#94a3b8",
                             fontSize: 13,
-                            mr: 1,
                           }}
                         >
                           ₹{product.productPrice}
@@ -736,12 +830,12 @@ const HomePage = ({ user }) => {
                         <Typography
                           component="span"
                           sx={{
-                            color: "#16a34a",
+                            color: "#15803d",
                             fontSize: 12,
-                            fontWeight: 600,
+                            fontWeight: 700,
                           }}
                         >
-                          {product.discount}% OFF
+                          {product.discount}% off
                         </Typography>
                       </>
                     )}
@@ -753,11 +847,23 @@ const HomePage = ({ user }) => {
         </Grid>
 
         {totalPages >= 1 && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
             <Pagination
               count={totalPages}
               page={page + 1}
               onChange={handlePageChange}
+              shape="rounded"
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  fontWeight: 600,
+                  color: '#475569',
+                },
+                '& .MuiPaginationItem-root.Mui-selected': {
+                  backgroundColor: '#2563eb',
+                  color: '#fff',
+                  '&:hover': { backgroundColor: '#1d4ed8' },
+                },
+              }}
             />
           </Box>
         )}

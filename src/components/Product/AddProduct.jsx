@@ -24,6 +24,20 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
     const [discount, setDiscount] = useState('');
     const [discountPrice, setDiscountPrice] = useState('');
     const [stockQuantity, setStockQuantity] = useState('');
+    const [variantName, setVariantName] = useState('');
+    const [color, setColor] = useState('');
+    const [size, setSize] = useState('');
+    const [material, setMaterial] = useState('');
+    const [style, setStyle] = useState('');
+    const [weight, setWeight] = useState('');
+    const [dimensions, setDimensions] = useState('');
+    const [countryOfOrigin, setCountryOfOrigin] = useState('');
+    const [warranty, setWarranty] = useState('');
+    const [manufacturer, setManufacturer] = useState('');
+    const [fabrics, setFabrics] = useState('');
+    const [occasions, setOccasions] = useState('');
+    const [sizeAndFit, setSizeAndFit] = useState('');
+    const [materialAndCare, setMaterialAndCare] = useState('');
 
     // existing image from backend (filename)
     const [existingImage, setExistingImage] = useState('');
@@ -62,6 +76,20 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
         setDiscount('');
         setDiscountPrice('');
         setStockQuantity('');
+        setVariantName('');
+        setColor('');
+        setSize('');
+        setMaterial('');
+        setStyle('');
+        setWeight('');
+        setDimensions('');
+        setCountryOfOrigin('');
+        setWarranty('');
+        setManufacturer('');
+        setFabrics('');
+        setOccasions('');
+        setSizeAndFit('');
+        setMaterialAndCare('');
         setExistingImage('');
         setImageFile(null);
         setApiResponse(null);
@@ -78,6 +106,20 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
             setDiscount(res.discount);
             setDiscountPrice(res.discountPrice);
             setStockQuantity(res.stockQuantity);
+            setVariantName(res.variantName || '');
+            setColor(res.color || '');
+            setSize(res.size || '');
+            setMaterial(res.material || '');
+            setStyle(res.style || '');
+            setWeight(res.weight || '');
+            setDimensions(res.dimensions || '');
+            setCountryOfOrigin(res.countryOfOrigin || '');
+            setWarranty(res.warranty || '');
+            setManufacturer(res.manufacturer || '');
+            setFabrics(res.fabrics || '');
+            setOccasions(res.occasions || '');
+            setSizeAndFit(res.sizeAndFit || '');
+            setMaterialAndCare(res.materialAndCare || '');
 
             // store existing image name
             setExistingImage(res.productImage);
@@ -111,6 +153,20 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
                 discount: Number(discount),
                 discountPrice: Number(discountPrice),
                 stockQuantity: Number(stockQuantity),
+                variantName,
+                color,
+                size,
+                material,
+                style,
+                weight,
+                dimensions,
+                countryOfOrigin,
+                warranty,
+                manufacturer,
+                fabrics,
+                occasions,
+                sizeAndFit,
+                materialAndCare,
                 // If user uploaded new file → send blank (backend will replace)
                 // else → send existing filename
                 productImage: imageFile ? "" : existingImage
@@ -307,6 +363,29 @@ const AddProduct = ({ editProductId, onProductSaved }) => {
                         onChange={(e) =>
                             setStockQuantity(e.target.value)
                         }
+                        fullWidth
+                    />
+
+                    {/* Product Details */}
+                    <TextField label="Variant Name" value={variantName} onChange={(e) => setVariantName(e.target.value)} fullWidth />
+                    <TextField label="Color" value={color} onChange={(e) => setColor(e.target.value)} fullWidth />
+                    <TextField label="Size" value={size} onChange={(e) => setSize(e.target.value)} fullWidth />
+                    <TextField label="Material" value={material} onChange={(e) => setMaterial(e.target.value)} fullWidth />
+                    <TextField label="Style" value={style} onChange={(e) => setStyle(e.target.value)} fullWidth />
+                    <TextField label="Weight" value={weight} onChange={(e) => setWeight(e.target.value)} fullWidth />
+                    <TextField label="Dimensions" value={dimensions} onChange={(e) => setDimensions(e.target.value)} fullWidth />
+                    <TextField label="Country of Origin" value={countryOfOrigin} onChange={(e) => setCountryOfOrigin(e.target.value)} fullWidth />
+                    <TextField label="Warranty" value={warranty} onChange={(e) => setWarranty(e.target.value)} fullWidth />
+                    <TextField label="Manufacturer" value={manufacturer} onChange={(e) => setManufacturer(e.target.value)} fullWidth />
+                    <TextField label="Fabrics" value={fabrics} onChange={(e) => setFabrics(e.target.value)} fullWidth />
+                    <TextField label="Occasions" value={occasions} onChange={(e) => setOccasions(e.target.value)} fullWidth />
+                    <TextField label="Size and Fit" value={sizeAndFit} onChange={(e) => setSizeAndFit(e.target.value)} fullWidth />
+                    <TextField
+                        label="Material and Care"
+                        value={materialAndCare}
+                        onChange={(e) => setMaterialAndCare(e.target.value)}
+                        multiline
+                        rows={2}
                         fullWidth
                     />
                 </Box>

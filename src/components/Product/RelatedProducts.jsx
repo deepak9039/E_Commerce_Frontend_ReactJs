@@ -26,7 +26,7 @@ const RelatedProducts = ({ relatedProducts }) => {
 
   if (!products.length) {
     return (
-      <Typography sx={{ mt: 4 }}>
+      <Typography sx={{ mt: 4, color: '#64748b' }}>
         No related products available
       </Typography>
     );
@@ -44,9 +44,12 @@ const RelatedProducts = ({ relatedProducts }) => {
 
   return (
     <Box sx={{ mt: 6, position: 'relative' }}>
-      <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
-        Related Products
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box sx={{ width: 4, height: 26, borderRadius: 2, backgroundColor: '#2563eb' }} />
+        <Typography sx={{ fontSize: { xs: 18, md: 22 }, fontWeight: 700, color: '#0f172a' }}>
+          Related Products
+        </Typography>
+      </Box>
 
       <Box sx={{ position: 'relative' }}>
         <Swiper
@@ -64,31 +67,37 @@ const RelatedProducts = ({ relatedProducts }) => {
           {products.map((product) => (
             <SwiperSlide key={product.productId}>
               <Card
+                elevation={0}
                 sx={{
-                  borderRadius: 3,
-                  transition: "0.3s",
+                  borderRadius: "16px",
+                  border: "1px solid #eef1f6",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
                   cursor: "pointer",
+                  overflow: "hidden",
                   "&:hover": {
                     transform: "translateY(-6px)",
-                    boxShadow: 6
+                    boxShadow: "0 16px 32px rgba(15,23,42,0.14)",
+                    borderColor: "#cbd5e1",
                   },
                   mb: 1
                 }}
                 onClick={() => navigate(`/product/${product.productId}`)}
               >
-                <CardMedia
-                  component="img"
-                  height="180"
-                  image={`http://localhost:1234/image/product/${product.productImageUrl}`}
-                  sx={{ objectFit: 'cover' }}
-                />
+                <Box sx={{ backgroundColor: "#f8fafc" }}>
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={`http://localhost:1234/image/product/${product.productImageUrl}`}
+                    sx={{ objectFit: 'contain', p: 1.5 }}
+                  />
+                </Box>
 
-                <CardContent>
-                  <Typography fontWeight={600} sx={{ fontSize: 15, mb: 0.5 }}>
+                <CardContent sx={{ pt: 1.75 }}>
+                  <Typography fontWeight={600} sx={{ fontSize: 14, color: '#1e293b', mb: 0.75, height: 20, overflow: 'hidden' }}>
                     {limitWords(product.productName)}
                   </Typography>
 
-                  <Typography sx={{ color: "#059669", fontWeight: 700, mb: 0.5 }}>
+                  <Typography sx={{ color: "#0f172a", fontWeight: 700, fontSize: 16, mb: 0.75 }}>
                     ₹{product.discountPrice || product.productPrice}
                   </Typography>
 
@@ -113,15 +122,18 @@ const RelatedProducts = ({ relatedProducts }) => {
               sx={{
                 position: 'absolute',
                 left: -10,
-                top: '50%',
+                top: '42%',
                 transform: 'translateY(-50%)',
                 zIndex: 20,
                 backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
+                width: 38,
+                height: 38,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
                 '&:hover': { backgroundColor: '#f8fafc' }
               }}
             >
-              <ArrowBackIcon />
+              <ArrowBackIcon sx={{ fontSize: 18 }} />
             </IconButton>
 
             <IconButton
@@ -130,15 +142,18 @@ const RelatedProducts = ({ relatedProducts }) => {
               sx={{
                 position: 'absolute',
                 right: -10,
-                top: '50%',
+                top: '42%',
                 transform: 'translateY(-50%)',
                 zIndex: 20,
                 backgroundColor: '#fff',
-                border: '1px solid #e5e7eb',
+                width: 38,
+                height: 38,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 4px 14px rgba(15,23,42,0.12)',
                 '&:hover': { backgroundColor: '#f8fafc' }
               }}
             >
-              <ArrowForwardIcon />
+              <ArrowForwardIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </>
         )}

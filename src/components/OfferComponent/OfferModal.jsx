@@ -17,10 +17,11 @@ const OfferModal = ({ open, handleClose }) => {
             maxWidth="xs"
             PaperProps={{
                 sx: {
-                    borderRadius: 4,
+                    borderRadius: "24px",
                     overflow: "visible",
                     position: "relative",
                     bgcolor: "#fff",
+                    boxShadow: "0 30px 70px rgba(15,23,42,0.35)",
                 },
             }}
         >
@@ -36,27 +37,29 @@ const OfferModal = ({ open, handleClose }) => {
                     onClick={handleClose}
                     sx={{
                         position: "absolute",
-                        top: 15,
-                        right: 15,
+                        top: 14,
+                        right: 14,
                         zIndex: 20,
-                        bgcolor: "#fff",
+                        bgcolor: "rgba(255,255,255,0.9)",
+                        width: 34,
+                        height: 34,
+                        boxShadow: "0 4px 12px rgba(15,23,42,0.15)",
                         "&:hover": {
-                            bgcolor: "#f5f5f5",
+                            bgcolor: "#fff",
                         },
                     }}
                 >
-                    <CloseIcon />
+                    <CloseIcon sx={{ fontSize: 20 }} />
                 </IconButton>
 
                 {/* Top Decoration */}
 
                 <Box
                     sx={{
-                        borderRadius: 4,
                         position: "relative",
-                        height: 180,
+                        height: 190,
                         background:
-                            "linear-gradient(180deg,#ffffff 0%, #fff7f4 100%)",
+                            "linear-gradient(160deg,#6755F4 0%, #8b6ff8 55%, #FF6B4A 100%)",
                         overflow: "hidden",
                     }}
                 >
@@ -67,15 +70,16 @@ const OfferModal = ({ open, handleClose }) => {
                             key={i}
                             sx={{
                                 position: "absolute",
-                                width: i % 2 === 0 ? 10 : 18,
-                                height: i % 2 === 0 ? 10 : 4,
+                                width: i % 2 === 0 ? 9 : 16,
+                                height: i % 2 === 0 ? 9 : 4,
                                 borderRadius: i % 2 === 0 ? "50%" : "16px",
                                 bgcolor:
                                     i % 3 === 0
-                                        ? "#FF6B4A"
+                                        ? "#FDBA2D"
                                         : i % 3 === 1
-                                            ? "#FDBA2D"
-                                            : "#E53935",
+                                            ? "#ffffff"
+                                            : "#FF9B7B",
+                                opacity: i % 4 === 0 ? 0.55 : 0.9,
                                 top: `${Math.random() * 100}%`,
                                 left: `${Math.random() * 100}%`,
                                 transform: `rotate(${Math.random() * 360}deg)`,
@@ -86,20 +90,59 @@ const OfferModal = ({ open, handleClose }) => {
                     {/* Floating Card */}
 
                     <Box
+                        sx={{
+                            position: "absolute",
+                            left: "50%",
+                            top: "50%",
+                            transform: "translate(-50%, -50%)",
+                            width: 108,
+                            height: 108,
+                            borderRadius: "50%",
+                            bgcolor: "#fff",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 18px 40px rgba(15,23,42,0.3)",
+                        }}
                     >
                         {/* Illustration */}
 
                         <Box
+                            sx={{
+                                width: 82,
+                                height: 82,
+                                borderRadius: "50%",
+                                background: "linear-gradient(135deg, #FF6B4A 0%, #FDBA2D 100%)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                position: "relative",
+                            }}
                         >
-                            <Box
-
-                            />
-
-                            <Box
-                            />
+                            <Typography
+                                sx={{
+                                    color: "#fff",
+                                    fontWeight: 900,
+                                    fontSize: 30,
+                                    lineHeight: 1,
+                                }}
+                            >
+                                %
+                            </Typography>
 
                             {[10, 25, 40].map((top) => (
                                 <Box
+                                    key={top}
+                                    sx={{
+                                        position: "absolute",
+                                        top: `${top}%`,
+                                        right: -3,
+                                        width: 6,
+                                        height: 6,
+                                        borderRadius: "50%",
+                                        bgcolor: "#fff",
+                                        opacity: 0.85,
+                                    }}
                                 />
                             ))}
                         </Box>
@@ -120,7 +163,9 @@ const OfferModal = ({ open, handleClose }) => {
                         sx={{
                             color: "#FF724B",
                             fontWeight: 700,
-                            fontSize: 20,
+                            fontSize: 15,
+                            letterSpacing: "1.5px",
+                            textTransform: "uppercase",
                         }}
                     >
                         Special Signup Code
@@ -128,13 +173,14 @@ const OfferModal = ({ open, handleClose }) => {
 
                     <Typography
                         sx={{
-                            mt: 3,
+                            mt: 1.5,
                             fontWeight: 800,
                             fontSize: {
-                                xs: 42,
-                                md: 54,
+                                xs: 30,
+                                md: 34,
                             },
-                            lineHeight: 1.1,
+                            lineHeight: 1.15,
+                            color: "#0f172a",
                         }}
                     >
                         Get Additional
@@ -144,11 +190,11 @@ const OfferModal = ({ open, handleClose }) => {
                         sx={{
                             fontWeight: 900,
                             fontSize: {
-                                xs: 52,
-                                md: 64,
+                                xs: 46,
+                                md: 54,
                             },
                             color: "#6755F4",
-                            lineHeight: 1,
+                            lineHeight: 1.05,
                         }}
                     >
                         10% Off*
@@ -156,9 +202,10 @@ const OfferModal = ({ open, handleClose }) => {
 
                     <Typography
                         sx={{
-                            mt: 3,
-                            fontSize: 30,
-                            fontWeight: 700,
+                            mt: 1.5,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            color: "#64748b",
                         }}
                     >
                         Sign-up Today
@@ -168,21 +215,32 @@ const OfferModal = ({ open, handleClose }) => {
                         fullWidth
                         variant="contained"
                         sx={{
-                            mt: 5,
-                            py: 2,
-                            borderRadius: "50px",
+                            mt: 3.5,
+                            py: 1.6,
+                            borderRadius: "999px",
                             bgcolor: "#FF6B4A",
-                            fontSize: 24,
+                            fontSize: 16,
                             fontWeight: 700,
                             textTransform: "none",
-                            boxShadow: "0px 10px 30px rgba(255,107,74,.4)",
+                            boxShadow: "0px 14px 30px rgba(255,107,74,.4)",
                             "&:hover": {
                                 bgcolor: "#f55b38",
+                                boxShadow: "0px 16px 34px rgba(255,107,74,.5)",
                             },
                         }}
                     >
                         Claim 10% OFF
                     </Button>
+
+                    <Typography
+                        sx={{
+                            mt: 2,
+                            fontSize: 11,
+                            color: "#94a3b8",
+                        }}
+                    >
+                        *Valid on your first order only
+                    </Typography>
                 </Box>
             </DialogContent>
         </Dialog>

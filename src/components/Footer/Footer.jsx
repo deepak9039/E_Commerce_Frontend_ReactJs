@@ -19,28 +19,38 @@ import logo from "../../../public/logoNew1.png";
 const footerLinkStyle = {
   color: "#94a3b8",
   textDecoration: "none",
-  transition: "all 0.3s ease",
-  fontSize: "14px",
+  transition: "all 0.25s ease",
+  fontSize: "13px",
   width: "fit-content",
 
   "&:hover": {
     color: "#ff008c",
-    transform: "translateX(5px)",
+    transform: "translateX(4px)",
   },
 };
 
 const socialIconStyle = {
   border: "1px solid rgba(255,255,255,0.12)",
   color: "#fff",
-  borderRadius: "4px",
-  transition: "0.3s ease",
+  borderRadius: "8px",
+  width: 34,
+  height: 34,
+  transition: "0.25s ease",
 
   "&:hover": {
     background: "#ff008c",
     borderColor: "#ff008c",
-    transform: "translateY(-4px)",
-    boxShadow: "0 0 20px rgba(255,0,140,0.5)",
+    transform: "translateY(-3px)",
+    boxShadow: "0 0 16px rgba(255,0,140,0.45)",
   },
+};
+
+const sectionHeadingStyle = {
+  color: "#fff",
+  fontWeight: 700,
+  mb: 2,
+  letterSpacing: "2px",
+  fontSize: "11px",
 };
 
 const Footer = () => {
@@ -68,21 +78,21 @@ const Footer = () => {
       <Container
         maxWidth="xl"
         sx={{
-          pt: 8,
-          pb: 4,
+          pt: 5,
+          pb: 2.5,
           position: "relative",
           zIndex: 2,
         }}
       >
-        <Grid container spacing={6}>
+        <Grid container spacing={4}>
           {/* ===== LOGO ===== */}
           <Grid item xs={12} md={3}>
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: 2 }}>
               <img
                 src={logo}
                 alt="logo"
                 style={{
-                  height: "60px",
+                  height: "44px",
                   objectFit: "contain",
                 }}
               />
@@ -91,8 +101,8 @@ const Footer = () => {
             <Typography
               sx={{
                 color: "#94a3b8",
-                lineHeight: 1.9,
-                fontSize: "14px",
+                lineHeight: 1.7,
+                fontSize: "13px",
               }}
             >
               Premium shopping experience with fast delivery, secure payments,
@@ -102,19 +112,11 @@ const Footer = () => {
 
           {/* ===== SHOP ===== */}
           <Grid item xs={6} md={2}>
-            <Typography
-              sx={{
-                color: "#fff",
-                fontWeight: 700,
-                mb: 3,
-                letterSpacing: "3px",
-                fontSize: "13px",
-              }}
-            >
+            <Typography sx={sectionHeadingStyle}>
               • SHOP
             </Typography>
 
-            <Stack spacing={2}>
+            <Stack spacing={1.1}>
               <Link href="/" sx={footerLinkStyle}>
                 Home
               </Link>
@@ -139,19 +141,11 @@ const Footer = () => {
 
           {/* ===== ACCOUNT ===== */}
           <Grid item xs={6} md={2}>
-            <Typography
-              sx={{
-                color: "#fff",
-                fontWeight: 700,
-                mb: 3,
-                letterSpacing: "3px",
-                fontSize: "13px",
-              }}
-            >
+            <Typography sx={sectionHeadingStyle}>
               • ACCOUNT
             </Typography>
 
-            <Stack spacing={2}>
+            <Stack spacing={1.1}>
               <Link href="/login" sx={footerLinkStyle}>
                 Login
               </Link>
@@ -172,32 +166,24 @@ const Footer = () => {
 
           {/* ===== CONTACT ===== */}
           <Grid item xs={12} md={3}>
-            <Typography
-              sx={{
-                color: "#fff",
-                fontWeight: 700,
-                mb: 3,
-                letterSpacing: "3px",
-                fontSize: "13px",
-              }}
-            >
+            <Typography sx={sectionHeadingStyle}>
               • HEADQUARTERS
             </Typography>
 
-            <Stack spacing={2}>
-              <Typography sx={{ color: "#cbd5e1", fontSize: "14px" }}>
+            <Stack spacing={1.1}>
+              <Typography sx={{ color: "#cbd5e1", fontSize: "13px" }}>
                 📍 Kerala, India
               </Typography>
 
-              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+              <Typography sx={{ color: "#94a3b8", fontSize: "13px" }}>
                 support@yourstore.com
               </Typography>
 
-              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+              <Typography sx={{ color: "#94a3b8", fontSize: "13px" }}>
                 Partnerships
               </Typography>
 
-              <Typography sx={{ color: "#94a3b8", fontSize: "14px" }}>
+              <Typography sx={{ color: "#94a3b8", fontSize: "13px" }}>
                 Press & Media
               </Typography>
             </Stack>
@@ -205,60 +191,52 @@ const Footer = () => {
 
           {/* ===== SOCIAL ===== */}
           <Grid item xs={12} md={2}>
-            <Typography
-              sx={{
-                color: "#fff",
-                fontWeight: 700,
-                mb: 3,
-                letterSpacing: "3px",
-                fontSize: "13px",
-              }}
-            >
+            <Typography sx={sectionHeadingStyle}>
               • NETWORK
             </Typography>
 
             <Typography
               sx={{
                 color: "#94a3b8",
-                fontSize: "14px",
-                lineHeight: 1.8,
-                mb: 3,
+                fontSize: "13px",
+                lineHeight: 1.6,
+                mb: 2,
               }}
             >
               Follow the brand across drops, offers and latest updates.
             </Typography>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={1.25}>
               <IconButton sx={socialIconStyle}>
-                <InstagramIcon />
+                <InstagramIcon sx={{ fontSize: 18 }} />
               </IconButton>
 
               <IconButton sx={socialIconStyle}>
-                <YouTubeIcon />
+                <YouTubeIcon sx={{ fontSize: 18 }} />
               </IconButton>
 
               <IconButton sx={socialIconStyle}>
-                <XIcon />
+                <XIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Stack>
           </Grid>
         </Grid>
 
-        {/* HUGE BACKGROUND TEXT */}
+        {/* BACKGROUND WORDMARK */}
         <Box
           sx={{
             position: "relative",
-            mt: 10,
-            mb: 3,
+            mt: 5,
+            mb: 1,
             textAlign: "center",
           }}
         >
 <Typography
   sx={{
-    fontSize: { xs: "70px", sm: "90px", md: "100px" },
+    fontSize: { xs: "32px", sm: "42px", md: "50px" },
     fontWeight: 900,
     lineHeight: 1,
-    letterSpacing: "-8px",
+    letterSpacing: "-2px",
     cursor: "pointer",
     userSelect: "none",
     display: "inline-block",
@@ -268,7 +246,7 @@ const Footer = () => {
     color: "transparent",
     WebkitTextStroke: "1px rgba(255,255,255,0.18)",
 
-    transition: "all 0.6s ease",
+    transition: "all 0.5s ease",
 
     /* HOVER EFFECT */
     "&:hover": {
@@ -280,7 +258,7 @@ const Footer = () => {
 
       WebkitTextStroke: "0px transparent",
 
-      filter: "drop-shadow(0 0 20px rgba(255,0,140,0.45))",
+      filter: "drop-shadow(0 0 14px rgba(255,0,140,0.4))",
 
       transform: "scale(1.02)",
     },
@@ -292,7 +270,7 @@ const Footer = () => {
 
         <Divider
           sx={{
-            my: 4,
+            my: 2.5,
             borderColor: "rgba(255,255,255,0.08)",
           }}
         />
@@ -300,21 +278,21 @@ const Footer = () => {
         {/* ===== BOTTOM ===== */}
         <Stack
           direction={{ xs: "column", md: "row" }}
-          spacing={2}
+          spacing={1.5}
           justifyContent="space-between"
           alignItems="center"
         >
           <Typography
             sx={{
               color: "#64748b",
-              fontSize: "13px",
-              letterSpacing: "2px",
+              fontSize: "12px",
+              letterSpacing: "1.5px",
             }}
           >
             © {new Date().getFullYear()} INFINITY STORE. ALL RIGHTS RESERVED.
           </Typography>
 
-          <Stack direction="row" spacing={3}>
+          <Stack direction="row" spacing={2.5}>
             <Link href="#" sx={footerLinkStyle}>
               Privacy
             </Link>

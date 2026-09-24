@@ -13,8 +13,11 @@ import {
   Divider,
   Chip,
   Paper,
-  Pagination
+  Pagination,
+  Collapse
 } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { useParams } from "react-router-dom";
 import { getProductById, addToCart, cartCountByUserId, getProductsByCategory, getProductReviews, fetchSimilarProducts } from "../../services/apiService";
 import { useCart } from "../Context/CartContext";
@@ -35,6 +38,8 @@ const ProductDetails = ({ user }) => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [similarProductsData, setSimilarProductsData] = useState([]);
   const [imageTilt, setImageTilt] = useState({ rotateX: 0, rotateY: 0, scale: 1 });
+  const [highlightsOpen, setHighlightsOpen] = useState(true);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   // Toast state
   const [toastOpen, setToastOpen] = React.useState(false);
@@ -140,7 +145,7 @@ const ProductDetails = ({ user }) => {
   if (loading) {
     return (
       <Stack alignItems="center" mt={6}>
-        <CircularProgress size={50} />
+        <CircularProgress size={50} sx={{ color: '#2563eb' }} />
       </Stack>
     );
   }
@@ -155,7 +160,7 @@ const ProductDetails = ({ user }) => {
 
   return (
     <>
-      <Container maxWidth="lg" sx={{ mt: 8 }}>
+      <Container maxWidth="lg" sx={{ mt: 5, mb: 2 }}>
 
         <Grid container spacing={6}>
 
@@ -165,25 +170,43 @@ const ProductDetails = ({ user }) => {
               onMouseMove={handleImageHover}
               onMouseLeave={handleImageLeave}
               sx={{
-                position: "relative",
-                border: "1px solid rgba(148, 163, 184, 0.25)",
-                borderRadius: 4,
+                position: "sticky",
+                top: 90,
+                border: "1px solid #e2e8f0",
+                borderRadius: "18px",
                 p: 3,
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 minHeight: 420,
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(238,242,255,0.9) 100%)",
-                boxShadow: "0 20px 45px rgba(15, 23, 42, 0.08)",
+                background: "#f8fafc",
                 overflow: "hidden",
-                transition: "transform 0.35s ease, box-shadow 0.35s ease",
-                transform: "perspective(1000px) rotateX(0deg) rotateY(0deg)",
+                transition: "box-shadow 0.35s ease",
                 "&:hover": {
-                  boxShadow: "0 26px 60px rgba(15, 23, 42, 0.18)",
+                  boxShadow: "0 20px 45px rgba(15, 23, 42, 0.12)",
                 },
               }}
             >
+              {product.discount > 0 && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 16,
+                    left: 16,
+                    backgroundColor: "#e11d48",
+                    color: "#fff",
+                    px: 1.25,
+                    py: 0.4,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    borderRadius: "6px",
+                    zIndex: 2,
+                  }}
+                >
+                  {product.discount}% OFF
+                </Box>
+              )}
+
               <Box
                 component="img"
                 className="product-image"
@@ -194,7 +217,7 @@ const ProductDetails = ({ user }) => {
                   objectFit: "contain",
                   transition: "transform 0.2s ease, filter 0.2s ease",
                   transform: `perspective(1000px) rotateX(${imageTilt.rotateX}deg) rotateY(${imageTilt.rotateY}deg) scale(${imageTilt.scale})`,
-                  filter: imageTilt.scale > 1 ? "drop-shadow(0 25px 35px rgba(15, 23, 42, 0.25))" : "none",
+                  filter: imageTilt.scale > 1 ? "drop-shadow(0 20px 30px rgba(15, 23, 42, 0.2))" : "none",
                 }}
               />
             </Box>
@@ -203,40 +226,48 @@ const ProductDetails = ({ user }) => {
           {/* DETAILS */}
           <Grid size={7}>
 
+            {/* CATEGORY */}
+            <Typography
+              variant="body2"
+              sx={{
+                display: "inline-block",
+                color: "#2563eb",
+                fontWeight: 600,
+                fontSize: 13,
+                mb: 1.25,
+                backgroundColor: "#eaf1ff",
+                px: 1.25,
+                py: 0.4,
+                borderRadius: "999px",
+              }}
+            >
+              {product.categoryName}
+            </Typography>
+
             {/* PRODUCT NAME */}
             <Typography
               variant="h5"
               sx={{
-                fontWeight: "bold",
+                fontWeight: 700,
                 color: "#0f172a",
-                mb: 1,
+                mb: 2,
+                lineHeight: 1.3,
               }}
             >
               {product.productName}
             </Typography>
 
-            {/* CATEGORY */}
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 2 }}
-            >
-              Category: {product.categoryName}
-            </Typography>
-
-            <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 2.5, display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: 1.25 }}>
 
               {/* Discounted Price */}
               <Typography
                 variant="h4"
                 sx={{
-                  fontWeight: "bold",
+                  fontWeight: 700,
                   color: "#0f172a",
-                  display: "inline-block",
-                  mr: 2,
                 }}
               >
-                ₹ {product.discountPrice || product.productPrice}
+                ₹{product.discountPrice || product.productPrice}
               </Typography>
 
               {/* Original Price */}
@@ -247,10 +278,9 @@ const ProductDetails = ({ user }) => {
                     textDecoration: "line-through",
                     color: "#94a3b8",
                     fontSize: 18,
-                    mr: 2,
                   }}
                 >
-                  ₹ {product.productPrice}
+                  ₹{product.productPrice}
                 </Typography>
               )}
 
@@ -260,50 +290,83 @@ const ProductDetails = ({ user }) => {
                   label={`${product.discount}% OFF`}
                   size="small"
                   sx={{
-                    backgroundColor: "#dcfce7",
-                    color: "#15803d",
-                    fontWeight: "bold",
+                    backgroundColor: "#e11d48",
+                    color: "#fff",
+                    fontWeight: 700,
                   }}
                 />
               )}
-
-              {/* You Save */}
-              {product.discount > 0 && (
-                <Typography
-                  variant="body2"
-                  sx={{
-                    mt: 1,
-                    color: "#15803d",
-                    fontWeight: 500,
-                  }}
-                >
-                  You save ₹ {product.productPrice - product.discountPrice}
-                </Typography>
-              )}
             </Box>
 
-            <Divider sx={{ my: 2 }} />
+            {/* You Save */}
+            {product.discount > 0 && (
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 3,
+                  color: "#15803d",
+                  fontWeight: 600,
+                  display: "inline-block",
+                  backgroundColor: "#f0fdf4",
+                  px: 1.25,
+                  py: 0.5,
+                  borderRadius: "8px",
+                }}
+              >
+                You save ₹{product.productPrice - product.discountPrice}
+              </Typography>
+            )}
+
+            <Divider sx={{ my: 2, borderColor: "#eef1f6" }} />
 
             {/* SERVICE INFO */}
-            <Stack spacing={1.2} sx={{ mb: 3 }}>
-              <Typography variant="body2">🚚 Free Delivery</Typography>
-              <Typography variant="body2">🔄 7-Day Return Available</Typography>
-              <Typography variant="body2">💵 Cash on Delivery</Typography>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              sx={{ mb: 3, flexWrap: "wrap", rowGap: 1.5 }}
+            >
+              {[
+                { icon: "🚚", label: "Free Delivery" },
+                { icon: "🔄", label: "7-Day Return" },
+                { icon: "💵", label: "Cash on Delivery" },
+              ].map((item) => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.75,
+                    backgroundColor: "#f8fafc",
+                    border: "1px solid #eef1f6",
+                    borderRadius: "999px",
+                    px: 1.5,
+                    py: 0.6,
+                  }}
+                >
+                  <Typography sx={{ fontSize: 15, lineHeight: 1 }}>{item.icon}</Typography>
+                  <Typography sx={{ fontSize: 13, fontWeight: 500, color: "#334155" }}>
+                    {item.label}
+                  </Typography>
+                </Box>
+              ))}
             </Stack>
 
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ my: 2, borderColor: "#eef1f6" }} />
 
             {/* DESCRIPTION */}
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: "bold", mb: 0.5, color: "#0f172a" }}
-            >
-              Description
-            </Typography>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 1 }}>
+              <Box sx={{ width: 4, height: 20, borderRadius: 2, backgroundColor: "#2563eb" }} />
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#0f172a" }}
+              >
+                Description
+              </Typography>
+            </Box>
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ mb: 3 }}
+              sx={{ mb: 3, lineHeight: 1.7 }}
             >
               {product.productDescription}
             </Typography>
@@ -312,14 +375,20 @@ const ProductDetails = ({ user }) => {
             <Typography
               variant="body2"
               sx={{
-                mb: 3,
-                fontWeight: 500,
+                mb: 1.5,
+                fontWeight: 600,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 0.75,
                 color:
                   product.stockQuantity > 0
-                    ? "success.main"
-                    : "error.main",
+                    ? "#15803d"
+                    : "#dc2626",
               }}
             >
+              {product.stockQuantity > 0 && (
+                <Box component="span" sx={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#15803d", display: "inline-block" }} />
+              )}
               {product.stockQuantity > 0
                 && `In stock (${product.stockQuantity} available)`
               }
@@ -342,40 +411,124 @@ const ProductDetails = ({ user }) => {
             )} */}
 
             {/* CTA */}
-            <Button
-              variant="contained"
-              size="small"
-              onClick={addToCartClick}
-              disabled={product.stockQuantity === 0}
-              sx={{
-                px: 4,
-                textTransform: "none",
-                fontWeight: "bold",
-                backgroundColor:
-                  product.stockQuantity > 0 ? "#0f172a" : "#9ca3af",
-
-                cursor:
-                  product.stockQuantity > 0 ? "pointer" : "not-allowed",
-
-                "&:hover": {
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexWrap: "wrap", mt: 2 }}>
+              <Button
+                variant="contained"
+                size="small"
+                onClick={addToCartClick}
+                disabled={product.stockQuantity === 0}
+                sx={{
+                  px: 2,
+                  py: 0.8,
+                  minHeight: 32,
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  borderRadius: "8px",
+                  boxShadow: "none",
                   backgroundColor:
-                    product.stockQuantity > 0 ? "#1e293b" : "#9ca3af",
-                },
+                    product.stockQuantity > 0 ? "#2563eb" : "#9ca3af",
+                  cursor:
+                    product.stockQuantity > 0 ? "pointer" : "not-allowed",
+                  marginTop: 0,
+                  "&:hover": {
+                    backgroundColor:
+                      product.stockQuantity > 0 ? "#1d4ed8" : "#9ca3af",
+                    boxShadow: product.stockQuantity > 0 ? "0 6px 16px rgba(37,99,235,0.25)" : "none",
+                  },
 
-                "&.Mui-disabled": {
-                  backgroundColor: "#9ca3af",
-                  color: "#fff",
-                },
-              }}
+                  "&.Mui-disabled": {
+                    backgroundColor: "#9ca3af",
+                    color: "#fff",
+                  },
+                }}
+              >
+                {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
+              </Button>
+
+              <Button
+                variant="outlined"
+                size="small"
+                disabled={product.stockQuantity === 0}
+                sx={{
+                  px: 2,
+                  py: 0.8,
+                  minHeight: 32,
+                  textTransform: "none",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  borderRadius: "8px",
+                  borderColor: "#2563eb",
+                  color: "#2563eb",
+                  backgroundColor: "#fff",
+                  cursor:
+                    product.stockQuantity > 0 ? "pointer" : "not-allowed",
+                  "&:hover": {
+                    borderColor: "#1d4ed8",
+                    backgroundColor: "#eff6ff",
+                  },
+                  "&.Mui-disabled": {
+                    borderColor: "#9ca3af",
+                    color: "#9ca3af",
+                    backgroundColor: "#fff",
+                  },
+                }}
+              >
+                Buy Now
+              </Button>
+              </Box>
+
+            {/* Product Highlight */}
+            <Box
+              onClick={() => setHighlightsOpen((isOpen) => !isOpen)}
+              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.25, mb: 1, cursor: "pointer", mt: 3 }}
             >
-              {product.stockQuantity > 0 ? "Add to Cart" : "Out of Stock"}
-            </Button>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+              <Box sx={{ width: 4, height: 20, borderRadius: 2, backgroundColor: "#2563eb" }} />
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#0f172a" }}
+              >
+                Product Highlights
+              </Typography>
+              </Box>
+              {highlightsOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </Box>
+            <Collapse in={highlightsOpen}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.7 }}>
+                {product.productDescription}
+              </Typography>
+            </Collapse>
+
+            {/* Product All Details */}
+            <Box
+              onClick={() => setDetailsOpen((isOpen) => !isOpen)}
+              sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1.25, mb: 1, cursor: "pointer" }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+              <Box sx={{ width: 4, height: 20, borderRadius: 2, backgroundColor: "#2563eb" }} />
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, color: "#0f172a" }}
+              >
+                All Details
+              </Typography>
+              </Box>
+              {detailsOpen ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </Box>
+            <Collapse in={detailsOpen}>
+              <Box sx={{ mb: 2, color: "#475569" }}>
+                <Typography variant="body2">Category: {product.categoryName}</Typography>
+                <Typography variant="body2">Available stock: {product.stockQuantity}</Typography>
+                <Typography variant="body2">Price: ₹{product.discountPrice || product.productPrice}</Typography>
+              </Box>
+            </Collapse>
 
           </Grid>
         </Grid>
         {/* RELATED PRODUCTS */}
         <Box sx={{ mt: 8 }}>
-          <Divider sx={{ mb: 3 }} />
+          <Divider sx={{ mb: 1, borderColor: "#eef1f6" }} />
           {/* <Typography
             variant="h6"
             sx={{ fontWeight: "bold", color: "#0f172a", mb: 3 }}
@@ -389,6 +542,15 @@ const ProductDetails = ({ user }) => {
                 count={relatedTotalPages}
                 page={relatedPage + 1}
                 onChange={(e, value) => fetchRelatedByPage(value - 1)}
+                shape="rounded"
+                sx={{
+                  '& .MuiPaginationItem-root': { fontWeight: 600, color: '#475569' },
+                  '& .MuiPaginationItem-root.Mui-selected': {
+                    backgroundColor: '#2563eb',
+                    color: '#fff',
+                    '&:hover': { backgroundColor: '#1d4ed8' },
+                  },
+                }}
               />
             </Box>
           )}

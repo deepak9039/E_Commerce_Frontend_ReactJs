@@ -22,6 +22,7 @@ import UserOrders from "./components/OrderPage/UserOrders";
 import AdminOrders from "./components/Admin/AdminOrders";
 import SearchResults from "./components/Search/SearchResults";
 import ProductReviewPage from "./components/Review/ProductReviewPage";
+import UserOrderPaymentPage from "./components/UserDetails/UserOrderPaymentPage";
 
 import { loginUser } from "./services/apiService";
 import { CartProvider } from "./components/Context/CartContext";
@@ -132,6 +133,7 @@ function App() {
             <Route path="/order-success" element={<OrderSuccess />} />
             <Route path="/productReview" element={<ProductReviewPage />} />
             <Route path="/process-payment" element={<PaymentPage user={user} />} />
+            <Route path="/user-order-payment" element={<UserOrderPaymentPage user={user} />} />
           </Routes>
           <Footer />
         </Router>

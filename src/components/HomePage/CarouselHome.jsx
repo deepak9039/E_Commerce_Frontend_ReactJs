@@ -35,11 +35,19 @@ const CarouselHome = ({ products }) => {
   return (
     <Box
       sx={{
+        backgroundColor: '#eef2f7',
+        borderBottom: '1px solid #e2e8f0',
+        pt: 2,
+      }}
+    >
+    <Box
+      sx={{
         px: 5,
-        mt: 2,
         position: 'relative',
+        maxWidth: 1400,
+        mx: 'auto',
         // reserve space below slides for dots so they render outside images
-        pb: '48px',
+        pb: '40px',
         // tighten and center react-slick dots
         '& .slick-list': {
           overflow: 'hidden',
@@ -48,86 +56,99 @@ const CarouselHome = ({ products }) => {
         overflowY: 'hidden',
         '& .slick-dots': {
           position: 'absolute',
-          bottom: '-30px',
+          bottom: '-32px',
           left: 0,
           right: 0,
           margin: 0,
           display: 'flex',
           justifyContent: 'center',
-          gap: 0,
+          gap: '6px',
           padding: 0,
           listStyle: 'none',
           zIndex: 10,
         },
         '& .slick-dots li': {
-          margin: '0 2px',
+          margin: 0,
           width: 'auto',
           display: 'inline-block',
         },
         '& .slick-dots li button': {
           padding: 0,
-          width: 10,
-          height: 10,
-          borderRadius: '50%',
+          width: 22,
+          height: 6,
+          borderRadius: 3,
         },
         '& .slick-dots li button:before': {
           fontSize: '0px',
           content: "''",
-          backgroundColor: '#c4c4c4',
+          backgroundColor: '#c7d0dc',
           display: 'block',
-          width: 6,
+          width: 22,
           height: 6,
-          borderRadius: '50%',
+          borderRadius: 3,
           opacity: 1,
+          transition: 'background-color 200ms ease',
         },
         '& .slick-dots li.slick-active button:before': {
-          backgroundColor: '#1976d2',
-          transform: 'scale(1.15)'
+          backgroundColor: '#2563eb',
         },
       }}
     >
       <Slider {...settings}>
         {products.map((item) => (
-          <Box key={item.id} sx={{ px: { xs: 1, sm: 1 } }}>
+          <Box key={item.id} sx={{ px: { xs: 1, sm: 1.25 } }}>
             <Card
+              elevation={0}
               sx={{
                 position: 'relative',
-                borderRadius: 3,
+                borderRadius: '18px',
                 overflow: "hidden",
                 cursor: "pointer",
-                boxShadow: 3,
+                border: '1px solid #e2e8f0',
+                boxShadow: '0 1px 3px rgba(15,23,42,0.06)',
+                transition: 'box-shadow 220ms ease, transform 220ms ease',
+                '&:hover': {
+                  boxShadow: '0 16px 32px rgba(15,23,42,0.16)',
+                  transform: 'translateY(-3px)',
+                },
               }}
             >
               <Box
                 sx={{
                   position: 'absolute',
-                  top: 8,
-                  left: 8,
+                  top: 12,
+                  left: 12,
                   zIndex: 5,
                 }}
               >
                 <Box sx={{
-                  bgcolor: 'rgba(0,0,0,0.7)',
+                  bgcolor: 'rgba(15,23,42,0.78)',
                   color: '#fff',
-                  px: 1.2,
-                  py: '2px',
-                  borderRadius: 1,
+                  px: 1.25,
+                  py: '3px',
+                  borderRadius: '6px',
                   fontSize: 11,
-                  fontWeight: 700,
+                  fontWeight: 600,
+                  letterSpacing: '0.2px',
                 }}>Sponsored</Box>
               </Box>
 
               <CardMedia
                 component="img"
-                height="180"
+                height="220"
                 image={item.productImageUrl ? `http://localhost:1234/image/product/${item.productImageUrl}` : "https://via.placeholder.com/300x180?text=No+Image"  }
                 alt={item.productName}
                 onClick={() => navigate(`/product/${item.productId}`)}
+                sx={{
+                  backgroundColor: '#f8fafc',
+                  objectFit: 'cover',
+                }}
               />
             </Card>
           </Box>
         ))}
       </Slider>
+    </Box>
     </Box>
   );
 };

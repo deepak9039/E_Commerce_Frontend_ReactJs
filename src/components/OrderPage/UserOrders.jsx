@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
   Grid,
@@ -23,6 +23,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { findOrdersByUserId, downloadInvoice } from "../../services/apiService";
+import { fetchPaymentDetails, fetchOrderDetails } from "../../services/paymentService";
 
 // Purely presentational helper — maps an order status to a status color/icon.
 // Does not change any data or logic, only how the status is displayed.
@@ -33,10 +34,13 @@ const getStatusMeta = (status) => {
   if (status === "CANCELLED") {
     return { color: "#d32f2f", bg: "#fdecea", icon: CancelIcon, label: "Cancelled" };
   }
-  return { color: "#e57c00", bg: "#fff3e0", icon: AutorenewIcon, label: "In Progress" };
+  return { color: "#c2760c", bg: "#fff3e0", icon: AutorenewIcon, label: "In Progress" };
 };
 
 const UserOrders = ({ user }) => {
+
+  const navigate = useNavigate();
+
   const [orders, setOrders] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -74,8 +78,25 @@ const UserOrders = ({ user }) => {
     }
   };
 
+  const handleUserPaymentAndOrderDetails = async (userId, orderId) => {
+    try{
+      const payload = { userId, orderId };
+      const paymentDetails = await fetchPaymentDetails(payload);
+      const orderDetails = await fetchOrderDetails(payload);
+
+      console.log("Fetched paymentDetails:", paymentDetails);
+      console.log("Fetched orderDetails:", orderDetails);
+
+      navigate('/user-order-payment', {
+        state: { paymentDetails, orderDetails },
+      });
+    } catch (error){
+      console.log("Error in payment details and order details");
+    }
+  }
+
   return (
-    <Box sx={{ minHeight: "calc(100vh - 72px)", py: { xs: 3, md: 5 } }}>
+    <Box sx={{ minHeight: "calc(100vh - 72px)", py: { xs: 3, md: 5 }, backgroundColor: "#f5f7fa" }}>
       <Container maxWidth="lg">
         {/* ===== HEADER ===== */}
         <Box
@@ -96,9 +117,9 @@ const UserOrders = ({ user }) => {
                 display: "grid",
                 placeItems: "center",
                 borderRadius: "14px",
-                background: "linear-gradient(135deg, #ff8a00 0%, #ff5722 100%)",
+                background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
                 color: "#fff",
-                boxShadow: "0 8px 18px rgba(255, 87, 34, 0.28)",
+                boxShadow: "0 8px 18px rgba(37, 99, 235, 0.28)",
               }}
             >
               <ShoppingBagIcon sx={{ fontSize: 26 }} />
@@ -146,14 +167,14 @@ const UserOrders = ({ user }) => {
                   width: 72,
                   height: 72,
                   borderRadius: "50%",
-                  bgcolor: "#fff3e0",
+                  bgcolor: "#eaf1ff",
                   display: "grid",
                   placeItems: "center",
                   mx: "auto",
                   mb: 2.5,
                 }}
               >
-                <InventoryIcon sx={{ fontSize: 34, color: "#ff5722" }} />
+                <InventoryIcon sx={{ fontSize: 34, color: "#2563eb" }} />
               </Box>
               <Typography variant="h6" fontWeight="800" color="#1e293b">
                 No orders yet
@@ -233,7 +254,7 @@ const UserOrders = ({ user }) => {
                     >
                       SHIP TO
                     </Typography>
-                    <Typography sx={{ color: "#ff5722", fontWeight: 700, fontSize: 14 }}>
+                    <Typography sx={{ color: "#2563eb", fontWeight: 700, fontSize: 14 }}>
                       {user?.firstName || user?.email}
                     </Typography>
                   </Grid>
@@ -254,13 +275,26 @@ const UserOrders = ({ user }) => {
                     </Typography>
                     <Button
                       size="small"
+                      // startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
+                      onClick={() => handleUserPaymentAndOrderDetails(user?.userId, order.orderId)}
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 700,
+                        color: "#2563eb",
+                        "&:hover": { bgcolor: "#eaf1ff" },
+                      }}
+                    >
+                      View Order Details
+                    </Button>
+                    <Button
+                      size="small"
                       startIcon={<DownloadIcon sx={{ fontSize: 16 }} />}
                       onClick={() => handleDownloadInvoice(user?.userId, order.orderId)}
                       sx={{
                         textTransform: "none",
                         fontWeight: 700,
-                        color: "#ff5722",
-                        "&:hover": { bgcolor: "#fff3e0" },
+                        color: "#2563eb",
+                        "&:hover": { bgcolor: "#eaf1ff" },
                       }}
                     >
                       Download Invoice
@@ -329,7 +363,7 @@ const UserOrders = ({ user }) => {
                         display: "block",
                         mb: 0.75,
                         textDecoration: "none",
-                        "&:hover": { color: "#ff5722" },
+                        "&:hover": { color: "#2563eb" },
                       }}
                     >
                       {order.product.productName}
@@ -368,7 +402,7 @@ const UserOrders = ({ user }) => {
                           }}
                           sx={{
                             textDecoration: "none",
-                            color: "#ff5722",
+                            color: "#2563eb",
                             fontWeight: 700,
                             fontSize: 13.5,
                             cursor: "pointer",
@@ -398,11 +432,11 @@ const UserOrders = ({ user }) => {
                           py: 1.2,
                           textTransform: "none",
                           fontWeight: 700,
-                          background: "linear-gradient(135deg, #ff8a00 0%, #ff5722 100%)",
-                          boxShadow: "0 6px 14px rgba(255, 87, 34, 0.28)",
+                          background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)",
+                          boxShadow: "0 6px 14px rgba(37, 99, 235, 0.28)",
                           "&:hover": {
-                            background: "linear-gradient(135deg, #f57c00 0%, #e64a19 100%)",
-                            boxShadow: "0 8px 18px rgba(255, 87, 34, 0.38)",
+                            background: "linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)",
+                            boxShadow: "0 8px 18px rgba(37, 99, 235, 0.38)",
                           },
                         }}
                       >
@@ -447,7 +481,7 @@ const UserOrders = ({ user }) => {
               size="large"
               sx={{
                 "& .Mui-selected": {
-                  background: "linear-gradient(135deg, #ff8a00 0%, #ff5722 100%) !important",
+                  background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important",
                   color: "#fff",
                 },
               }}

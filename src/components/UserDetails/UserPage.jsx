@@ -59,47 +59,74 @@ const UserPage = () => {
       justifyContent="center"
       alignItems="center"
       sx={{
-        backgroundColor: "#f1f3f6",
+        backgroundColor: "#f5f7fa",
         p: 2,
       }}
     >
       <Card
+        elevation={0}
         sx={{
           width: "100%",
           maxWidth: 900,
           minHeight: 550,
           display: "flex",
-          borderRadius: 2,
+          flexDirection: { xs: "column", md: "row" },
+          borderRadius: "20px",
           overflow: "hidden",
-          boxShadow: 4,
+          border: "1px solid #e2e8f0",
+          boxShadow: "0 24px 60px rgba(15,23,42,0.12)",
         }}
       >
         {/* LEFT SIDE */}
         <Box
           sx={{
-            width: "38%",
-            background: "linear-gradient(180deg, #0f172a, #1e293b)",
+            width: { xs: "100%", md: "38%" },
+            background: "linear-gradient(160deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%)",
             color: "#fff",
             p: 5,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            position: "relative",
+            overflow: "hidden",
           }}
         >
-          <Box>
+          {/* soft glow accents */}
+          <Box
+            sx={{
+              position: "absolute",
+              width: 220,
+              height: 220,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.10)",
+              top: -70,
+              right: -70,
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              width: 160,
+              height: 160,
+              borderRadius: "50%",
+              background: "rgba(255,255,255,0.07)",
+              bottom: 100,
+              left: -60,
+            }}
+          />
+
+          <Box sx={{ position: "relative", zIndex: 1 }}>
             <Typography
-              variant="h3"
-              fontWeight="bold"
-              mb={2}
+              sx={{ fontSize: { xs: 32, md: 38 }, fontWeight: 800, mb: 1.5 }}
             >
               Register
             </Typography>
 
             <Typography
-              variant="h6"
               sx={{
-                opacity: 0.9,
+                opacity: 0.92,
                 lineHeight: 1.8,
+                fontSize: 16,
               }}
             >
               Create your account and
@@ -109,13 +136,14 @@ const UserPage = () => {
           </Box>
 
           {/* Bottom Image */}
-          <Box textAlign="center">
+          <Box textAlign="center" sx={{ position: "relative", zIndex: 1 }}>
             <img
               src={registerImage}
               alt="register"
               style={{
-                width: "80%",
+                width: "78%",
                 objectFit: "contain",
+                filter: "drop-shadow(0 16px 30px rgba(0,0,0,0.28))",
               }}
             />
           </Box>
@@ -129,34 +157,32 @@ const UserPage = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            p: 5,
+            p: { xs: 3, md: 5 },
           }}
         >
           <CardContent sx={{ width: "100%", maxWidth: 420 }}>
             <Box textAlign="center" mb={3}>
               <Avatar
                 sx={{
-                  width: 64,
-                  height: 64,
-                  bgcolor: "#0f172a",
+                  width: 60,
+                  height: 60,
+                  bgcolor: "#eaf1ff",
+                  color: "#2563eb",
                   mx: "auto",
-                  mb: 1,
+                  mb: 1.5,
                 }}
               >
                 <Person fontSize="large" />
               </Avatar>
 
               <Typography
-                variant="h5"
-                fontWeight="bold"
-                color="#0f172a"
+                sx={{ fontSize: 22, fontWeight: 700, color: "#0f172a" }}
               >
                 Create Account
               </Typography>
 
               <Typography
-                variant="body2"
-                color="text.secondary"
+                sx={{ color: "#64748b", fontSize: 14, mt: 0.5 }}
               >
                 Register to continue
               </Typography>
@@ -165,7 +191,7 @@ const UserPage = () => {
             <Box component="form" onSubmit={handleSubmit}>
               <Stack spacing={3}>
                 {alertMessage && (
-                  <Alert severity={alertType}>
+                  <Alert severity={alertType} sx={{ borderRadius: "10px" }}>
                     {alertMessage}
                   </Alert>
                 )}
@@ -173,31 +199,44 @@ const UserPage = () => {
                 <TextField
                   label="Email"
                   type="email"
-                  variant="standard"
+                  variant="outlined"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   fullWidth
                   required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      "&.Mui-focused fieldset": { borderColor: "#2563eb" },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#2563eb" },
+                  }}
                 />
 
                 <TextField
                   label="Password"
                   type="password"
-                  variant="standard"
+                  variant="outlined"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   fullWidth
                   required
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      borderRadius: "10px",
+                      "&.Mui-focused fieldset": { borderColor: "#2563eb" },
+                    },
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#2563eb" },
+                  }}
                 />
 
                 <Typography
-                  variant="body2"
-                  color="text.secondary"
+                  sx={{ color: "#64748b", fontSize: 12.5, lineHeight: 1.7 }}
                 >
                   By continuing, you agree to our{" "}
                   <span
                     style={{
-                      color: "#0f172a",
+                      color: "#2563eb",
                       fontWeight: 600,
                     }}
                   >
@@ -206,7 +245,7 @@ const UserPage = () => {
                   and{" "}
                   <span
                     style={{
-                      color: "#0f172a",
+                      color: "#2563eb",
                       fontWeight: 600,
                     }}
                   >
@@ -220,14 +259,16 @@ const UserPage = () => {
                   variant="contained"
                   fullWidth
                   sx={{
-                    backgroundColor: "#0f172a",
-                    py: 1.5,
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                    borderRadius: 2,
+                    backgroundColor: "#2563eb",
+                    py: 1.4,
+                    fontSize: "15px",
+                    fontWeight: 700,
+                    borderRadius: "10px",
                     textTransform: "none",
+                    boxShadow: "none",
                     "&:hover": {
-                      backgroundColor: "#1e293b",
+                      backgroundColor: "#1d4ed8",
+                      boxShadow: "0 10px 24px rgba(37,99,235,0.32)",
                     },
                   }}
                 >
@@ -235,17 +276,17 @@ const UserPage = () => {
                 </Button>
 
                 <Typography
-                  variant="body2"
-                  textAlign="center"
+                  sx={{ textAlign: "center", fontSize: 14, color: "#475569" }}
                 >
                   Already have an account?{" "}
                   <Typography
                     component="a"
                     href="/signin"
                     sx={{
-                      color: "#0f172a",
-                      fontWeight: "bold",
+                      color: "#2563eb",
+                      fontWeight: 700,
                       textDecoration: "none",
+                      "&:hover": { textDecoration: "underline" },
                     }}
                   >
                     Login

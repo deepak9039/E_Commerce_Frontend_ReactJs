@@ -134,8 +134,8 @@ const AdminOrders = ( { user }) => {
       width: 170,
       renderCell: (params) => (
         <Box sx={{ py: 1, width: '100%' }}>
-          <Typography fontWeight="bold" sx={{ wordBreak: 'break-word' }}>{params.value}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word' }}>
+          <Typography sx={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a', wordBreak: 'break-word' }}>{params.value}</Typography>
+          <Typography variant="body2" sx={{ color: '#64748b', fontSize: 12.5, wordBreak: 'break-word' }}>
             {params.row.phone}
           </Typography>
         </Box>
@@ -149,8 +149,8 @@ const AdminOrders = ( { user }) => {
       maxWidth: 320,
       renderCell: (params) => (
         <Box sx={{ py: 1, width: '100%' }}>
-          <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{params.value}</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>
+          <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'normal', color: '#334155', fontSize: 13 }}>{params.value}</Typography>
+          <Typography variant="body2" sx={{ wordBreak: 'break-word', whiteSpace: 'normal', color: '#94a3b8', fontSize: 12.5 }}>
             {params.row.email}
           </Typography>
         </Box>
@@ -160,36 +160,40 @@ const AdminOrders = ( { user }) => {
       field: "orderDate",
       headerName: "Order Date",
       width: 140,
-      renderCell: (params) => new Date(params.value).toLocaleDateString(),
+      renderCell: (params) => (
+        <Typography sx={{ fontSize: 13, color: '#334155' }}>
+          {new Date(params.value).toLocaleDateString()}
+        </Typography>
+      ),
     },
     {
       field: "productName",
       headerName: "Product",
       width: 200,
-      renderCell: (params) => <Typography sx={{ wordBreak: 'break-word', whiteSpace: 'normal' }}>{params.value}</Typography>,
+      renderCell: (params) => <Typography sx={{ wordBreak: 'break-word', whiteSpace: 'normal', fontSize: 13.5, fontWeight: 500, color: '#0f172a' }}>{params.value}</Typography>,
     },
     {
       field: "quantity",
       headerName: "Qty",
       width: 90,
-      renderCell: (params) => <Typography>{params.value}</Typography>,
+      renderCell: (params) => <Typography sx={{ fontSize: 13.5, color: '#334155' }}>{params.value}</Typography>,
     },
     {
       field: "price",
       headerName: "Price",
       width: 110,
-      renderCell: (params) => <Typography>₹{params.value}</Typography>,
+      renderCell: (params) => <Typography sx={{ fontSize: 13.5, color: '#334155' }}>₹{params.value}</Typography>,
     },
     {
       field: "total",
       headerName: "Total",
       width: 110,
-      renderCell: (params) => <Typography fontWeight="bold">₹{params.value}</Typography>,
+      renderCell: (params) => <Typography sx={{ fontWeight: 700, fontSize: 13.5, color: '#0f172a' }}>₹{params.value}</Typography>,
     },
     {
       field: "status",
       headerName: "Status",
-      width: 160,
+      width: 170,
       renderCell: (params) => (
         <Select
           size="small"
@@ -197,6 +201,14 @@ const AdminOrders = ( { user }) => {
           value={orderStatuses[params.row.orderId] || params.value}
           onChange={(e) => handleStatusChange(params.row.orderId, e.target.value)}
           disabled={!(user && user.role === "ROLE_SUPER_ADMIN")}
+          sx={{
+            fontSize: 13,
+            borderRadius: '8px',
+            backgroundColor: '#fff',
+            '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
+            '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#2563eb' },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#2563eb' },
+          }}
         >
           <MenuItem value="IN_PROGRESS">IN_PROGRESS</MenuItem>
           <MenuItem value="ORDER_RECE">ORDER_RECEIVED</MenuItem>
@@ -218,6 +230,18 @@ const AdminOrders = ( { user }) => {
             variant="contained"
             size="small"
             onClick={() => handleUpdateClick(params.row.orderId)}
+            sx={{
+              textTransform: 'none',
+              fontWeight: 700,
+              fontSize: 12.5,
+              borderRadius: '8px',
+              boxShadow: 'none',
+              backgroundColor: '#2563eb',
+              '&:hover': {
+                backgroundColor: '#1d4ed8',
+                boxShadow: '0 6px 14px rgba(37, 99, 235,0.28)',
+              },
+            }}
           >
             Update
           </Button>
@@ -227,7 +251,14 @@ const AdminOrders = ( { user }) => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 5 }}>
+    <Box sx={{ backgroundColor: '#f5f7fa', minHeight: '100vh', py: 5 }}>
+    <Container maxWidth="xl">
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box sx={{ width: 4, height: 26, borderRadius: 2, backgroundColor: '#2563eb' }} />
+        <Typography sx={{ fontSize: { xs: 20, md: 24 }, fontWeight: 700, color: '#0f172a' }}>
+          Admin – All Orders
+        </Typography>
+      </Box>
       {/* <Typography variant="h5" fontWeight="bold" gutterBottom>
         Admin – All Orders
       </Typography> */}
@@ -244,24 +275,37 @@ const AdminOrders = ( { user }) => {
           pageSizeOptions={[PAGE_SIZE]}
           disableRowSelectionOnClick
           sx={{
-            border: "1px solid #e0e0e0",
-            borderRadius: 2,
+            border: "1px solid #e2e8f0",
+            borderRadius: "16px",
+            backgroundColor: '#fff',
+            boxShadow: '0 4px 16px rgba(15, 23, 42, 0.05)',
             '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#f5f5f5',
-              fontWeight: 600,
+              backgroundColor: '#eaf1ff',
+              fontWeight: 700,
+              color: '#0f172a',
+              fontSize: 13,
+              borderBottom: '1px solid #e2e8f0',
             },
             '& .MuiDataGrid-cell': {
               whiteSpace: 'normal',
               alignItems: 'flex-start',
               py: 1.2,
+              borderBottom: '1px solid #f1f5f9',
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: '#f8fafc',
             },
             '& .MuiDataGrid-root': {
               overflow: 'auto',
+            },
+            '& .MuiDataGrid-footerContainer': {
+              borderTop: '1px solid #e2e8f0',
             },
           }}
         />
       </Box>
     </Container>
+    </Box>
   );
 };
 
